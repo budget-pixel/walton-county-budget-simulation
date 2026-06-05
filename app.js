@@ -13,7 +13,8 @@ const state = {
     baselineRevenue: budgetData.revenueForecast.baseRevenue,
     baselineExpense: budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline,
     futureRevenueGrowthRate: 0.01,
-    futureExpenseInflationRate: 0.05
+    futureExpenseInflationRate: 0.05,
+    fy2029RevenueReduction: 9700000
   },
   personnelDrivers: { ...budgetData.personnelCostDrivers },
   scenarioMeta: { name: "", author: "", notes: "" },
@@ -249,8 +250,6 @@ function renderChrome() {
     $("#brandMount").innerHTML = window.WaltonSplitLogo.getHtml();
     window.WaltonSplitLogo.injectStyles?.();
   }
-  const modeLabel = $("#modeLabel");
-  if (modeLabel) modeLabel.hidden = true;
   document.body.classList.toggle("staff-mode", isStaffMode);
   $$('[data-staff-only]').forEach((element) => { element.hidden = !isStaffMode; });
 }
@@ -470,8 +469,8 @@ function renderAssumptions() {
   $("#methodologyList").innerHTML = "<li>Public reductions are capped at the projected revenue shortfall.</li><li>Staff mode may model surplus for internal planning.</li><li>Ranking exports are generated from internal data even though the full support table is hidden.</li>";
   $("#formulaDefinitions").innerHTML = [
     "Revenue Shortfall = Projected Supported Expense - Projected Revenue",
-    "Direct Revenue Reduction = Forecast baseline revenue less modeled revenue after reductions",
-    "Expense Inflation Pressure = Current Year Projected Supported Expense - Prior Year Projected Supported Expense",
+    "Direct Revenue Reduction = Staff revenue reduction setting for the fiscal year",
+    "Expense Inflation Pressure = Revenue Shortfall - Direct Revenue Reduction",
     "Estimated Ad Valorem Revenue = Taxable Value Base x Millage / 1,000",
     "Required Millage = Target Revenue / Taxable Value Base x 1,000",
     "Rollback Rate = FY2026 Budgeted Ad Valorem Revenue / Taxable Value Base x 1,000",
@@ -480,15 +479,14 @@ function renderAssumptions() {
 }
 
 function shortfallComponents() {
-  const baseRevenue = Number(state.revenueAssumptions.baselineRevenue || budgetData.revenueForecast.baseRevenue);
-  const years = forecastYears();
+  const directReductionByYear = {
+    FY2028: Number(state.revenueAssumptions.fy2028RevenueReduction || 0),
+    FY2029: Number(state.revenueAssumptions.fy2029RevenueReduction || 0)
+  };
 
-  return years.filter((year) => year.year !== "FY2027").map((year) => {
-    const index = years.findIndex((item) => item.year === year.year);
-    const priorYear = years[index - 1];
-    const projectedRevenueWithoutMillage = year.revenue - millageRevenueImpact();
-    const directRevenueReduction = Math.min(Math.max(baseRevenue - projectedRevenueWithoutMillage, 0), year.revenueShortfall);
-    const expenseInflationPressure = Math.max(year.projectedSupportedExpense - (priorYear?.projectedSupportedExpense || year.projectedSupportedExpense), 0);
+  return forecastYears().filter((year) => year.year !== "FY2027").map((year) => {
+    const directRevenueReduction = Number(directReductionByYear[year.year] || 0);
+    const expenseInflationPressure = year.revenueShortfall - directRevenueReduction;
     return { ...year, directRevenueReduction, expenseInflationPressure };
   });
 }
