@@ -227,7 +227,7 @@ const budgetData = {
     defaultAssumptions: {
       futureRevenueGrowthRate: 0.01,
       fy2028RevenueReduction: 5700000,
-      fy2029RevenueReduction: 10000000
+      fy2029RevenueReduction: 9700000
     },
     fixedGrowthRates: {
       fy2028: 0.03,
