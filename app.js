@@ -257,6 +257,7 @@ function createPersonnelControls() {
     .join("");
 }
 
+
 function isConstitutionalOrSheriff(department) {
   return [
     "tax-collector",
@@ -267,9 +268,32 @@ function isConstitutionalOrSheriff(department) {
   ].includes(department.id);
 }
 
+function isRemovedScenarioDepartment(department) {
+  const removedIds = [
+    "medical-examiner",
+    "state-attorney",
+    "public-defender",
+    "county-court",
+    "circuit-court",
+    "guardian-ad-litem",
+    "human-services"
+  ];
+  const removedNames = [
+    "Medical Examiner",
+    "State Attorney",
+    "Public Defender",
+    "County Court",
+    "Circuit Court",
+    "Guardian ad Litem",
+    "Human Services"
+  ];
+
+  return removedIds.includes(department.id) || removedNames.includes(department.name);
+}
+
 function createOperatingControls() {
   const container = document.querySelector("#operatingControls");
-  const departmentsWithOperatingBudget = budgetData.departments.filter((department) => department.operatingBudget > 0);
+  const departmentsWithOperatingBudget = budgetData.departments.filter((department) => department.operatingBudget > 0 && !isRemovedScenarioDepartment(department));
   const protectedDepartments = departmentsWithOperatingBudget.filter(isConstitutionalOrSheriff);
   const adjustableDepartments = departmentsWithOperatingBudget.filter((department) => !isConstitutionalOrSheriff(department));
   const protectedOperatingTotal = protectedDepartments.reduce((total, department) => total + department.operatingBudget, 0);
@@ -279,8 +303,7 @@ function createOperatingControls() {
       <section class="protected-operating-card" aria-label="Constitutional offices and Sheriff operating budgets">
         <div class="protected-operating-header">
           <div>
-            <p class="eyebrow">Read Only</p>
-            <h4>Constitutional Offices and Sheriff</h4>
+            <h4>Constitutional Office Operating Budgets</h4>
             <p>These operating budgets are shown for context and are not adjustable in this scenario tool.</p>
           </div>
           <strong>${formatCurrency(protectedOperatingTotal)}</strong>
@@ -428,6 +451,18 @@ function createBuildScenarioCollapsibles() {
         white-space: nowrap;
       }
 
+      .protected-impact-row {
+        background: rgba(0, 98, 49, 0.08);
+      }
+
+      .protected-impact-row td {
+        border-top-color: rgba(0, 98, 49, 0.16);
+      }
+
+      .protected-impact-row td:first-child {
+        color: #006231;
+      }
+
       @media (max-width: 640px) {
         .protected-operating-header,
         .protected-operating-list > div {
@@ -447,12 +482,20 @@ function createBuildScenarioCollapsibles() {
   const collapsibleTitles = [
     "Reduce FTE Positions",
     "Adjust Department Operating Budgets",
-    "Select Capital Projects to Keep"
+    "Select Capital Projects to Keep",
+    "Equipment and Capital Reductions"
   ];
 
   builder.querySelectorAll("article.panel").forEach((panel, index) => {
     const title = panel.querySelector("h3")?.textContent?.trim();
-    if (!collapsibleTitles.includes(title) || panel.classList.contains("collapsible-panel")) {
+    if (title === "Select Capital Projects to Keep") {
+      const heading = panel.querySelector("h3");
+      const description = panel.querySelector("p:not(.eyebrow)");
+      if (heading) heading.textContent = "Equipment and Capital Reductions";
+      if (description) description.textContent = "Select Machinery & Equipment and capital projects to keep.";
+    }
+    const updatedTitle = panel.querySelector("h3")?.textContent?.trim();
+    if (!collapsibleTitles.includes(updatedTitle) || panel.classList.contains("collapsible-panel")) {
       return;
     }
 
@@ -475,7 +518,7 @@ function createBuildScenarioCollapsibles() {
     button.className = "collapse-toggle";
     button.setAttribute("aria-expanded", "false");
     button.setAttribute("aria-controls", content.id);
-    button.setAttribute("aria-label", `Expand ${title}`);
+    button.setAttribute("aria-label", `Expand ${updatedTitle}`);
     button.textContent = "+";
 
     header.appendChild(button);
@@ -487,7 +530,7 @@ function createBuildScenarioCollapsibles() {
 
       const isExpanded = button.getAttribute("aria-expanded") === "true";
       button.setAttribute("aria-expanded", String(!isExpanded));
-      button.setAttribute("aria-label", `${isExpanded ? "Expand" : "Collapse"} ${title}`);
+      button.setAttribute("aria-label", `${isExpanded ? "Expand" : "Collapse"} ${updatedTitle}`);
       button.textContent = isExpanded ? "+" : "−";
       content.hidden = isExpanded;
     });
@@ -777,7 +820,19 @@ function updateScenario() {
     if (personnelReductionCell) personnelReductionCell.textContent = formatCurrency(impact.personnelReduction);
     if (operatingPercent) operatingPercent.textContent = formatPercent(impact.operatingReduction);
   });
-  document.querySelector("#impactTable").innerHTML = totals.departmentImpacts.map((impact) => `<tr><td><strong>${impact.department.name}</strong></td><td>${formatNumber(impact.fteReduction)}</td><td>${formatPercent(impact.operatingReduction)}</td><td>${formatCurrency(impact.personnelReduction)}</td><td>${formatCurrency(impact.operatingReductionAmount)}</td><td>${formatCurrency(impact.totalReduction)}</td></tr>`).join("");
+  const visibleImpacts = totals.departmentImpacts.filter((impact) => !isRemovedScenarioDepartment(impact.department));
+  const protectedImpacts = visibleImpacts.filter((impact) => isConstitutionalOrSheriff(impact.department));
+  const adjustableImpacts = visibleImpacts.filter((impact) => !isConstitutionalOrSheriff(impact.department));
+
+  const protectedRows = protectedImpacts.map((impact) =>
+    `<tr class="protected-impact-row"><td><strong>${impact.department.name}</strong></td><td>${formatNumber(impact.fteReduction)}</td><td>Not adjustable</td><td>${formatCurrency(impact.personnelReduction)}</td><td>${formatCurrency(impact.department.operatingBudget)}</td><td>${formatCurrency(impact.totalReduction)}</td></tr>`
+  ).join("");
+
+  const adjustableRows = adjustableImpacts.map((impact) =>
+    `<tr><td><strong>${impact.department.name}</strong></td><td>${formatNumber(impact.fteReduction)}</td><td>${formatPercent(impact.operatingReduction)}</td><td>${formatCurrency(impact.personnelReduction)}</td><td>${formatCurrency(impact.operatingReductionAmount)}</td><td>${formatCurrency(impact.totalReduction)}</td></tr>`
+  ).join("");
+
+  document.querySelector("#impactTable").innerHTML = protectedRows + adjustableRows;
 }
 
 function bindEvents() {
@@ -834,10 +889,25 @@ function bindEvents() {
     }
   });
   document.addEventListener("click", (event) => {
-    const target = event.target.closest("[data-control='ranking-tab']");
-    if (!target) return;
-    state.rankingTab = target.dataset.ranking;
-    createRankings();
+    const rankingTab = event.target.closest("[data-control='ranking-tab']");
+    if (rankingTab) {
+      state.rankingTab = rankingTab.dataset.ranking;
+      createRankings();
+      return;
+    }
+
+    const topServicesToggle = event.target.closest("[data-control='toggle-top-services']");
+    if (topServicesToggle) {
+      state.showAllTopServices = !state.showAllTopServices;
+      createTopServicesBars();
+      return;
+    }
+
+    const departmentCardsToggle = event.target.closest("[data-control='toggle-department-cards']");
+    if (departmentCardsToggle) {
+      state.showAllDepartmentCards = !state.showAllDepartmentCards;
+      createDepartmentCards();
+    }
   });
   document.addEventListener("blur", (event) => {
     const target = event.target;
