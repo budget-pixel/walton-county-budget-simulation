@@ -6,39 +6,175 @@
   <title>Walton County Budget Simulation</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="styles.css">
+  <script>
+    (function(){
+      var STYLE_ID = "wc-split-logo-styles";
+      function injectStyles(){
+        if(document.getElementById(STYLE_ID)){
+          return;
+        }
+        var style = document.createElement("style");
+        style.id = STYLE_ID;
+        style.textContent = `
+          .wc-split-brand,
+          .wc-split-brand *{
+            -webkit-text-size-adjust:100% !important;
+            text-size-adjust:100% !important;
+          }
+          .wc-split-brand{
+            display:flex !important;
+            align-items:center !important;
+            justify-content:flex-start !important;
+            gap:4px !important;
+            width:auto !important;
+            min-width:max-content !important;
+            height:58px !important;
+            flex:0 0 auto !important;
+            overflow:visible !important;
+            font-family:"Avenir Next", Avenir, Helvetica, Arial, sans-serif !important;
+            text-decoration:none !important;
+            color:inherit !important;
+          }
+          .wc-split-brand-left,
+          .wc-split-brand-right{
+            display:flex !important;
+            flex-direction:column !important;
+            justify-content:center !important;
+            gap:0 !important;
+          }
+          .wc-split-brand-left{
+            align-items:flex-end !important;
+          }
+          .wc-split-brand-right{
+            align-items:flex-start !important;
+          }
+          .wc-split-brand-top{
+            display:block !important;
+            color:#006231 !important;
+            font-family:"Avenir Next", Avenir, Helvetica, Arial, sans-serif !important;
+            font-size:26px !important;
+            line-height:.84 !important;
+            font-weight:800 !important;
+            letter-spacing:.11em !important;
+            text-transform:uppercase !important;
+            white-space:nowrap !important;
+          }
+          .wc-split-brand-bottom{
+            display:block !important;
+            margin-top:2px !important;
+            margin-right:1px !important;
+            color:#000000 !important;
+            font-family:"Avenir Next", Avenir, Helvetica, Arial, sans-serif !important;
+            font-size:10.588235px !important;
+            line-height:9px !important;
+            font-weight:800 !important;
+            letter-spacing:.15em !important;
+            text-transform:uppercase !important;
+            white-space:nowrap !important;
+          }
+          .wc-split-brand-right .wc-split-brand-bottom{
+            margin-left:3px !important;
+            margin-right:1px !important;
+            letter-spacing:.20em !important;
+          }
+          .wc-split-brand-seal,
+          .wc-seal-mark{
+            position:static !important;
+            display:block !important;
+            width:50px !important;
+            height:50px !important;
+            flex:0 0 50px !important;
+            border-radius:999px !important;
+            background:#ffffff url("https://stories.opengov.com/countyofwaltonfl/uploads/c432578eae78-Walton_County_Logo_no_background.png") center center / 46px 46px no-repeat !important;
+            border:2px solid #d1be78 !important;
+            box-sizing:border-box !important;
+            transform:none !important;
+            z-index:2 !important;
+            cursor:pointer !important;
+            text-decoration:none !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      function getHtml(linkHref, linkLabel){
+        var sealTag = linkHref ? "a" : "span";
+        var hrefAttr = linkHref ? ' href="' + linkHref + '"' : "";
+        var ariaAttr = linkLabel ? ' aria-label="' + linkLabel + '"' : ' aria-hidden="true"';
+        return `
+          <div class="wc-split-brand" aria-label="Walton County Board of County Commissioners">
+            <div class="wc-split-brand-left">
+              <div class="wc-split-brand-top">Walton</div>
+              <div class="wc-split-brand-bottom">Board of County</div>
+            </div>
+            <${sealTag} class="wc-split-brand-seal wc-seal-mark"${hrefAttr}${ariaAttr}></${sealTag}>
+            <div class="wc-split-brand-right">
+              <div class="wc-split-brand-top">County</div>
+              <div class="wc-split-brand-bottom">Commissioners</div>
+            </div>
+          </div>
+        `;
+      }
+      window.WaltonSplitLogo = {
+        injectStyles: injectStyles,
+        getHtml: getHtml
+      };
+      injectStyles();
+    })();
+  </script>
 </head>
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <div>
-        <p class="eyebrow">Public Budget Planning Tool</p>
-        <h1>Walton County Budget Simulation</h1>
-      </div>
+      <div id="brandMount" class="brand-mount" aria-label="Walton County Board of County Commissioners"></div>
       <nav class="primary-nav" aria-label="Primary navigation">
-        <a href="#dashboard">Dashboard</a>
-        <a href="#builder">Build Budget</a>
+        <a href="#overview">Overview</a>
+        <a href="#rankings">Rankings</a>
         <a href="#departments">Departments</a>
-        <a href="#assumptions">Assumptions</a>
+        <a href="#builder">Build Scenario</a>
+        <a href="#methodology">Methodology</a>
       </nav>
     </div>
   </header>
 
   <main>
-    <section id="dashboard" class="page-section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Executive Dashboard</p>
-          <h2>Projected Fiscal Outlook</h2>
+    <section id="overview" class="hero-section">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Walton County Budget Simulation</p>
+          <h1>Projected Revenue Reduction</h1>
+          <p>The simulation estimates how future property tax revenue reductions could affect county services supported by ad valorem taxes.</p>
         </div>
-        <p class="section-summary">Planning estimates show the impact of property tax revenue reductions against property-tax-supported expenses.</p>
+        <div class="hero-metrics" aria-label="Projected fiscal indicators">
+          <article>
+            <span>Active FY2028 Revenue Reduction</span>
+            <strong id="heroRevenueReduction"></strong>
+          </article>
+          <article>
+            <span>Projected Revenue Shortfall</span>
+            <strong id="heroRevenueShortfall"></strong>
+          </article>
+        </div>
       </div>
+    </section>
 
-      <div class="summary-grid" id="dashboardCards"></div>
+    <section class="context-section">
+      <div class="context-inner">
+        <div>
+          <p class="eyebrow">Context</p>
+          <h2>Where Property Tax Revenue Goes</h2>
+        </div>
+        <p>In FY2025, Walton County allocated approximately $149.4 million of ad valorem revenue to county and constitutional services.</p>
+      </div>
+    </section>
 
+    <section id="dashboard" class="page-section">
       <div class="chart-grid">
         <article class="panel">
           <div class="panel-header">
-            <h3>Ad Valorem Revenue and Supported Expenses</h3>
+            <div>
+              <p class="eyebrow">Trend</p>
+              <h3>Ad Valorem Revenue and Supported Expenses</h3>
+            </div>
           </div>
           <div class="chart-wrap">
             <canvas id="trendChart"></canvas>
@@ -46,29 +182,110 @@
         </article>
         <article class="panel">
           <div class="panel-header">
-            <h3>Projected Revenue Shortfall</h3>
+            <div>
+              <p class="eyebrow">Forecast</p>
+              <h3>Projected Revenue Shortfall</h3>
+            </div>
           </div>
           <div class="chart-wrap">
-            <canvas id="gapChart"></canvas>
+            <canvas id="shortfallChart"></canvas>
           </div>
         </article>
       </div>
+
+      <article class="panel overview-bars-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Overview</p>
+            <h3>Top Ad Valorem Supported Services</h3>
+          </div>
+          <label class="toolbar-control compact-control" for="overviewFundingYear">
+            <span>Fiscal Year</span>
+            <select id="overviewFundingYear" data-control="overview-year">
+              <option value="FY2022">FY2022</option>
+              <option value="FY2023">FY2023</option>
+              <option value="FY2024">FY2024</option>
+              <option value="FY2025" selected>FY2025</option>
+            </select>
+          </label>
+        </div>
+        <div id="topServicesBars" class="ranked-bars"></div>
+      </article>
+    </section>
+
+    <section id="rankings" class="page-section section-band">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Department Rankings</p>
+          <h2>Compare Ad Valorem Supported Services</h2>
+        </div>
+        <p class="section-summary">Rank departments by support level, dependency, workforce, and budget structure.</p>
+      </div>
+      <article class="panel">
+        <div class="ranking-toolbar">
+          <div class="tabs" role="tablist" aria-label="Ranking sort options">
+            <button type="button" class="tab-button active" data-control="ranking-tab" data-ranking="support">Largest Ad Valorem Support</button>
+            <button type="button" class="tab-button" data-control="ranking-tab" data-ranking="dependency">Highest Dependency</button>
+            <button type="button" class="tab-button" data-control="ranking-tab" data-ranking="fte">Largest Workforce</button>
+            <button type="button" class="tab-button" data-control="ranking-tab" data-ranking="budget">Largest Budget</button>
+          </div>
+          <input id="rankingSearch" class="search-input" type="search" placeholder="Search departments" data-control="ranking-search">
+        </div>
+        <div id="rankingCards" class="ranking-list"></div>
+        <div class="table-scroll">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Ad Valorem Support</th>
+                <th>Dependency %</th>
+                <th>FTE</th>
+                <th>Budget</th>
+              </tr>
+            </thead>
+            <tbody id="rankingTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="departments" class="page-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Department Detail</p>
+          <h2>Department Funding Detail</h2>
+        </div>
+        <p class="section-summary">Historical years show funding allocation fields only. FY2027 Budget shows the active budget structure used by the scenario model.</p>
+      </div>
+      <div class="detail-toolbar panel" aria-label="Department funding display controls">
+        <label class="toolbar-control" for="departmentFiscalYear">
+          <span>Fiscal Year</span>
+          <select id="departmentFiscalYear" data-control="department-year">
+            <option value="FY2022">FY2022</option>
+            <option value="FY2023">FY2023</option>
+            <option value="FY2024">FY2024</option>
+            <option value="FY2025">FY2025</option>
+            <option value="FY2027 Budget" selected>FY2027 Budget</option>
+          </select>
+        </label>
+      </div>
+      <div id="departmentCards" class="department-grid"></div>
     </section>
 
     <section id="builder" class="page-section section-band">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Build Your Own Budget</p>
+          <p class="eyebrow">Build Scenario</p>
           <h2>Address the Projected Revenue Shortfall</h2>
         </div>
-        <p class="section-summary">Adjust personnel, operating, and capital levers to see immediate financial consequences. The simulation does not recommend cuts.</p>
+        <p class="section-summary">Adjust personnel, operating, and capital levers to see immediate financial consequences. The simulation does not recommend reductions.</p>
       </div>
 
       <div class="builder-layout">
         <div class="builder-main">
           <article class="panel gap-callout">
-            <p class="eyebrow">Starting Projected Revenue Shortfall</p>
-            <div id="startingGap" class="callout-value"></div>
+            <p class="eyebrow">Total Revenue Shortfall</p>
+            <div id="startingShortfall" class="callout-value"></div>
           </article>
 
           <article class="panel">
@@ -115,52 +332,42 @@
           </article>
         </div>
 
-        <aside class="results-panel" aria-label="Real time budget results">
+        <aside class="results-panel" aria-label="Real time scenario results">
           <div class="panel sticky-panel">
             <div class="panel-header">
               <div>
-                <p class="eyebrow">Real Time Results</p>
+                <p class="eyebrow">Revenue Shortfall Allocation</p>
                 <h3>Scenario Summary</h3>
               </div>
             </div>
             <div id="budgetStatus" class="status-banner"></div>
             <dl class="results-list">
               <div>
-                <dt>Revenue Shortfall</dt>
-                <dd id="resultBudgetGap"></dd>
+                <dt>Total Revenue Shortfall</dt>
+                <dd id="resultRevenueShortfall"></dd>
               </div>
               <div>
-                <dt>Personnel Reductions</dt>
-                <dd id="resultPersonnelSavings"></dd>
-              </div>
-              <div>
-                <dt>Operating Reductions</dt>
-                <dd id="resultOperatingSavings"></dd>
-              </div>
-              <div>
-                <dt>Capital Reductions</dt>
-                <dd id="resultCapitalSavings"></dd>
-              </div>
-              <div class="total-row">
-                <dt>Total Reductions</dt>
-                <dd id="resultTotalSavings"></dd>
+                <dt>Selected Reductions</dt>
+                <dd id="resultSelectedReductions"></dd>
               </div>
               <div class="remaining-row">
                 <dt>Remaining Revenue Shortfall</dt>
-                <dd id="resultRemainingGap"></dd>
+                <dd id="resultRemainingShortfall"></dd>
               </div>
             </dl>
             <div class="progress-block">
               <div class="progress-label">
                 <span>Revenue Shortfall Addressed</span>
-                <strong id="gapClosedPercent"></strong>
+                <strong id="shortfallAddressedPercent"></strong>
               </div>
               <div class="progress-track">
-                <div id="gapProgress" class="progress-fill"></div>
+                <div id="shortfallProgress" class="progress-fill"></div>
               </div>
             </div>
-            <div class="chart-wrap compact-chart">
-              <canvas id="savingsChart"></canvas>
+            <div class="allocation-breakdown">
+              <div><span>Personnel</span><strong id="resultPersonnelReductions"></strong></div>
+              <div><span>Operating</span><strong id="resultOperatingReductions"></strong></div>
+              <div><span>Capital</span><strong id="resultCapitalReductions"></strong></div>
             </div>
           </div>
         </aside>
@@ -169,7 +376,7 @@
       <article class="panel">
         <div class="panel-header">
           <div>
-            <p class="eyebrow">Visualization</p>
+            <p class="eyebrow">Scenario Reductions</p>
             <h3>Department Impact Table</h3>
           </div>
         </div>
@@ -191,44 +398,10 @@
       </article>
     </section>
 
-    <section id="departments" class="page-section">
+    <section id="methodology" class="page-section">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Department Detail</p>
-          <h2>Budget Components by Department</h2>
-        </div>
-        <p class="section-summary">Each department record includes personnel, operating, capital, FTE count, average personnel cost, and historical ad valorem support where available.</p>
-      </div>
-      <div class="detail-toolbar panel" aria-label="Department funding display controls">
-        <label class="toolbar-control" for="departmentFiscalYear">
-          <span>Fiscal Year</span>
-          <select id="departmentFiscalYear" data-control="department-year">
-            <option value="FY2022">FY2022</option>
-            <option value="FY2023">FY2023</option>
-            <option value="FY2024">FY2024</option>
-            <option value="FY2025">FY2025</option>
-            <option value="FY2027 Budget" selected>FY2027 Budget</option>
-          </select>
-        </label>
-        <fieldset class="segmented-control">
-          <legend>Department Funding View</legend>
-          <label>
-            <input type="radio" name="departmentFundingView" value="grossExpense" data-control="funding-view" checked>
-            <span>Gross Expense</span>
-          </label>
-          <label>
-            <input type="radio" name="departmentFundingView" value="adValoremSupport" data-control="funding-view">
-            <span>Ad Valorem Support</span>
-          </label>
-        </fieldset>
-      </div>
-      <div id="departmentCards" class="department-grid"></div>
-    </section>
-
-    <section id="assumptions" class="page-section section-band">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Assumptions and Methodology</p>
+          <p class="eyebrow">Methodology</p>
           <h2>How the Simulation Calculates Results</h2>
         </div>
       </div>
@@ -242,7 +415,7 @@
           <ul id="revenueAssumptions"></ul>
         </article>
         <article class="panel">
-          <h3>Expenditure Assumptions</h3>
+          <h3>Supported Expense Assumptions</h3>
           <ul id="inflationAssumptions"></ul>
         </article>
         <article class="panel">
