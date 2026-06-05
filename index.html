@@ -127,19 +127,19 @@
     <div class="header-inner">
       <div id="brandMount" class="brand-mount" aria-label="Walton County Board of County Commissioners"></div>
       <nav class="primary-nav" aria-label="Primary navigation">
-        <a href="#overview" data-public-nav>Overview</a>
-        <a href="#departments" data-public-nav>Departments</a>
+        <a href="#overview">Overview</a>
+        <a href="#departments">Departments</a>
         <a href="#builder">Build Scenario</a>
-        <a href="#tax-impact" data-public-nav>Property Tax</a>
-        <a href="#methodology" data-public-nav>Methodology</a>
+        <a href="#tax-impact">Property Tax</a>
+        <a href="#methodology">Methodology</a>
       </nav>
       <script>
 (function(){
   var isStaffMode = new URLSearchParams(window.location.search).get('mode') === 'staff';
-  if(!isStaffMode) return;
-  document.querySelectorAll('[data-public-nav]').forEach(function(el){
-    el.style.display = 'none';
-  });
+  var builderLink = document.querySelector('a[href="#builder"]');
+  if(!isStaffMode && builderLink){
+    builderLink.style.display = 'none';
+  }
 })();
 </script>
       <div class="header-actions">
