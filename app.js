@@ -260,10 +260,9 @@ function infoButton(text) {
 
 function personnelDriverCardsMarkup() {
   return budgetData.personnelCostFactors.map((factor) => `
-    <div class="driver-card">
+    <div class="driver-card compact-driver-card">
       <span>${factor.label} ${infoButton(factor.note)}</span>
       <strong>${percent(factor.percentOfTotal)}</strong>
-      <small>of total personnel cost</small>
     </div>
   `).join("");
 }
@@ -298,7 +297,7 @@ function renderLocks() {
 function renderPersonnel() {
   const costFactors = $("#personnelCostFactorsInline");
   if (costFactors) {
-    costFactors.innerHTML = `<div><h4>Personnel Cost Factors</h4><p>These percentages show each factor as a share of total personnel cost.</p></div><div class="personnel-driver-grid">${personnelDriverCardsMarkup()}</div>`;
+    costFactors.innerHTML = `<div class="personnel-factor-compact-header"><h4>Personnel Cost Factors</h4><p>Percentage of total personnel cost.</p></div><div class="personnel-driver-grid personnel-driver-grid-compact">${personnelDriverCardsMarkup()}</div>`;
   }
   $("#personnelControls").innerHTML = departments().filter((department) => department.fteCount > 0 && !department.nonFteAdjustable).sort(sortDepartments).map((department) => {
     const isLocked = locked(department.id);
@@ -319,7 +318,7 @@ function renderOperating() {
     if (isLocked) state.operatingReductions[department.id] = 0;
     const reductionPercent = Number(state.operatingReductions[department.id] || 0);
     const newOperatingBudget = department.operatingBudget * (1 - reductionPercent / 100);
-    return `<div class="slider-row ${isLocked ? "locked-row" : ""}"><div><label>${department.name}</label><div class="slider-meta">Operating budget: ${money(department.operatingBudget)}${isLocked ? " | Locked" : ""}</div><div class="slider-meta slider-meta-secondary">New operating budget: ${money(newOperatingBudget)}</div></div><input class="operating-slider" type="range" min="0" max="100" value="${reductionPercent}" data-control="operating" data-department="${department.id}" ${isLocked ? "disabled" : ""}><label class="percent-entry"><input type="number" min="0" max="100" step="1" value="${reductionPercent}" data-control="operating-percent" data-department="${department.id}" ${isLocked ? "disabled" : ""}><span>%</span></label></div>`;
+    return `<div class="slider-row ${isLocked ? "locked-row" : ""}"><div><label>${department.name}</label><div class="slider-meta">Operating budget: ${money(department.operatingBudget)}${isLocked ? " | Locked" : ""}</div><div class="slider-meta slider-meta-secondary">New operating budget: <span class="new-operating-budget-value">${money(newOperatingBudget)}</span></div></div><input class="operating-slider" type="range" min="0" max="100" value="${reductionPercent}" data-control="operating" data-department="${department.id}" ${isLocked ? "disabled" : ""}><label class="percent-entry"><input type="number" min="0" max="100" step="1" value="${reductionPercent}" data-control="operating-percent" data-department="${department.id}" ${isLocked ? "disabled" : ""}><span>%</span></label></div>`;
   }).join("");
 }
 
@@ -619,6 +618,7 @@ function updateResults() {
   const remainingShortfallElement = $("#resultRemainingShortfall");
   remainingShortfallElement.textContent = totals.remainingShortfall ? negativeMoney(totals.remainingShortfall) : "$0";
   remainingShortfallElement.classList.toggle("negative-value", totals.remainingShortfall > 0);
+  renderResultingShortfallForecast(totals);
   $("#resultPersonnelReductions").textContent = money(totals.personnelReductions);
   $("#resultOperatingReductions").textContent = money(totals.operatingReductions);
   $("#resultCapitalReductions").textContent = money(totals.capitalReductions);
@@ -748,6 +748,7 @@ function syncScenarioFields() {
   if (select) select.value = state.selectedScenarioName || "";
 }
 
+
 function renderScenarioComparison() {
   const box = $("#scenarioComparison");
   if (!box) return;
@@ -757,6 +758,27 @@ function renderScenarioComparison() {
   const previous = saved.data.savedTotals;
   const rows = [["Shortfall", current.remainingShortfall - previous.remainingShortfall], ["Personnel", current.personnelReductions - previous.personnelReductions], ["Operating", current.operatingReductions - previous.operatingReductions], ["Capital", current.capitalReductions - previous.capitalReductions], ["Total", current.totalReductions - previous.totalReductions]];
   box.innerHTML = rows.map(([label, value]) => `<div class="comparison-item"><span>${label} vs Saved</span><strong>${money(value)}</strong></div>`).join("");
+}
+
+function renderResultingShortfallForecast(totals) {
+  const anchor = $("#resultRemainingShortfall");
+  if (!anchor) return;
+
+  let forecastBox = $("#resultingShortfallForecast");
+  if (!forecastBox) {
+    forecastBox = document.createElement("div");
+    forecastBox.id = "resultingShortfallForecast";
+    forecastBox.className = "resulting-shortfall-forecast";
+    anchor.insertAdjacentElement("afterend", forecastBox);
+  }
+
+  forecastBox.innerHTML = forecastYears()
+    .filter((year) => ["FY2028", "FY2029", "FY2030", "FY2031", "FY2032"].includes(year.year))
+    .map((year) => {
+      const resultingShortfall = Math.max(year.revenueShortfall - totals.totalReductions, 0);
+      return `<div><span>${year.year}</span><strong class="${resultingShortfall ? "negative-value" : ""}">${resultingShortfall ? negativeMoney(resultingShortfall) : "$0"}</strong></div>`;
+    })
+    .join("");
 }
 
 function reductionRowsForPdf() {
@@ -817,13 +839,32 @@ document.addEventListener("input", (event) => {
   if (control === "buyout-cost") { state.buyoutCosts[id] = parseMoney(event.target.value); updateResults(); }
   if (control === "operating") {
     const department = budgetData.departments.find((item) => item.id === id);
-    state.operatingReductions[id] = capPublicOperating(department, Number(event.target.value || 0));
-    renderOperating(); updateResults();
+    const cappedValue = capPublicOperating(department, Number(event.target.value || 0));
+    state.operatingReductions[id] = cappedValue;
+    if (Number(event.target.value || 0) !== cappedValue) event.target.value = cappedValue;
+
+    const row = event.target.closest(".slider-row");
+    const percentInput = row?.querySelector('[data-control="operating-percent"]');
+    const newBudget = row?.querySelector(".new-operating-budget-value");
+
+    if (percentInput) percentInput.value = cappedValue;
+    if (newBudget) newBudget.textContent = money(department.operatingBudget * (1 - cappedValue / 100));
+
+    updateResults();
   }
   if (control === "operating-percent") {
     const department = budgetData.departments.find((item) => item.id === id);
-    state.operatingReductions[id] = capPublicOperating(department, Number(event.target.value || 0));
-    renderOperating();
+    const cappedValue = capPublicOperating(department, Number(event.target.value || 0));
+    state.operatingReductions[id] = cappedValue;
+    if (Number(event.target.value || 0) !== cappedValue) event.target.value = cappedValue;
+
+    const row = event.target.closest(".slider-row");
+    const slider = row?.querySelector('[data-control="operating"]');
+    const newBudget = row?.querySelector(".new-operating-budget-value");
+
+    if (slider) slider.value = cappedValue;
+    if (newBudget) newBudget.textContent = money(department.operatingBudget * (1 - cappedValue / 100));
+
     updateResults();
   }
   if (control === "revenue-assumption" && isStaffMode) {
