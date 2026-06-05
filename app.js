@@ -638,17 +638,29 @@ function setupScenarioAccordions() {
 }
 
 function renderAssumptions() {
-  $("#inflationAssumptions").innerHTML = "<li>Personnel cost factors show both dollars and percent of total personnel cost.</li><li>Staff mode can edit revenue forecast settings, millage targets, and department locks.</li><li>Expense inflation pressure represents the portion of forecast shortfall driven by expense growth after direct revenue reductions are applied.</li>";
+  $("#inflationAssumptions").innerHTML = "<li>Personnel cost factors show both dollars and percent of total personnel cost.</li><li>Staff mode can edit revenue forecast settings, millage targets, and department locks.</li><li>Expense inflation pressure represents year-over-year growth in projected supported expense.</li>";
   $("#methodologyList").innerHTML = "<li>Public reductions are capped at the projected revenue shortfall.</li><li>Staff mode may model surplus for internal planning.</li><li>Ranking exports are generated from internal data even though the full support table is hidden.</li>";
-  $("#formulaDefinitions").innerHTML = ["Revenue Shortfall = Projected Supported Expense - Projected Revenue", "Direct Revenue Reduction = Forecast baseline revenue less modeled revenue after reductions", "Expense Inflation Pressure = Revenue Shortfall - Direct Revenue Reduction", "Estimated Ad Valorem Revenue = Taxable Value Base x Millage / 1,000", "Required Millage = Target Revenue / Taxable Value Base x 1,000", "Rollback Rate = FY2026 Budgeted Ad Valorem Revenue / Taxable Value Base x 1,000", "Buy-Out First-Year Net = Recurring Reduction - One-Time Cost"].map((item) => `<div class="formula-item"><code>${item}</code></div>`).join("");
+  $("#formulaDefinitions").innerHTML = [
+    "Revenue Shortfall = Projected Supported Expense - Projected Revenue",
+    "Direct Revenue Reduction = Forecast baseline revenue less modeled revenue after reductions",
+    "Expense Inflation Pressure = Current Year Projected Supported Expense - Prior Year Projected Supported Expense",
+    "Estimated Ad Valorem Revenue = Taxable Value Base x Millage / 1,000",
+    "Required Millage = Target Revenue / Taxable Value Base x 1,000",
+    "Rollback Rate = FY2026 Budgeted Ad Valorem Revenue / Taxable Value Base x 1,000",
+    "Buy-Out First-Year Net = Recurring Reduction - One-Time Cost"
+  ].map((item) => `<div class="formula-item"><code>${item}</code></div>`).join("");
 }
 
 function shortfallComponents() {
   const baseRevenue = Number(state.revenueAssumptions.baselineRevenue || budgetData.revenueForecast.baseRevenue);
-  return forecastYears().filter((year) => year.year !== "FY2027").map((year) => {
+  const years = forecastYears();
+
+  return years.filter((year) => year.year !== "FY2027").map((year) => {
+    const index = years.findIndex((item) => item.year === year.year);
+    const priorYear = years[index - 1];
     const projectedRevenueWithoutMillage = year.revenue - millageRevenueImpact();
     const directRevenueReduction = Math.min(Math.max(baseRevenue - projectedRevenueWithoutMillage, 0), year.revenueShortfall);
-    const expenseInflationPressure = Math.max(year.revenueShortfall - directRevenueReduction, 0);
+    const expenseInflationPressure = Math.max(year.projectedSupportedExpense - (priorYear?.projectedSupportedExpense || year.projectedSupportedExpense), 0);
     return { ...year, directRevenueReduction, expenseInflationPressure };
   });
 }
