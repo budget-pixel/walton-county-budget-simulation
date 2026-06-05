@@ -87,11 +87,12 @@ function getFiscalYears() {
   const fy2029Reduction = Number(state.revenueAssumptions.fy2029RevenueReduction || 0);
   const projectedSupportedExpenseBaseline = budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline || budgetData.budgetBaselineTotals.totalBudgetBaseline;
 
-  const fy2027 = baseRevenue;
-  const fy2028Baseline = fy2027 * (1 + budgetData.revenueForecast.fixedGrowthRates.fy2028);
-  const fy2028 = fy2028Baseline - fy2028Reduction;
-  const fy2029Baseline = fy2028Baseline * (1 + budgetData.revenueForecast.fixedGrowthRates.fy2029);
-  const fy2029 = fy2028 * (1 + budgetData.revenueForecast.fixedGrowthRates.fy2029) - fy2029Reduction;
+  const fy2027Baseline = baseRevenue;
+  const fy2027 = fy2027Baseline - fy2028Reduction;
+  const fy2028Baseline = fy2027;
+  const fy2028 = fy2028Baseline - fy2029Reduction;
+  const fy2029Baseline = fy2028;
+  const fy2029 = fy2029Baseline * (1 + futureGrowth);
   const fy2030Baseline = fy2029Baseline * (1 + futureGrowth);
   const fy2030 = fy2029 * (1 + futureGrowth);
   const fy2031Baseline = fy2030Baseline * (1 + futureGrowth);
@@ -120,9 +121,9 @@ function getFiscalYears() {
   }));
 
   const forecastYears = [
-    { year: "FY2027", revenue: fy2027, baselineRevenue: fy2027, revenueShortfall: Math.max(fy2027ProjectedSupportedExpense - fy2027, 0), historicalSupportedExpense: null, projectedSupportedExpense: fy2027ProjectedSupportedExpense, revenueReduction: 0, type: "Forecast", historical: false },
-    { year: "FY2028", revenue: fy2028, baselineRevenue: fy2028Baseline, revenueShortfall: Math.max(fy2028ProjectedSupportedExpense - fy2028, 0), historicalSupportedExpense: null, projectedSupportedExpense: fy2028ProjectedSupportedExpense, revenueReduction: fy2028Reduction, type: "Forecast", historical: false },
-    { year: "FY2029", revenue: fy2029, baselineRevenue: fy2029Baseline, revenueShortfall: Math.max(fy2029ProjectedSupportedExpense - fy2029, 0), historicalSupportedExpense: null, projectedSupportedExpense: fy2029ProjectedSupportedExpense, revenueReduction: fy2029Reduction, type: "Forecast", historical: false },
+    { year: "FY2027", revenue: fy2027, baselineRevenue: fy2027Baseline, revenueShortfall: Math.max(fy2027ProjectedSupportedExpense - fy2027, 0), historicalSupportedExpense: null, projectedSupportedExpense: fy2027ProjectedSupportedExpense, revenueReduction: fy2028Reduction, type: "Forecast", historical: false },
+    { year: "FY2028", revenue: fy2028, baselineRevenue: fy2028Baseline, revenueShortfall: Math.max(fy2028ProjectedSupportedExpense - fy2028, 0), historicalSupportedExpense: null, projectedSupportedExpense: fy2028ProjectedSupportedExpense, revenueReduction: fy2029Reduction, type: "Forecast", historical: false },
+    { year: "FY2029", revenue: fy2029, baselineRevenue: fy2029Baseline, revenueShortfall: Math.max(fy2029ProjectedSupportedExpense - fy2029, 0), historicalSupportedExpense: null, projectedSupportedExpense: fy2029ProjectedSupportedExpense, revenueReduction: 0, type: "Forecast", historical: false },
     { year: "FY2030", revenue: fy2030, baselineRevenue: fy2030Baseline, revenueShortfall: Math.max(fy2030ProjectedSupportedExpense - fy2030, 0), historicalSupportedExpense: null, projectedSupportedExpense: fy2030ProjectedSupportedExpense, revenueReduction: 0, type: "Forecast", historical: false },
     { year: "FY2031", revenue: fy2031, baselineRevenue: fy2031Baseline, revenueShortfall: Math.max(fy2031ProjectedSupportedExpense - fy2031, 0), historicalSupportedExpense: null, projectedSupportedExpense: fy2031ProjectedSupportedExpense, revenueReduction: 0, type: "Forecast", historical: false },
     { year: "FY2032", revenue: fy2032, baselineRevenue: fy2032Baseline, revenueShortfall: Math.max(fy2032ProjectedSupportedExpense - fy2032, 0), historicalSupportedExpense: null, projectedSupportedExpense: fy2032ProjectedSupportedExpense, revenueReduction: 0, type: "Forecast", historical: false }
@@ -710,10 +711,10 @@ function updateForecastTable() {
 function createAssumptions() {
   const revenueAssumptions = [
     "Historical ad valorem revenue is included for FY2022 through FY2026.",
-    "FY2027 revenue forecast is $163,473,140.",
-    "FY2028 revenue equals FY2027 x 1.03 minus the FY2028 revenue reduction.",
-    "FY2029 revenue equals the reduced FY2028 revenue x 1.02 minus the FY2029 revenue reduction.",
-    "FY2030 through FY2032 revenue uses the editable future revenue growth rate."
+    "FY2026 base revenue is $163,473,140.",
+    "FY2027 revenue equals the FY2026 base amount minus the first revenue reduction, with no rate adjustment.",
+    "FY2028 revenue equals the reduced FY2027 amount minus the second revenue reduction, with no rate adjustment.",
+    "FY2029 through FY2032 revenue uses the editable future revenue growth rate."
   ];
   const expenditureAssumptions = [
     "The main trend chart uses ad valorem supported expense, not gross total county expenditures.",
