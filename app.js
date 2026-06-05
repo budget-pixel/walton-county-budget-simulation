@@ -273,7 +273,7 @@ function renderLocks() {
 }
 
 function renderPersonnel() {
-  const personnelDriverRow = `<tr class="personnel-driver-row"><td colspan="8"><div class="personnel-driver-inline"><div><h4>Personnel Cost Factors</h4><p>These percentages show each factor as a share of total personnel cost.</p></div><div class="personnel-driver-grid">${personnelDriverCardsMarkup()}</div></div></td></tr>`;
+  const personnelDriverRow = `<tr class="personnel-driver-row"><td colspan="8"><div class="section-clear-row"><div class="personnel-driver-inline"><div><h4>Personnel Cost Factors</h4><p>These percentages show each factor as a share of total personnel cost.</p></div><div class="personnel-driver-grid">${personnelDriverCardsMarkup()}</div></div><button type="button" class="clear-section-button" data-control="clear-personnel">Clear Personnel Reductions</button></div></td></tr>`;
   $("#personnelControls").innerHTML = personnelDriverRow + departments().filter((department) => department.fteCount > 0 && !department.nonFteAdjustable).sort(sortDepartments).map((department) => {
     const isLocked = locked(department.id);
     const averageCost = fteCost(department);
@@ -291,12 +291,12 @@ function renderOperating() {
   $("#operatingControls").innerHTML = `<section class="protected-operating-card"><div class="protected-operating-header"><div><h4>Constitutional Office Operating Budgets</h4><p>Shown for context and not adjustable.</p></div><strong>${money(protectedDepartments.reduce((total, department) => total + department.operatingBudget, 0))}</strong></div><div class="protected-operating-list">${protectedDepartments.map((department) => `<div><span>${department.name}</span><strong>${money(department.operatingBudget)}</strong></div>`).join("")}</div></section>` + adjustableDepartments.map((department) => {
     const isLocked = locked(department.id);
     if (isLocked) state.operatingReductions[department.id] = 0;
-    return `<div class="slider-row ${isLocked ? "locked-row" : ""}"><div><label>${department.name}</label><div class="slider-meta">Operating budget: ${money(department.operatingBudget)}${isLocked ? " | Locked" : ""}</div></div><input type="range" min="0" max="100" value="${state.operatingReductions[department.id] || 0}" data-control="operating" data-department="${department.id}" ${isLocked ? "disabled" : ""}><div class="percent-pill">${percent(state.operatingReductions[department.id] || 0)}</div></div>`;
-  }).join("");
+    return `<div class="slider-row ${isLocked ? "locked-row" : ""}"><div><label>${department.name}</label><div class="slider-meta">Operating budget: ${money(department.operatingBudget)}${isLocked ? " | Locked" : ""}</div></div><input class="operating-slider" type="range" min="0" max="100" value="${state.operatingReductions[department.id] || 0}" data-control="operating" data-department="${department.id}" ${isLocked ? "disabled" : ""}><label class="percent-entry"><input type="number" min="0" max="100" step="1" value="${state.operatingReductions[department.id] || 0}" data-control="operating-percent" data-department="${department.id}" ${isLocked ? "disabled" : ""}><span>%</span></label></div>`;
+  }).join("") + `<button type="button" class="clear-section-button" data-control="clear-operating">Clear Operating Reductions</button>`;
 }
 
 function renderCapital() {
-  $("#capitalControls").innerHTML = budgetData.capitalProjects.map((project) => {
+  $("#capitalControls").innerHTML = `<button type="button" class="clear-section-button" data-control="clear-capital">Clear Capital Reductions</button>` + budgetData.capitalProjects.map((project) => {
     state.keptProjects[project.id] ??= true;
     const isLocked = locked(project.departmentId);
     if (isLocked) state.keptProjects[project.id] = true;
@@ -420,6 +420,75 @@ function setupScenarioAccordions() {
 
       .scenario-accordion-content[hidden] {
         display: none;
+      }
+
+      .operating-slider {
+        cursor: grab;
+        min-height: 36px;
+        accent-color: #006231;
+      }
+
+      .operating-slider:active {
+        cursor: grabbing;
+      }
+
+      .operating-slider::-webkit-slider-thumb {
+        cursor: grab;
+        min-width: 24px;
+        min-height: 24px;
+      }
+
+      .operating-slider::-moz-range-thumb {
+        cursor: grab;
+        min-width: 24px;
+        min-height: 24px;
+      }
+
+      .percent-entry {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        justify-content: flex-end;
+        min-width: 92px;
+        color: #006231;
+        font-weight: 900;
+      }
+
+      .percent-entry input {
+        width: 68px;
+        min-height: 38px;
+        border: 1px solid rgba(0, 98, 49, 0.24);
+        border-radius: 999px;
+        padding: 6px 10px;
+        text-align: right;
+        font-weight: 900;
+        color: #006231;
+      }
+
+      .clear-section-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        margin: 10px 0 14px;
+        padding: 9px 16px;
+        border: 1px solid rgba(0, 98, 49, 0.24);
+        border-radius: 999px;
+        background: #ffffff;
+        color: #006231;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .clear-section-button:hover,
+      .clear-section-button:focus {
+        background: rgba(0, 98, 49, 0.08);
+        outline: none;
+      }
+
+      .section-clear-row {
+        display: grid;
+        gap: 8px;
       }
 
       .personnel-driver-row td {
@@ -852,6 +921,12 @@ document.addEventListener("input", (event) => {
     state.operatingReductions[id] = capPublicOperating(department, Number(event.target.value || 0));
     renderOperating(); updateResults();
   }
+  if (control === "operating-percent") {
+    const department = budgetData.departments.find((item) => item.id === id);
+    state.operatingReductions[id] = capPublicOperating(department, Number(event.target.value || 0));
+    renderOperating();
+    updateResults();
+  }
   if (control === "revenue-assumption" && isStaffMode) {
     const assumption = event.target.dataset.assumption;
     const value = event.target.dataset.format === "currency" ? parseMoney(event.target.value) : Number(event.target.value || 0);
@@ -913,6 +988,23 @@ document.addEventListener("click", (event) => {
   if (control === "toggle-department-cards") { state.showAllDepartmentCards = !state.showAllDepartmentCards; renderDepartments(); }
   if (control === "toggle-rankings") { state.showAllRankings = !state.showAllRankings; renderRankings(); }
   if (control === "toggle-impact-table") { state.showImpactTable = !state.showImpactTable; renderImpact(); }
+  if (control === "clear-personnel") {
+    state.fteReductions = {};
+    state.buyoutCounts = {};
+    state.buyoutCosts = {};
+    renderPersonnel();
+    updateResults();
+  }
+  if (control === "clear-operating") {
+    state.operatingReductions = {};
+    renderOperating();
+    updateResults();
+  }
+  if (control === "clear-capital") {
+    state.keptProjects = {};
+    renderCapital();
+    updateResults();
+  }
   if (control === "export-rankings") csv("department-rankings.csv", ["Department", "Ad Valorem Support", "FTE", "Budget"], sortedRankingRows().map((row) => [row.name, money(row.support), number(row.fte), money(row.budget)]));
   if (control === "export-impact") csv("scenario-impact.csv", ["Department", "FTE Reduced", "Operating Reduction", "Personnel Reduction", "Operating Reduction Amount", "Total Department Reduction"], scenarioTotals().departmentImpacts.filter((impact) => !excluded(impact.department)).sort(sortDepartments).map((impact) => [impact.department.name, number(impact.fteReduction), constitutional(impact.department) ? "Protected" : percent(impact.operatingReduction), money(impact.personnelReduction), money(impact.operatingReductionAmount), money(impact.totalReduction)]));
   if (control === "export-pdf") exportPdf();
