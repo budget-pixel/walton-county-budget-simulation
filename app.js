@@ -103,11 +103,11 @@ function getFiscalYears() {
 
   const forecastYears = [
     { year: "FY2027", revenue: fy2027, baselineRevenue: fy2027, revenueShortfall: 0, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: 0, type: "Forecast", historical: false },
-    { year: "FY2028", revenue: fy2028, baselineRevenue: fy2028Baseline, revenueShortfall: fy2028Baseline - fy2028, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: fy2028Reduction, type: "Forecast", historical: false },
-    { year: "FY2029", revenue: fy2029, baselineRevenue: fy2029Baseline, revenueShortfall: fy2029Baseline - fy2029, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: fy2029Reduction, type: "Forecast", historical: false },
-    { year: "FY2030", revenue: fy2030, baselineRevenue: fy2030Baseline, revenueShortfall: fy2030Baseline - fy2030, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: 0, type: "Forecast", historical: false },
-    { year: "FY2031", revenue: fy2031, baselineRevenue: fy2031Baseline, revenueShortfall: fy2031Baseline - fy2031, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: 0, type: "Forecast", historical: false },
-    { year: "FY2032", revenue: fy2032, baselineRevenue: fy2032Baseline, revenueShortfall: fy2032Baseline - fy2032, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: 0, type: "Forecast", historical: false }
+    { year: "FY2028", revenue: fy2028, baselineRevenue: fy2028Baseline, revenueShortfall: fy2028Reduction, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: fy2028Reduction, type: "Forecast", historical: false },
+    { year: "FY2029", revenue: fy2029, baselineRevenue: fy2029Baseline, revenueShortfall: fy2029Reduction, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: fy2029Reduction, type: "Forecast", historical: false },
+    { year: "FY2030", revenue: fy2030, baselineRevenue: fy2030Baseline, revenueShortfall: 0, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: 0, type: "Forecast", historical: false },
+    { year: "FY2031", revenue: fy2031, baselineRevenue: fy2031Baseline, revenueShortfall: 0, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: 0, type: "Forecast", historical: false },
+    { year: "FY2032", revenue: fy2032, baselineRevenue: fy2032Baseline, revenueShortfall: 0, historicalSupportedExpense: null, projectedSupportedExpense: projectedSupportedExpenseBaseline, revenueReduction: 0, type: "Forecast", historical: false }
   ];
 
   return [...historicalYears, ...forecastYears];
@@ -451,7 +451,7 @@ function createAssumptions() {
   const expenditureAssumptions = [
     "The main trend chart uses ad valorem supported expense, not gross total county expenditures.",
     "Historical ad valorem supported expense reconciles to historical ad valorem revenue for FY2022 through FY2025.",
-    "FY2027 through FY2032 projected supported expense equals the included-department baseline used by the scenario reduction model.",
+    "FY2027 through FY2032 projected supported expense equals the FY2027 ad valorem-supported department budget baseline used by the scenario reduction model.",
     "Departments outside the property-tax simulation are not stored in the active scenario reduction model."
   ];
   const methodology = [
