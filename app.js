@@ -248,14 +248,22 @@ function infoButton(text) {
   return `<button class="info-button" type="button" aria-label="More information" data-tip="${text.replace(/"/g, "&quot;")}">i</button>`;
 }
 
-function renderDrivers() {
-  $("#personnelDriverControls").innerHTML = budgetData.personnelCostFactors.map((factor) => `
+function personnelDriverCardsMarkup() {
+  return budgetData.personnelCostFactors.map((factor) => `
     <div class="driver-card">
       <span>${factor.label} ${infoButton(factor.note)}</span>
       <strong>${percent(factor.percentOfTotal)}</strong>
       <small>of total personnel cost</small>
     </div>
   `).join("");
+}
+
+function renderDrivers() {
+  const oldContainer = $("#personnelDriverControls");
+  if (!oldContainer) return;
+  oldContainer.innerHTML = "";
+  const oldPanel = oldContainer.closest("article, .panel, section");
+  if (oldPanel) oldPanel.hidden = true;
 }
 
 function renderLocks() {
@@ -265,7 +273,8 @@ function renderLocks() {
 }
 
 function renderPersonnel() {
-  $("#personnelControls").innerHTML = departments().filter((department) => department.fteCount > 0 && !department.nonFteAdjustable).sort(sortDepartments).map((department) => {
+  const personnelDriverRow = `<tr class="personnel-driver-row"><td colspan="8"><div class="personnel-driver-inline"><div><h4>Personnel Cost Factors</h4><p>These percentages show each factor as a share of total personnel cost.</p></div><div class="personnel-driver-grid">${personnelDriverCardsMarkup()}</div></div></td></tr>`;
+  $("#personnelControls").innerHTML = personnelDriverRow + departments().filter((department) => department.fteCount > 0 && !department.nonFteAdjustable).sort(sortDepartments).map((department) => {
     const isLocked = locked(department.id);
     const averageCost = fteCost(department);
     state.buyoutCosts[department.id] ??= Math.round(averageCost * 0.35);
@@ -411,6 +420,45 @@ function setupScenarioAccordions() {
 
       .scenario-accordion-content[hidden] {
         display: none;
+      }
+
+      .personnel-driver-row td {
+        padding: 0 0 16px;
+        border-bottom: 0;
+      }
+
+      .personnel-driver-inline {
+        border: 1px solid rgba(0, 98, 49, 0.18);
+        border-radius: 16px;
+        background: rgba(0, 98, 49, 0.04);
+        padding: 16px;
+        margin-bottom: 8px;
+      }
+
+      .personnel-driver-inline h4 {
+        margin: 0 0 4px;
+        color: #006231;
+      }
+
+      .personnel-driver-inline p {
+        margin: 0 0 12px;
+        color: #56635d;
+      }
+
+      .personnel-driver-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .personnel-driver-grid .driver-card {
+        background: #ffffff;
+      }
+
+      @media (max-width: 760px) {
+        .personnel-driver-grid {
+          grid-template-columns: 1fr;
+        }
       }
 
       .department-explorer-controls {
