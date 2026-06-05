@@ -39,7 +39,7 @@ a { color: inherit; }
   top: 0;
   z-index: 20;
   background: rgba(255, 255, 255, 0.96);
-  border-bottom: 4px solid var(--color-secondary);
+  border-bottom: 4px solid var(--color-primary);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
 .header-inner {
