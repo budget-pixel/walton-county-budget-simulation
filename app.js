@@ -21,6 +21,8 @@ const state = {
   overviewFiscalYear: "FY2027 Budget",
   rankingTab: "support",
   rankingSearch: "",
+  departmentSort: "support",
+  departmentSearch: "",
   showAllTopServices: false,
   showAllDepartmentCards: false,
   showAllRankings: false,
@@ -313,17 +315,42 @@ function renderTopServices() {
 
 function renderRankings() {
   const rows = sortedRankingRows();
-  const cards = state.showAllRankings ? rows : rows.slice(0, 8);
-  $("#rankingCards").innerHTML = cards.map((row, index) => `<article class="ranking-card ${row.constitutional ? "constitutional-card" : ""}"><div><span>${index + 1}</span><strong>${row.name}</strong></div><dl><div><dt>Ad Valorem Support</dt><dd>${money(row.support)}</dd></div><div><dt>FTE</dt><dd>${number(row.fte)}</dd></div><div><dt>Budget</dt><dd>${money(row.budget)}</dd></div></dl></article>`).join("") + (rows.length > 8 ? `<button class="view-all-button" data-control="toggle-rankings">${state.showAllRankings ? "Show Less" : "View All"}</button>` : "");
-  $("#rankingTable").innerHTML = rows.map((row) => `<tr><td>${row.name}</td><td>${money(row.support)}</td><td>${number(row.fte)}</td><td>${money(row.budget)}</td></tr>`).join("");
-  $("#rankingTableWrap").hidden = true;
+  const rankingCards = $("#rankingCards");
+  if (rankingCards) rankingCards.innerHTML = "";
+  const rankingTable = $("#rankingTable");
+  if (rankingTable) rankingTable.innerHTML = rows.map((row) => `<tr><td>${row.name}</td><td>${money(row.support)}</td><td>${number(row.fte)}</td><td>${money(row.budget)}</td></tr>`).join("");
+  const rankingTableWrap = $("#rankingTableWrap");
+  if (rankingTableWrap) rankingTableWrap.hidden = true;
+}
+
+function departmentExplorerRows() {
+  const query = state.departmentSearch.trim().toLowerCase();
+  const rows = departments()
+    .filter((department) => !query || department.name.toLowerCase().includes(query));
+
+  if (state.departmentSort === "support") return rows.sort((a, b) => departmentSupport(b, state.departmentFiscalYear) - departmentSupport(a, state.departmentFiscalYear) || sortDepartments(a, b));
+  if (state.departmentSort === "fte") return rows.sort((a, b) => b.fteCount - a.fteCount || sortDepartments(a, b));
+  if (state.departmentSort === "budget") return rows.sort((a, b) => b.totalBudget - a.totalBudget || sortDepartments(a, b));
+  return rows.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 function renderDepartments() {
-  const rows = departments().sort(sortDepartments);
+  const rows = departmentExplorerRows();
   const visibleRows = state.showAllDepartmentCards ? rows : rows.slice(0, 4);
   const budgetYear = state.departmentFiscalYear === "FY2027 Budget";
-  $("#departmentCards").innerHTML = visibleRows.map((department) => {
+  const controls = `
+    <div class="department-explorer-controls">
+      <label><span>Sort Departments</span><select data-control="department-sort">
+        <option value="support" ${state.departmentSort === "support" ? "selected" : ""}>Ad Valorem Support</option>
+        <option value="fte" ${state.departmentSort === "fte" ? "selected" : ""}>FTE</option>
+        <option value="budget" ${state.departmentSort === "budget" ? "selected" : ""}>Total Budget</option>
+        <option value="alpha" ${state.departmentSort === "alpha" ? "selected" : ""}>A-Z</option>
+      </select></label>
+      <label><span>Search Departments</span><input type="search" value="${state.departmentSearch.replace(/"/g, "&quot;")}" placeholder="Search department" data-control="department-search"></label>
+      <button type="button" class="view-all-button" data-control="export-rankings">Export Department Data</button>
+    </div>
+  `;
+  $("#departmentCards").innerHTML = controls + visibleRows.map((department) => {
     const record = historicalFundingData.find((item) => item.department === department.name)?.history.find((item) => item.fiscalYear === state.departmentFiscalYear);
     return `<article class="panel department-card ${constitutional(department) ? "constitutional-card" : ""}"><h3>${department.name}</h3><div class="department-primary-metric"><span>${budgetYear ? "FY2027 Ad Valorem Support" : "Ad Valorem Support"}</span><strong>${money(budgetYear ? departmentSupport(department) : record?.adValoremSupport || 0)}</strong></div><div class="detail-grid">${budgetYear ? detail("Personnel Budget", department.personnelBudget) + detail("Operating Budget", department.operatingBudget) + detail("Capital Budget", department.capitalBudget) + detail("Total Budget", department.totalBudget) + detail("FTE Count", department.fteCount, number) + detail("Average Personnel Cost", fteCost(department)) : record ? detail("Gross Expense", record.grossExpense) + detail("Department Revenue", record.departmentRevenue) + detail("Net Expense", record.netExpense) + detail("Ad Valorem Support", record.adValoremSupport) : '<p class="historical-note">No record available.</p>'}</div></article>`;
   }).join("") + (rows.length > 4 ? `<button class="view-all-button department-view-all-button" data-control="toggle-department-cards">${state.showAllDepartmentCards ? "Show Less" : "View All"}</button>` : "");
@@ -384,6 +411,35 @@ function setupScenarioAccordions() {
 
       .scenario-accordion-content[hidden] {
         display: none;
+      }
+
+      .department-explorer-controls {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .department-explorer-controls label {
+        display: grid;
+        gap: 6px;
+        font-weight: 800;
+        color: #006231;
+      }
+
+      .department-explorer-controls select,
+      .department-explorer-controls input {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid rgba(0, 98, 49, 0.24);
+        border-radius: 12px;
+        padding: 8px 10px;
+      }
+
+      @media (max-width: 760px) {
+        .department-explorer-controls {
+          grid-template-columns: 1fr;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -743,6 +799,7 @@ document.addEventListener("input", (event) => {
     updateResults();
   }
   if (control === "ranking-search") { state.rankingSearch = event.target.value; renderRankings(); }
+  if (control === "department-search") { state.departmentSearch = event.target.value; state.showAllDepartmentCards = false; renderDepartments(); }
   if (control === "scenario-meta") { state.scenarioMeta[event.target.dataset.field] = event.target.value; }
   if (control === "millage" && isStaffMode) { state.proposedMillage = Number(event.target.value || 0); updateResults(); }
   if (control === "revenue-target" && isStaffMode) { state.proposedMillage = parseMoney(event.target.value) / budgetData.millageAssumptions.taxableValueBase * 1000; updateResults(); }
@@ -764,6 +821,7 @@ document.addEventListener("change", (event) => {
   }
   if (control === "department-lock") { state.lockedDepartments[event.target.dataset.department] = event.target.checked; rerender(); }
   if (control === "department-year") { state.departmentFiscalYear = event.target.value; renderDepartments(); }
+  if (control === "department-sort") { state.departmentSort = event.target.value; state.showAllDepartmentCards = false; renderDepartments(); }
   if (control === "overview-year") { state.overviewFiscalYear = event.target.value; renderTopServices(); }
   if (control === "scenario-select") { state.selectedScenarioName = event.target.value; renderScenarioComparison(); }
   if (control === "homestead") { state.useHomesteadExemption = event.target.checked; renderTax(); }
