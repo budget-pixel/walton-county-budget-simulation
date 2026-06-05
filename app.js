@@ -299,11 +299,9 @@ function getRankingRows(fiscalYear = "FY2025") {
     const department = departmentsByName.get(name);
     const record = getHistoricalRecord(name, fiscalYear);
     const support = record?.adValoremSupport || 0;
-    const netExpense = record?.netExpense || 0;
     return {
       name,
       support,
-      dependency: netExpense > 0 ? (support / netExpense) * 100 : 0,
       fte: department?.fteCount || 0,
       budget: department?.totalBudget || 0
     };
@@ -324,7 +322,6 @@ function createTopServicesBars() {
 }
 
 function getRankingSortValue(row) {
-  if (state.rankingTab === "dependency") return row.dependency;
   if (state.rankingTab === "fte") return row.fte;
   if (state.rankingTab === "budget") return row.budget;
   return row.support;
@@ -347,7 +344,6 @@ function createRankings() {
       <div class="bar-track"><div class="bar-fill" style="width:${(getRankingSortValue(row) / max) * 100}%"></div></div>
       <dl>
         <div><dt>Ad Valorem Support</dt><dd>${formatCurrency(row.support)}</dd></div>
-        <div><dt>Dependency</dt><dd>${formatPercent(row.dependency)}</dd></div>
         <div><dt>FTE</dt><dd>${formatNumber(row.fte)}</dd></div>
         <div><dt>Budget</dt><dd>${formatCurrency(row.budget)}</dd></div>
       </dl>
@@ -358,7 +354,6 @@ function createRankings() {
     <tr>
       <td><strong>${row.name}</strong></td>
       <td>${formatCurrency(row.support)}</td>
-      <td>${formatPercent(row.dependency)}</td>
       <td>${formatNumber(row.fte)}</td>
       <td>${formatCurrency(row.budget)}</td>
     </tr>
@@ -401,13 +396,11 @@ function detailItem(label, value, formatter = formatCurrency) {
 }
 
 function historicalDetailItems(record) {
-  const dependency = record.netExpense > 0 ? (record.adValoremSupport / record.netExpense) * 100 : 0;
   return [
     detailItem("Gross Expense", record.grossExpense),
     hasValue(record.departmentRevenue) ? detailItem("Department Revenue", record.departmentRevenue) : "",
     hasValue(record.netExpense) ? detailItem("Net Expense", record.netExpense) : "",
-    detailItem("Ad Valorem Support", record.adValoremSupport),
-    dependency > 0 ? detailItem("Ad Valorem Dependency", dependency, formatPercent) : ""
+    detailItem("Ad Valorem Support", record.adValoremSupport)
   ].join("");
 }
 
@@ -467,8 +460,7 @@ function createAssumptions() {
     { name: "Revenue Shortfall Addressed", formula: "Selected Reductions / Total Revenue Shortfall, capped at 100%" },
     { name: "Personnel Reduction", formula: "FTE Reduction x Average Cost Per FTE" },
     { name: "Operating Reduction", formula: "Operating Budget x Reduction Percentage" },
-    { name: "Capital Reduction", formula: "Sum of Removed Capital Project Costs" },
-    { name: "Ad Valorem Dependency", formula: "Ad Valorem Support / Net Expense" }
+    { name: "Capital Reduction", formula: "Sum of Removed Capital Project Costs" }
   ];
   const renderList = (selector, items) => {
     document.querySelector(selector).innerHTML = items.map((item) => `<li>${item}</li>`).join("");
