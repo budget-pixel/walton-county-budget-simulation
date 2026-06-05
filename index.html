@@ -30,7 +30,7 @@
           <p class="eyebrow">Executive Dashboard</p>
           <h2>Projected Fiscal Outlook</h2>
         </div>
-        <p class="section-summary">Planning estimates show the impact of property tax revenue reductions against projected operating and capital expenses.</p>
+        <p class="section-summary">Planning estimates show the impact of property tax revenue reductions alongside actual expenditure history and projected expenditures.</p>
       </div>
 
       <div class="summary-grid" id="dashboardCards"></div>
@@ -38,7 +38,7 @@
       <div class="chart-grid">
         <article class="panel">
           <div class="panel-header">
-            <h3>Revenue vs Expense Trend</h3>
+            <h3>Revenue and Expenditure Trend</h3>
           </div>
           <div class="chart-wrap">
             <canvas id="trendChart"></canvas>
@@ -46,7 +46,7 @@
         </article>
         <article class="panel">
           <div class="panel-header">
-            <h3>Budget Gap Trend</h3>
+            <h3>Revenue Shortfall Trend</h3>
           </div>
           <div class="chart-wrap">
             <canvas id="gapChart"></canvas>
@@ -59,7 +59,7 @@
       <div class="section-heading">
         <div>
           <p class="eyebrow">Build Your Own Budget</p>
-          <h2>Close the Projected Gap</h2>
+          <h2>Address the Projected Revenue Shortfall</h2>
         </div>
         <p class="section-summary">Adjust personnel, operating, and capital levers to see immediate financial consequences. The simulation does not recommend cuts.</p>
       </div>
@@ -67,7 +67,7 @@
       <div class="builder-layout">
         <div class="builder-main">
           <article class="panel gap-callout">
-            <p class="eyebrow">Starting Projected Budget Gap</p>
+            <p class="eyebrow">Starting Projected Revenue Shortfall</p>
             <div id="startingGap" class="callout-value"></div>
           </article>
 
@@ -86,7 +86,7 @@
                     <th>Current FTE</th>
                     <th>Average Cost Per FTE</th>
                     <th>Reduction</th>
-                    <th>Personnel Savings</th>
+                    <th>Personnel Reduction</th>
                   </tr>
                 </thead>
                 <tbody id="personnelControls"></tbody>
@@ -126,33 +126,33 @@
             <div id="budgetStatus" class="status-banner"></div>
             <dl class="results-list">
               <div>
-                <dt>Budget Gap</dt>
+                <dt>Revenue Shortfall</dt>
                 <dd id="resultBudgetGap"></dd>
               </div>
               <div>
-                <dt>Personnel Savings</dt>
+                <dt>Personnel Reductions</dt>
                 <dd id="resultPersonnelSavings"></dd>
               </div>
               <div>
-                <dt>Operating Savings</dt>
+                <dt>Operating Reductions</dt>
                 <dd id="resultOperatingSavings"></dd>
               </div>
               <div>
-                <dt>Capital Savings</dt>
+                <dt>Capital Reductions</dt>
                 <dd id="resultCapitalSavings"></dd>
               </div>
               <div class="total-row">
-                <dt>Total Savings</dt>
+                <dt>Total Reductions</dt>
                 <dd id="resultTotalSavings"></dd>
               </div>
               <div class="remaining-row">
-                <dt>Remaining Gap</dt>
+                <dt>Remaining Revenue Shortfall</dt>
                 <dd id="resultRemainingGap"></dd>
               </div>
             </dl>
             <div class="progress-block">
               <div class="progress-label">
-                <span>Gap Closed</span>
+                <span>Revenue Shortfall Addressed</span>
                 <strong id="gapClosedPercent"></strong>
               </div>
               <div class="progress-track">
@@ -180,9 +180,9 @@
                 <th>Department</th>
                 <th>FTE Reduced</th>
                 <th>Operating Reduction</th>
-                <th>Personnel Savings</th>
-                <th>Operating Savings</th>
-                <th>Total Department Savings</th>
+                <th>Personnel Reduction</th>
+                <th>Operating Reduction Amount</th>
+                <th>Total Department Reduction</th>
               </tr>
             </thead>
             <tbody id="impactTable"></tbody>
@@ -219,7 +219,7 @@
           <ul id="revenueAssumptions"></ul>
         </article>
         <article class="panel">
-          <h3>Inflation Assumptions</h3>
+          <h3>Expenditure Assumptions</h3>
           <ul id="inflationAssumptions"></ul>
         </article>
         <article class="panel">
@@ -235,7 +235,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>Walton County Budget Simulation is a browser-based planning model using sample data for public discussion.</p>
+    <p>Walton County Budget Simulation is a browser-based planning model using county revenue, expenditure, and department budget data for public discussion.</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
