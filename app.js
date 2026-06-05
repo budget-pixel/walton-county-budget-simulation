@@ -140,8 +140,8 @@ function scenarioTotals(raw = false) {
   const departmentImpacts = budgetData.departments.map((department) => {
     const isLocked = locked(department.id) || excluded(department);
     const averageCost = fteCost(department);
-    const fteReduction = !isLocked && department.fteCount > 0 && !department.nonFteAdjustable ? Number(state.fteReductions[department.id] || 0) : 0;
-    const buyoutCount = isLocked ? 0 : Math.min(Number(state.buyoutCounts[department.id] || 0), Math.max(department.fteCount - fteReduction, 0));
+    const fteReduction = !isLocked && department.fteCount > 0 && !department.nonFteAdjustable && department.name !== "Board of County Commissioners" ? Number(state.fteReductions[department.id] || 0) : 0;
+    const buyoutCount = isLocked || department.name === "Board of County Commissioners" ? 0 : Math.min(Number(state.buyoutCounts[department.id] || 0), Math.max(department.fteCount - fteReduction, 0));
     const buyoutCost = isLocked ? 0 : Number(state.buyoutCosts[department.id] || 0);
     const operatingPercent = isLocked || constitutional(department) ? 0 : Number(state.operatingReductions[department.id] || 0);
     const personnelReduction = (fteReduction + buyoutCount) * averageCost;
@@ -296,7 +296,7 @@ function renderPersonnel() {
   if (costFactors) {
     costFactors.innerHTML = `<div class="personnel-factor-compact-header"><h4>Personnel Cost Factors</h4><p>Percentage of total personnel cost.</p></div><div class="personnel-driver-grid personnel-driver-grid-compact">${personnelDriverCardsMarkup()}</div>`;
   }
-  $("#personnelControls").innerHTML = departments().filter((department) => department.fteCount > 0 && !department.nonFteAdjustable).sort(sortDepartments).map((department) => {
+  $("#personnelControls").innerHTML = departments().filter((department) => department.fteCount > 0 && !department.nonFteAdjustable && department.name !== "Board of County Commissioners").sort(sortDepartments).map((department) => {
     const isLocked = locked(department.id);
     const averageCost = fteCost(department);
     state.buyoutCosts[department.id] ??= Math.round(averageCost * 0.35);
@@ -386,7 +386,23 @@ function renderDepartments() {
   }
   $("#departmentCards").innerHTML = visibleRows.map((department) => {
     const record = historicalFundingData.find((item) => item.department === department.name)?.history.find((item) => item.fiscalYear === state.departmentFiscalYear);
-    return `<article class="panel department-card ${constitutional(department) ? "constitutional-card" : ""}"><h3>${department.name}</h3><div class="department-primary-metric"><span>${budgetYear ? "FY2027 Ad Valorem Support" : "Ad Valorem Support"}</span><strong>${money(budgetYear ? departmentSupport(department) : record?.adValoremSupport || 0)}</strong></div><div class="detail-grid">${budgetYear ? detail("Personnel Budget", department.personnelBudget) + detail("Operating Budget", department.operatingBudget) + detail("Capital Budget", department.capitalBudget) + detail("Total Budget", department.totalBudget) + detail("FTE Count", department.fteCount, number) + detail("Average Personnel Cost", fteCost(department)) : record ? detail("Gross Expense", record.grossExpense) + detail("Department Revenue", record.departmentRevenue) + detail("Net Expense", record.netExpense) + detail("Ad Valorem Support", record.adValoremSupport) : '<p class="historical-note">No record available.</p>'}</div></article>`;
+    return `<article class="panel department-card ${constitutional(department) ? "constitutional-card" : ""}"><h3>${department.name}</h3><div class="department-primary-metric"><span>${budgetYear ? "FY2027 Ad Valorem Support" : "Ad Valorem Support"}</span><strong>${money(budgetYear ? departmentSupport(department) : record?.adValoremSupport || 0)}</strong></div><div class="detail-grid">${
+      budgetYear
+        ? detail("Personnel Budget", department.personnelBudget)
+          + detail("Operating Budget", department.operatingBudget)
+          + detail("Capital Budget", department.capitalBudget)
+          + detail("Total Budget", department.totalBudget)
+          + detail("FTE Count", department.fteCount, number)
+          + (!constitutional(department) && department.name !== "Board of County Commissioners"
+              ? detail("Average Personnel Cost", fteCost(department))
+              : "")
+        : record
+          ? detail("Gross Expense", record.grossExpense)
+            + detail("Department Revenue", record.departmentRevenue)
+            + detail("Net Expense", record.netExpense)
+            + detail("Ad Valorem Support", record.adValoremSupport)
+          : '<p class="historical-note">No record available.</p>'
+    }</div></article>`;
   }).join("") + (rows.length > 4 ? `<button class="view-all-button department-view-all-button" data-control="toggle-department-cards">${state.showAllDepartmentCards ? "Show Less" : "View All"}</button>` : "");
 }
 
@@ -842,12 +858,12 @@ document.addEventListener("input", (event) => {
   if (control === "fte") {
     const department = budgetData.departments.find((item) => item.id === id);
     state.fteReductions[id] = capPublicFte(department, Number(event.target.value || 0));
-    renderPersonnel(); updateResults();
+    updateResults();
   }
   if (control === "buyout-count") {
     const department = budgetData.departments.find((item) => item.id === id);
     state.buyoutCounts[id] = capPublicBuyout(department, Number(event.target.value || 0));
-    renderPersonnel(); updateResults();
+    updateResults();
   }
   if (control === "buyout-cost") { state.buyoutCosts[id] = parseMoney(event.target.value); updateResults(); }
   if (control === "operating") {
