@@ -915,3 +915,57 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   .department-side-detail { position: static; }
   .property-tax-embed { min-height: 840px; }
 }
+
+#departments .detail-toolbar {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.55fr) minmax(260px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+#departments .department-explorer-controls {
+  display: contents;
+}
+
+#departments .department-explorer-controls label {
+  display: grid;
+  gap: 6px;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+#departments .department-explorer-controls span {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+#departments .compact-export-button {
+  justify-self: end;
+  min-height: 38px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.department-list-scroll {
+  max-height: 342px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.department-list-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+@media (max-width: 740px) {
+  #departments .detail-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  #departments .compact-export-button {
+    justify-self: stretch;
+  }
+}

@@ -28,7 +28,6 @@ const state = {
   overviewFiscalYear: "FY2027 Budget",
   rankingTab: "support",
   rankingSearch: "",
-  departmentSort: "support",
   departmentSearch: "",
   selectedDepartmentId: "",
   showAllTopServices: false,
@@ -358,20 +357,12 @@ function renderRankings() {
   if (rankingTableWrap) rankingTableWrap.hidden = true;
 }
 
-function departmentBudgetForYear(department, fiscalYear) {
-  if (fiscalYear === "FY2027 Budget") return department.totalBudget;
-  return historicalFundingData.find((item) => item.department === department.name)?.history.find((record) => record.fiscalYear === fiscalYear)?.grossExpense || 0;
-}
-
 function departmentExplorerRows() {
   const query = state.departmentSearch.trim().toLowerCase();
   const rows = departments()
     .filter((department) => !query || department.name.toLowerCase().includes(query));
 
-  if (state.departmentSort === "support") return rows.sort((a, b) => departmentSupport(b, state.departmentFiscalYear) - departmentSupport(a, state.departmentFiscalYear) || sortDepartments(a, b));
-  if (state.departmentSort === "fte") return rows.sort((a, b) => b.fteCount - a.fteCount || sortDepartments(a, b));
-  if (state.departmentSort === "budget") return rows.sort((a, b) => departmentBudgetForYear(b, state.departmentFiscalYear) - departmentBudgetForYear(a, state.departmentFiscalYear) || sortDepartments(a, b));
-  return rows.sort((a, b) => a.name.localeCompare(b.name));
+  return rows.sort((a, b) => departmentSupport(b, state.departmentFiscalYear) - departmentSupport(a, state.departmentFiscalYear) || sortDepartments(a, b));
 }
 
 function renderDepartments() {
@@ -384,14 +375,8 @@ function renderDepartments() {
   const controlsTarget = $("#departmentExplorerControls");
   if (controlsTarget) {
     controlsTarget.innerHTML = `
-      <label><span>Sort Departments</span><select data-control="department-sort">
-        <option value="support" ${state.departmentSort === "support" ? "selected" : ""}>Ad Valorem Support</option>
-        <option value="fte" ${state.departmentSort === "fte" ? "selected" : ""}>FTE</option>
-        <option value="budget" ${state.departmentSort === "budget" ? "selected" : ""}>Total Budget</option>
-        <option value="alpha" ${state.departmentSort === "alpha" ? "selected" : ""}>A-Z</option>
-      </select></label>
       <label><span>Search Departments</span><input type="search" value="${state.departmentSearch.replace(/"/g, "&quot;")}" placeholder="Search department" data-control="department-search"></label>
-      <button type="button" class="view-all-button" data-control="export-rankings">Export Department Data</button>
+      <button type="button" class="view-all-button compact-export-button" data-control="export-rankings">Export</button>
     `;
   }
 
@@ -948,7 +933,6 @@ document.addEventListener("change", (event) => {
   }
   if (control === "department-lock") { state.lockedDepartments[event.target.dataset.department] = event.target.checked; rerender(); }
   if (control === "department-year") { state.departmentFiscalYear = event.target.value; renderDepartments(); }
-  if (control === "department-sort") { state.departmentSort = event.target.value; renderDepartments(); }
   if (control === "overview-year") { state.overviewFiscalYear = event.target.value; renderTopServices(); }
   if (control === "scenario-select") { state.selectedScenarioName = event.target.value; renderScenarioComparison(); }
 });
