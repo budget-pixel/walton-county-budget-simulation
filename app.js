@@ -218,7 +218,6 @@ function clampOperatingReduction(department, requestedPercentReduction) {
 
 function createHero() {
   const scenario = getScenario();
-  document.querySelector("#heroRevenueReduction").textContent = formatCurrency(state.revenueAssumptions.fy2028RevenueReduction);
   document.querySelector("#heroRevenueShortfall").textContent = formatCurrency(scenario.revenueShortfall);
 }
 
@@ -491,6 +490,7 @@ function createCharts() {
       labels: fiscalYears.map((year) => year.year),
       datasets: [
         { label: "Historical Ad Valorem Revenue", data: fiscalYears.map((year) => year.historical ? year.revenue : null), borderColor: "#006231", backgroundColor: "rgba(0, 98, 49, 0.12)", tension: 0.25, fill: false, spanGaps: false },
+        { label: "Projected Revenue", data: fiscalYears.map((year) => year.historical ? null : year.revenue), borderColor: "#006231", backgroundColor: "rgba(0, 98, 49, 0.08)", borderDash: [6, 6], tension: 0.25, fill: false, spanGaps: false },
         { label: "Historical Ad Valorem Supported Expense", data: fiscalYears.map((year) => year.historicalSupportedExpense), borderColor: "#24445a", backgroundColor: "rgba(36, 68, 90, 0.12)", tension: 0.25, fill: false, spanGaps: false },
         { label: "Projected Ad Valorem Supported Expense", data: fiscalYears.map((year) => year.projectedSupportedExpense), borderColor: "#d1be78", backgroundColor: "rgba(209, 190, 120, 0.16)", tension: 0.25, fill: false, spanGaps: false }
       ]
@@ -517,8 +517,9 @@ function updateCharts() {
   const shortfallYears = getProjectedShortfallYears();
   trendChart.data.labels = fiscalYears.map((year) => year.year);
   trendChart.data.datasets[0].data = fiscalYears.map((year) => year.historical ? year.revenue : null);
-  trendChart.data.datasets[1].data = fiscalYears.map((year) => year.historicalSupportedExpense);
-  trendChart.data.datasets[2].data = fiscalYears.map((year) => year.projectedSupportedExpense);
+  trendChart.data.datasets[1].data = fiscalYears.map((year) => year.historical ? null : year.revenue);
+  trendChart.data.datasets[2].data = fiscalYears.map((year) => year.historicalSupportedExpense);
+  trendChart.data.datasets[3].data = fiscalYears.map((year) => year.projectedSupportedExpense);
   trendChart.update();
   shortfallChart.data.labels = shortfallYears.map((year) => year.year);
   shortfallChart.data.datasets[0].data = shortfallYears.map((year) => year.revenueShortfall);
