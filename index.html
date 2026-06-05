@@ -164,13 +164,13 @@
           <div class="panel-header">
             <div>
               <p class="eyebrow">Trend</p>
-              <h3>Ad Valorem Revenue and Supported Expenses</h3>
+              <h3>Property Tax Revenue and Supported Expenses</h3>
             </div>
           </div>
           <div class="chart-wrap">
             <canvas id="trendChart"></canvas>
           </div>
-          <p class="forecast-note">Projected revenues reflect phased reductions in ad valorem revenue due to the proposed homestead exemption increase. The 2028 forecast includes an estimated $5.7 million revenue loss, while 2029 assumes a further $9.7 million reduction in property taxes. Forecast years FY2029 through FY2032 assume a 1.0% annual inflation rate for supported expenditures.</p>
+          <p class="forecast-note">Projected revenues reflect phased reductions in Property Tax revenue due to the proposed homestead exemption increase. The 2028 forecast includes an estimated $5.7 million revenue loss, while 2029 assumes a further $9.7 million reduction in property taxes. Forecast years FY2029 through FY2032 assume a 1.0% annual inflation rate for supported expenditures.</p>
         </article>
         <article class="panel">
           <div class="panel-header">
@@ -217,7 +217,7 @@
               <thead>
                 <tr>
                   <th>Department</th>
-                  <th>Ad Valorem Support</th>
+                  <th>Property Tax Support</th>
                   <th id="departmentBudgetColumn">Total Budget</th>
                   <th>FTE</th>
                 </tr>
@@ -429,7 +429,7 @@
           <p class="eyebrow">Context</p>
           <h2>Where Property Tax Revenue Goes</h2>
         </div>
-        <p>In FY2025, Walton County allocated approximately $149.4 million of ad valorem revenue to county and constitutional services.</p>
+        <p>In FY2025, Walton County allocated approximately $149.4 million of Property Tax revenue to county and constitutional services.</p>
       </div>
     </section>
 
@@ -443,13 +443,13 @@
             <button type="button" class="view-all-button" data-control="reset-millage" data-staff-only>Reset</button>
           </div>
           <div class="millage-grid">
-            <div class="metric-box"><span>Current Millage <button class="info-button" type="button" aria-label="Current millage help" data-tip="The millage rate is the property tax rate used to calculate countywide ad valorem revenue. One mill equals $1 of tax for every $1,000 of taxable value.">i</button></span><strong id="currentMillage"></strong></div>
-            <div class="metric-box"><span>Rollback Rate <button class="info-button" type="button" aria-label="Rollback rate help" data-tip="The rollback rate is the millage rate that would generate approximately the same ad valorem revenue as the prior fiscal year, using the current taxable value base. In this model, it is calculated from FY2026 budgeted ad valorem revenue of $155,766,296 and a taxable value base of $46,454,430,401.">i</button></span><strong id="rollbackRate"></strong></div>
+            <div class="metric-box"><span>Current Millage <button class="info-button" type="button" aria-label="Current millage help" data-tip="The millage rate is the property tax rate used to calculate countywide Property Tax revenue. One mill equals $1 of tax for every $1,000 of taxable value.">i</button></span><strong id="currentMillage"></strong></div>
+            <div class="metric-box"><span>Rollback Rate <button class="info-button" type="button" aria-label="Rollback rate help" data-tip="The rollback rate is the millage rate that would generate approximately the same Property Tax revenue as the prior fiscal year, using the current taxable value base. In this model, it is calculated from FY2026 budgeted Property Tax revenue of $155,766,296 and a taxable value base of $46,454,430,401.">i</button></span><strong id="rollbackRate"></strong></div>
             <label class="metric-box editable-millage"><span>Proposed Millage <button class="info-button" type="button" aria-label="Proposed millage help" data-tip="The proposed millage is a planning assumption. Changing it estimates how much revenue a different tax rate would generate using the taxable value base in this model.">i</button></span><input id="proposedMillage" type="text" inputmode="decimal" placeholder="Enter millage" data-control="millage"></label>
             <label class="metric-box editable-millage" data-staff-only><span>Revenue Target <button class="info-button" type="button" aria-label="Estimated revenue help" data-tip="Estimated revenue is calculated as taxable value base multiplied by millage, divided by 1,000. This is a planning estimate and may not match final certified tax roll calculations.">i</button></span><input id="revenueTarget" type="text" data-control="revenue-target" placeholder="$163,473,140"></label>
             <div class="metric-box"><span>Estimated Revenue <button class="info-button" type="button" aria-label="Estimated revenue help" data-tip="Estimated revenue is calculated as taxable value base multiplied by millage, divided by 1,000. This is a planning estimate and may not match final certified tax roll calculations.">i</button></span><strong id="estimatedMillageRevenue"></strong></div>
-            <div class="metric-box"><span>Vs Current Millage <button class="info-button" type="button" aria-label="Revenue difference help" data-tip="Revenue difference shows how much more or less ad valorem revenue the proposed millage would generate compared with the selected reference point, such as current millage or the rollback revenue target.">i</button></span><strong id="millageRevenueImpact"></strong></div>
-            <div class="metric-box"><span>Vs Rollback Revenue <button class="info-button" type="button" aria-label="Revenue difference help" data-tip="Revenue difference shows how much more or less ad valorem revenue the proposed millage would generate compared with the selected reference point, such as current millage or the rollback revenue target.">i</button></span><strong id="rollbackRevenueImpact"></strong></div>
+            <div class="metric-box"><span>Vs Current Millage <button class="info-button" type="button" aria-label="Revenue difference help" data-tip="Revenue difference shows how much more or less Property Tax revenue the proposed millage would generate compared with the selected reference point, such as current millage or the rollback revenue target.">i</button></span><strong id="millageRevenueImpact"></strong></div>
+            <div class="metric-box"><span>Vs Rollback Revenue <button class="info-button" type="button" aria-label="Revenue difference help" data-tip="Revenue difference shows how much more or less Property Tax revenue the proposed millage would generate compared with the selected reference point, such as current millage or the rollback revenue target.">i</button></span><strong id="rollbackRevenueImpact"></strong></div>
             <div class="metric-box"><span>Resulting Shortfall</span><strong id="millageShortfallImpact"></strong></div>
             <div class="metric-box"><span>Estimated Annual Property Tax Savings<button class="info-button" type="button" aria-label="Taxpayer impact help" data-tip="Taxpayer impact estimates how a millage or budget scenario could affect an individual property tax bill. Actual tax bills depend on taxable value, exemptions, assessment limitations, and final adopted millage rates.">i</button></span><strong id="taxpayerImpact"></strong><small><em>Example: A property with $200,000 in taxable value would save approximately twice this amount.</em></small></div>
           </div>
