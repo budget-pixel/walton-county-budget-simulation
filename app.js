@@ -8,7 +8,13 @@ const isStaffMode = new URLSearchParams(window.location.search).get("mode") === 
 const scenarioStoreKey = "waltonBudgetScenarios";
 
 const state = {
-  revenueAssumptions: { ...budgetData.revenueForecast.defaultAssumptions, futureRevenueGrowthRate: 0.01, futureExpenseInflationRate: 0.05 },
+  revenueAssumptions: {
+    ...budgetData.revenueForecast.defaultAssumptions,
+    baselineRevenue: budgetData.revenueForecast.baseRevenue,
+    baselineExpense: budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline,
+    futureRevenueGrowthRate: 0.01,
+    futureExpenseInflationRate: 0.05
+  },
   personnelDrivers: { ...budgetData.personnelCostDrivers },
   scenarioMeta: { name: "", author: "", notes: "" },
   fteReductions: {},
@@ -92,13 +98,14 @@ function millageRevenueImpact() {
 }
 
 function fiscalYears() {
-  const baseRevenue = budgetData.revenueForecast.baseRevenue;
+  const baseRevenue = Number(state.revenueAssumptions.baselineRevenue || budgetData.revenueForecast.baseRevenue);
+  const baselineExpense = Number(state.revenueAssumptions.baselineExpense || budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline);
   const growth = Number(state.revenueAssumptions.futureRevenueGrowthRate || 0);
   const expenseGrowth = Number(state.revenueAssumptions.futureExpenseInflationRate || 0);
   const fy2028Reduction = Number(state.revenueAssumptions.fy2028RevenueReduction || 0);
   const fy2029Reduction = Number(state.revenueAssumptions.fy2029RevenueReduction || 0);
   const revenue = [baseRevenue + millageRevenueImpact(), baseRevenue - fy2028Reduction - fy2029Reduction + millageRevenueImpact()];
-  const expense = [budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline, 154000000];
+  const expense = [baselineExpense, 154000000];
   for (let index = 2; index < 6; index += 1) {
     revenue[index] = revenue[index - 1] * (1 + growth);
     expense[index] = expense[index - 1] * (1 + expenseGrowth);
@@ -269,6 +276,19 @@ function renderDrivers() {
   if (oldPanel) oldPanel.hidden = true;
 }
 
+function renderStaffRevenueControls() {
+  const container = $("#staffRevenueControls");
+  if (!container) return;
+  container.innerHTML = `
+    <label><span>Revenue Growth</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureRevenueGrowthRate * 100}" data-control="revenue-assumption" data-assumption="futureRevenueGrowthRate"></label>
+    <label><span>Baseline Revenue</span><input type="text" value="${moneyInput(state.revenueAssumptions.baselineRevenue)}" data-control="revenue-assumption" data-assumption="baselineRevenue" data-format="currency"></label>
+    <label><span>Baseline Expense</span><input type="text" value="${moneyInput(state.revenueAssumptions.baselineExpense)}" data-control="revenue-assumption" data-assumption="baselineExpense" data-format="currency"></label>
+    <label><span>FY2029+ Inflation Rate</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureExpenseInflationRate * 100}" data-control="revenue-assumption" data-assumption="futureExpenseInflationRate"></label>
+    <label><span>FY2028 Revenue Reduction</span><input type="text" value="${moneyInput(state.revenueAssumptions.fy2028RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2028RevenueReduction" data-format="currency"></label>
+    <label><span>FY2029 Revenue Reduction</span><input type="text" value="${moneyInput(state.revenueAssumptions.fy2029RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2029RevenueReduction" data-format="currency"></label>
+  `;
+}
+
 function renderLocks() {
   const container = $("#departmentLocks");
   if (!container) return;
@@ -276,8 +296,11 @@ function renderLocks() {
 }
 
 function renderPersonnel() {
-  const personnelDriverRow = `<tr class="personnel-driver-row"><td colspan="8"><div class="section-clear-row"><div class="personnel-driver-inline"><div><h4>Personnel Cost Factors</h4><p>These percentages show each factor as a share of total personnel cost.</p></div><div class="personnel-driver-grid">${personnelDriverCardsMarkup()}</div></div><button type="button" class="clear-section-button" data-control="clear-personnel">Clear Personnel Reductions</button></div></td></tr>`;
-  $("#personnelControls").innerHTML = personnelDriverRow + departments().filter((department) => department.fteCount > 0 && !department.nonFteAdjustable).sort(sortDepartments).map((department) => {
+  const costFactors = $("#personnelCostFactorsInline");
+  if (costFactors) {
+    costFactors.innerHTML = `<div><h4>Personnel Cost Factors</h4><p>These percentages show each factor as a share of total personnel cost.</p></div><div class="personnel-driver-grid">${personnelDriverCardsMarkup()}</div>`;
+  }
+  $("#personnelControls").innerHTML = departments().filter((department) => department.fteCount > 0 && !department.nonFteAdjustable).sort(sortDepartments).map((department) => {
     const isLocked = locked(department.id);
     const averageCost = fteCost(department);
     state.buyoutCosts[department.id] ??= Math.round(averageCost * 0.35);
@@ -297,11 +320,11 @@ function renderOperating() {
     const reductionPercent = Number(state.operatingReductions[department.id] || 0);
     const newOperatingBudget = department.operatingBudget * (1 - reductionPercent / 100);
     return `<div class="slider-row ${isLocked ? "locked-row" : ""}"><div><label>${department.name}</label><div class="slider-meta">Operating budget: ${money(department.operatingBudget)}${isLocked ? " | Locked" : ""}</div><div class="slider-meta slider-meta-secondary">New operating budget: ${money(newOperatingBudget)}</div></div><input class="operating-slider" type="range" min="0" max="100" value="${reductionPercent}" data-control="operating" data-department="${department.id}" ${isLocked ? "disabled" : ""}><label class="percent-entry"><input type="number" min="0" max="100" step="1" value="${reductionPercent}" data-control="operating-percent" data-department="${department.id}" ${isLocked ? "disabled" : ""}><span>%</span></label></div>`;
-  }).join("") + `<button type="button" class="clear-section-button" data-control="clear-operating">Clear Operating Reductions</button>`;
+  }).join("");
 }
 
 function renderCapital() {
-  $("#capitalControls").innerHTML = `<button type="button" class="clear-section-button" data-control="clear-capital">Clear Capital Reductions</button>` + budgetData.capitalProjects.map((project) => {
+  $("#capitalControls").innerHTML = budgetData.capitalProjects.map((project) => {
     state.keptProjects[project.id] ??= true;
     const isLocked = locked(project.departmentId);
     if (isLocked) state.keptProjects[project.id] = true;
@@ -352,8 +375,9 @@ function renderDepartments() {
   const rows = departmentExplorerRows();
   const visibleRows = state.showAllDepartmentCards ? rows : rows.slice(0, 4);
   const budgetYear = state.departmentFiscalYear === "FY2027 Budget";
-  const controls = `
-    <div class="department-explorer-controls">
+  const controlsTarget = $("#departmentExplorerControls");
+  if (controlsTarget) {
+    controlsTarget.innerHTML = `
       <label><span>Sort Departments</span><select data-control="department-sort">
         <option value="support" ${state.departmentSort === "support" ? "selected" : ""}>Ad Valorem Support</option>
         <option value="fte" ${state.departmentSort === "fte" ? "selected" : ""}>FTE</option>
@@ -362,9 +386,9 @@ function renderDepartments() {
       </select></label>
       <label><span>Search Departments</span><input type="search" value="${state.departmentSearch.replace(/"/g, "&quot;")}" placeholder="Search department" data-control="department-search"></label>
       <button type="button" class="view-all-button" data-control="export-rankings">Export Department Data</button>
-    </div>
-  `;
-  $("#departmentCards").innerHTML = controls + visibleRows.map((department) => {
+    `;
+  }
+  $("#departmentCards").innerHTML = visibleRows.map((department) => {
     const record = historicalFundingData.find((item) => item.department === department.name)?.history.find((item) => item.fiscalYear === state.departmentFiscalYear);
     return `<article class="panel department-card ${constitutional(department) ? "constitutional-card" : ""}"><h3>${department.name}</h3><div class="department-primary-metric"><span>${budgetYear ? "FY2027 Ad Valorem Support" : "Ad Valorem Support"}</span><strong>${money(budgetYear ? departmentSupport(department) : record?.adValoremSupport || 0)}</strong></div><div class="detail-grid">${budgetYear ? detail("Personnel Budget", department.personnelBudget) + detail("Operating Budget", department.operatingBudget) + detail("Capital Budget", department.capitalBudget) + detail("Total Budget", department.totalBudget) + detail("FTE Count", department.fteCount, number) + detail("Average Personnel Cost", fteCost(department)) : record ? detail("Gross Expense", record.grossExpense) + detail("Department Revenue", record.departmentRevenue) + detail("Net Expense", record.netExpense) + detail("Ad Valorem Support", record.adValoremSupport) : '<p class="historical-note">No record available.</p>'}</div></article>`;
   }).join("") + (rows.length > 4 ? `<button class="view-all-button department-view-all-button" data-control="toggle-department-cards">${state.showAllDepartmentCards ? "Show Less" : "View All"}</button>` : "");
@@ -475,7 +499,7 @@ function setupScenarioAccordions() {
         align-items: center;
         justify-content: center;
         min-height: 40px;
-        margin: 10px 0 14px;
+        margin: 0;
         padding: 9px 16px;
         border: 1px solid rgba(0, 98, 49, 0.24);
         border-radius: 999px;
@@ -496,10 +520,6 @@ function setupScenarioAccordions() {
         gap: 8px;
       }
 
-      .personnel-driver-row td {
-        padding: 0 0 16px;
-        border-bottom: 0;
-      }
 
       .personnel-driver-inline {
         border: 1px solid rgba(0, 98, 49, 0.18);
@@ -539,7 +559,7 @@ function setupScenarioAccordions() {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 12px;
-        margin-bottom: 16px;
+        margin-bottom: 0;
       }
 
       .department-explorer-controls label {
@@ -607,7 +627,7 @@ function setupScenarioAccordions() {
     panel.classList.add('scenario-accordion-panel');
 
     header.addEventListener('click', (event) => {
-      if (event.target.closest('a, input, select, textarea, label')) return;
+      if (event.target.closest('a, button, input, select, textarea, label')) return;
       const expanded = button.getAttribute('aria-expanded') === 'true';
       button.setAttribute('aria-expanded', String(!expanded));
       button.setAttribute('aria-label', `${expanded ? 'Expand' : 'Collapse'} ${title}`);
@@ -618,38 +638,57 @@ function setupScenarioAccordions() {
 }
 
 function renderAssumptions() {
-  $("#revenueAssumptionControls").innerHTML = `<label class="assumption-control"><span>Revenue Growth Rate</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureRevenueGrowthRate * 100}" data-control="revenue-assumption" data-assumption="futureRevenueGrowthRate" ${isStaffMode ? "" : "disabled"}></label><label class="assumption-control"><span>FY2029+ Supported Expense Inflation Rate</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureExpenseInflationRate * 100}" data-control="revenue-assumption" data-assumption="futureExpenseInflationRate" ${isStaffMode ? "" : "disabled"}></label><label class="assumption-control"><span>FY2028 Revenue Reduction</span><input type="text" value="${moneyInput(state.revenueAssumptions.fy2028RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2028RevenueReduction" data-format="currency" ${isStaffMode ? "" : "disabled"}></label><label class="assumption-control"><span>FY2029 Revenue Reduction</span><input type="text" value="${moneyInput(state.revenueAssumptions.fy2029RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2029RevenueReduction" data-format="currency" ${isStaffMode ? "" : "disabled"}></label><div class="forecast-table-wrap"><table class="forecast-table"><thead><tr><th>Fiscal Year</th><th>Revenue</th><th>Supported Expense</th><th>Status</th><th>Revenue Shortfall</th></tr></thead><tbody id="forecastTable"></tbody></table></div>`;
-  $("#revenueAssumptions").innerHTML = "<li>FY2027 revenue and supported expense are $163,473,140 before millage changes.</li><li>FY2028 supported expense is approximately $154,000,000.</li><li>Revenue shortfall equals projected supported expense minus projected revenue.</li>";
-  $("#inflationAssumptions").innerHTML = "<li>Personnel cost factors show both dollars and percent of total personnel cost.</li><li>Staff mode can edit assumptions, millage targets, and department locks.</li>";
+  $("#inflationAssumptions").innerHTML = "<li>Personnel cost factors show both dollars and percent of total personnel cost.</li><li>Staff mode can edit revenue forecast settings, millage targets, and department locks.</li><li>Expense inflation pressure represents the portion of forecast shortfall driven by expense growth after direct revenue reductions are applied.</li>";
   $("#methodologyList").innerHTML = "<li>Public reductions are capped at the projected revenue shortfall.</li><li>Staff mode may model surplus for internal planning.</li><li>Ranking exports are generated from internal data even though the full support table is hidden.</li>";
-  $("#formulaDefinitions").innerHTML = ["Revenue Shortfall = Projected Supported Expense - Projected Revenue", "Estimated Ad Valorem Revenue = Taxable Value Base x Millage / 1,000", "Required Millage = Target Revenue / Taxable Value Base x 1,000", "Rollback Rate = FY2026 Budgeted Ad Valorem Revenue / Taxable Value Base x 1,000", "Buy-Out First-Year Net = Recurring Reduction - One-Time Cost"].map((item) => `<div class="formula-item"><code>${item}</code></div>`).join("");
+  $("#formulaDefinitions").innerHTML = ["Revenue Shortfall = Projected Supported Expense - Projected Revenue", "Direct Revenue Reduction = Forecast baseline revenue less modeled revenue after reductions", "Expense Inflation Pressure = Revenue Shortfall - Direct Revenue Reduction", "Estimated Ad Valorem Revenue = Taxable Value Base x Millage / 1,000", "Required Millage = Target Revenue / Taxable Value Base x 1,000", "Rollback Rate = FY2026 Budgeted Ad Valorem Revenue / Taxable Value Base x 1,000", "Buy-Out First-Year Net = Recurring Reduction - One-Time Cost"].map((item) => `<div class="formula-item"><code>${item}</code></div>`).join("");
+}
+
+function shortfallComponents() {
+  const baseRevenue = Number(state.revenueAssumptions.baselineRevenue || budgetData.revenueForecast.baseRevenue);
+  return forecastYears().filter((year) => year.year !== "FY2027").map((year) => {
+    const projectedRevenueWithoutMillage = year.revenue - millageRevenueImpact();
+    const directRevenueReduction = Math.min(Math.max(baseRevenue - projectedRevenueWithoutMillage, 0), year.revenueShortfall);
+    const expenseInflationPressure = Math.max(year.revenueShortfall - directRevenueReduction, 0);
+    return { ...year, directRevenueReduction, expenseInflationPressure };
+  });
 }
 
 function renderForecast() {
-  $("#forecastTable").innerHTML = fiscalYears().map((year) => `<tr><td><strong>${year.year}</strong></td><td>${money(year.revenue)}</td><td>${year.historicalSupportedExpense == null ? money(year.projectedSupportedExpense) : money(year.historicalSupportedExpense)}</td><td>${year.type}</td><td class="${!year.historical && year.revenueShortfall ? "negative-value" : ""}">${year.historical ? "-" : year.revenueShortfall ? negativeMoney(year.revenueShortfall) : "$0"}</td></tr>`).join("");
+  const table = $("#forecastTable");
+  if (!table) return;
+  table.innerHTML = fiscalYears().map((year) => `<tr><td><strong>${year.year}</strong></td><td>${money(year.revenue)}</td><td>${year.historicalSupportedExpense == null ? money(year.projectedSupportedExpense) : money(year.historicalSupportedExpense)}</td><td>${year.type}</td><td class="${!year.historical && year.revenueShortfall ? "negative-value" : ""}">${year.historical ? "-" : year.revenueShortfall ? negativeMoney(year.revenueShortfall) : "$0"}</td></tr>`).join("");
 }
 
-function chartOptions(bar = false) {
-  return { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: bar, ticks: { callback: (value) => money(value) } } }, plugins: { tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${money(context.raw)}` } } } };
+function chartOptions(bar = false, stacked = false) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: { stacked },
+      y: { beginAtZero: bar, stacked, ticks: { callback: (value) => money(value) } }
+    },
+    plugins: { tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${money(context.raw)}` } } }
+  };
 }
 
 function renderCharts() {
   const forecast = forecastYears();
-  const shortfallYears = forecast.filter((year) => year.year !== "FY2027");
+  const components = shortfallComponents();
   Chart.defaults.font.family = "Arial, Helvetica, sans-serif";
   trendChart = new Chart($("#trendChart"), { type: "line", data: { labels: forecast.map((year) => year.year), datasets: [{ label: "Projected Revenue", data: forecast.map((year) => year.revenue), borderColor: "#006231", borderDash: [6, 6] }, { label: "Projected Ad Valorem Supported Expense", data: forecast.map((year) => year.projectedSupportedExpense), borderColor: "#d1be78" }] }, options: chartOptions() });
-  shortfallChart = new Chart($("#shortfallChart"), { type: "bar", data: { labels: shortfallYears.map((year) => year.year), datasets: [{ label: "Projected Revenue Shortfall", data: shortfallYears.map((year) => year.revenueShortfall), backgroundColor: "rgba(0,98,49,.74)" }] }, options: chartOptions(true) });
+  shortfallChart = new Chart($("#shortfallChart"), { type: "bar", data: { labels: components.map((year) => year.year), datasets: [{ label: "Direct Revenue Reduction", data: components.map((year) => year.directRevenueReduction), backgroundColor: "rgba(0, 98, 49, 0.78)", stack: "shortfall" }, { label: "Expense Inflation Pressure", data: components.map((year) => year.expenseInflationPressure), backgroundColor: "rgba(0, 98, 49, 0.28)", stack: "shortfall" }] }, options: chartOptions(true, true) });
 }
 
 function updateCharts() {
   const forecast = forecastYears();
-  const shortfallYears = forecast.filter((year) => year.year !== "FY2027");
+  const components = shortfallComponents();
   trendChart.data.labels = forecast.map((year) => year.year);
   trendChart.data.datasets[0].data = forecast.map((year) => year.revenue);
   trendChart.data.datasets[1].data = forecast.map((year) => year.projectedSupportedExpense);
   trendChart.update();
-  shortfallChart.data.labels = shortfallYears.map((year) => year.year);
-  shortfallChart.data.datasets[0].data = shortfallYears.map((year) => year.revenueShortfall);
+  shortfallChart.data.labels = components.map((year) => year.year);
+  shortfallChart.data.datasets[0].data = components.map((year) => year.directRevenueReduction);
+  shortfallChart.data.datasets[1].data = components.map((year) => year.expenseInflationPressure);
   shortfallChart.update();
 }
 
@@ -908,6 +947,7 @@ function searchParcels() {
 
 function rerender() {
   renderDrivers();
+  renderStaffRevenueControls();
   renderLocks();
   renderPersonnel();
   renderOperating();
@@ -1045,6 +1085,7 @@ function init() {
 
   syncScenarioFields();
   renderDrivers();
+  renderStaffRevenueControls();
   renderLocks();
   renderPersonnel();
   renderOperating();

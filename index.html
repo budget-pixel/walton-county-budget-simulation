@@ -133,6 +133,9 @@
         <a href="#tax-impact">Property Tax</a>
         <a href="#methodology">Methodology</a>
       </nav>
+      <div class="header-actions">
+        <button type="button" class="settings-button" data-control="toggle-tools" data-staff-only aria-label="Open scenario tools" aria-expanded="false">&#9881;</button>
+      </div>
     </div>
   </header>
 
@@ -235,13 +238,13 @@
             <option value="FY2027 Budget" selected>FY2027</option>
           </select>
         </label>
+        <div id="departmentExplorerControls" class="department-explorer-controls"></div>
       </div>
       <div id="departmentCards" class="department-grid"></div>
     </section>
 
     <section id="builder" class="page-section section-band">
       <div class="section-heading build-heading">
-        <button type="button" class="settings-button" data-control="toggle-tools" data-staff-only aria-label="Open scenario tools" aria-expanded="false">&#9881;</button>
         <div>
           <p class="eyebrow">Build Scenario</p>
           <h2>Address the Projected Revenue Shortfall</h2>
@@ -258,6 +261,8 @@
             </div>
             <button type="button" class="icon-button" data-control="close-tools" aria-label="Close scenario tools">&times;</button>
           </div>
+          <div id="staffRevenueControls" class="scenario-meta-grid staff-revenue-controls"></div>
+          <hr>
           <div class="scenario-meta-grid">
             <label><span>Scenario Name</span><input id="scenarioName" type="text" data-control="scenario-meta" data-field="name" placeholder="FY2027 Planning Scenario"></label>
             <label><span>Author</span><input id="scenarioAuthor" type="text" data-control="scenario-meta" data-field="author" placeholder="Name or team"></label>
@@ -287,7 +292,7 @@
 
       <div class="builder-layout">
         <div class="builder-main">
-          <article class="panel gap-callout">
+          <article class="panel gap-callout shortfall-callout">
             <p class="eyebrow">Total Revenue Shortfall</p>
             <div id="startingShortfall" class="callout-value"></div>
             <p id="publicCapMessage" class="cap-message" aria-live="polite"></p>
@@ -297,20 +302,14 @@
           <article class="panel">
             <div class="panel-header">
               <div>
-                <p class="eyebrow">Personnel Assumptions</p>
-                <h3>Cost Driver Composition</h3>
-              </div>
-            </div>
-            <div id="personnelDriverControls" class="driver-grid"></div>
-          </article>
-
-          <article class="panel">
-            <div class="panel-header">
-              <div>
                 <p class="eyebrow">Personnel Reductions</p>
                 <h3>Reduce FTE Positions</h3>
               </div>
+              <div class="button-row section-header-actions">
+                <button type="button" class="clear-section-button" data-control="clear-personnel">Clear Personnel</button>
+              </div>
             </div>
+            <div id="personnelCostFactorsInline" class="personnel-driver-inline"></div>
             <div class="table-scroll">
               <table>
                 <thead>
@@ -336,6 +335,9 @@
                 <p class="eyebrow">Operating Reductions</p>
                 <h3>Adjust Department Operating Budgets</h3>
               </div>
+              <div class="button-row section-header-actions">
+                <button type="button" class="clear-section-button" data-control="clear-operating">Clear Operating</button>
+              </div>
             </div>
             <div id="operatingControls" class="control-list"></div>
           </article>
@@ -346,6 +348,9 @@
                 <p class="eyebrow">Capital Reductions</p>
                 <h3>Equipment and Capital Reductions</h3>
                 <p>Select Machinery &amp; Equipment and capital projects to keep.</p>
+              </div>
+              <div class="button-row section-header-actions">
+                <button type="button" class="clear-section-button" data-control="clear-capital">Clear Capital</button>
               </div>
             </div>
             <div id="capitalControls" class="project-grid"></div>
@@ -476,14 +481,6 @@
         </div>
       </div>
       <div class="assumption-grid">
-        <article class="panel">
-          <h3>Revenue Forecast Controls</h3>
-          <div id="revenueAssumptionControls" class="assumption-controls"></div>
-        </article>
-        <article class="panel">
-          <h3>Revenue Assumptions</h3>
-          <ul id="revenueAssumptions"></ul>
-        </article>
         <article class="panel">
           <h3>Supported Expense Assumptions</h3>
           <ul id="inflationAssumptions"></ul>
