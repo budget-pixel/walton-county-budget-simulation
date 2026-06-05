@@ -247,12 +247,13 @@ function infoButton(text) {
 }
 
 function renderDrivers() {
-  const total = budgetData.personnelCostFactors.reduce((sum, factor) => sum + factor.amount, 0);
-  $("#personnelDriverControls").innerHTML = budgetData.personnelCostFactors.map((factor) => {
-    const control = isStaffMode ? `<input type="number" min="0" step="0.01" value="${(state.personnelDrivers[factor.id] * 100).toFixed(2)}" data-control="personnel-driver" data-driver="${factor.id}">` : `<strong>${percent(factor.percentOfTotal)}</strong>`;
-    const baseNote = factor.baseWagePercent ? `<small>${percent(factor.baseWagePercent)} of base wages; ${percent(factor.percentOfTotal)} of total personnel cost</small>` : `<small>${percent(factor.percentOfTotal)} of total personnel cost</small>`;
-    return `<div class="driver-card"><span>${factor.label} ${infoButton(factor.note)}</span>${control}<strong>${money(factor.amount)}</strong>${baseNote}</div>`;
-  }).join("") + `<div class="driver-card total-driver"><span>Displayed Factor Total</span><strong>${money(total)}</strong><small>Listed factors reconcile to approximately ${money(total)}.</small></div>`;
+  $("#personnelDriverControls").innerHTML = budgetData.personnelCostFactors.map((factor) => `
+    <div class="driver-card">
+      <span>${factor.label} ${infoButton(factor.note)}</span>
+      <strong>${percent(factor.percentOfTotal)}</strong>
+      <small>of total personnel cost</small>
+    </div>
+  `).join("");
 }
 
 function renderLocks() {
@@ -329,6 +330,114 @@ function renderDepartments() {
 }
 
 function detail(label, value, formatter = money) { return `<div class="detail-item"><span>${label}</span><strong>${formatter(value || 0)}</strong></div>`; }
+
+function setupScenarioAccordions() {
+  const accordionTitles = [
+    "Personnel Reduction",
+    "Personnel Reductions",
+    "Reduce FTE Positions",
+    "Operating Reduction",
+    "Operating Reductions",
+    "Adjust Department Operating Budgets",
+    "Equipment and Capital Reductions",
+    "Capital Reduction",
+    "Capital Reductions"
+  ];
+
+  if (!$("#scenarioAccordionStyles")) {
+    const style = document.createElement("style");
+    style.id = "scenarioAccordionStyles";
+    style.textContent = `
+      .scenario-accordion-panel .panel-header,
+      .scenario-accordion-panel > h3 {
+        cursor: pointer;
+      }
+
+      .scenario-accordion-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .scenario-accordion-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+        border: 1px solid rgba(0, 98, 49, 0.24);
+        border-radius: 999px;
+        background: #ffffff;
+        color: #006231;
+        font-size: 20px;
+        font-weight: 900;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .scenario-accordion-toggle:hover,
+      .scenario-accordion-toggle:focus {
+        background: rgba(0, 98, 49, 0.08);
+        outline: none;
+      }
+
+      .scenario-accordion-content[hidden] {
+        display: none;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  $$('article.panel').forEach((panel, index) => {
+    const heading = panel.querySelector('h3');
+    const title = heading?.textContent?.trim();
+    if (!title || !accordionTitles.includes(title)) return;
+
+    if (panel.classList.contains('scenario-accordion-panel')) {
+      const content = panel.querySelector('.scenario-accordion-content');
+      const button = panel.querySelector('.scenario-accordion-toggle');
+      if (content && button && button.getAttribute('aria-expanded') !== 'true') {
+        content.hidden = true;
+        button.textContent = '+';
+      }
+      return;
+    }
+
+    const header = panel.querySelector('.panel-header') || heading.parentElement || heading;
+    header.classList.add('scenario-accordion-heading');
+
+    const content = document.createElement('div');
+    content.className = 'scenario-accordion-content';
+    content.id = `scenario-accordion-${index}`;
+    content.hidden = true;
+
+    Array.from(panel.children).forEach((child) => {
+      if (child !== header) content.appendChild(child);
+    });
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'scenario-accordion-toggle';
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', content.id);
+    button.setAttribute('aria-label', `Expand ${title}`);
+    button.textContent = '+';
+
+    header.appendChild(button);
+    panel.appendChild(content);
+    panel.classList.add('scenario-accordion-panel');
+
+    header.addEventListener('click', (event) => {
+      if (event.target.closest('a, input, select, textarea, label')) return;
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!expanded));
+      button.setAttribute('aria-label', `${expanded ? 'Expand' : 'Collapse'} ${title}`);
+      button.textContent = expanded ? '+' : '−';
+      content.hidden = expanded;
+    });
+  });
+}
 
 function renderAssumptions() {
   $("#revenueAssumptionControls").innerHTML = `<label class="assumption-control"><span>Revenue Growth Rate</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureRevenueGrowthRate * 100}" data-control="revenue-assumption" data-assumption="futureRevenueGrowthRate" ${isStaffMode ? "" : "disabled"}></label><label class="assumption-control"><span>FY2029+ Supported Expense Inflation Rate</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureExpenseInflationRate * 100}" data-control="revenue-assumption" data-assumption="futureExpenseInflationRate" ${isStaffMode ? "" : "disabled"}></label><label class="assumption-control"><span>FY2028 Revenue Reduction</span><input type="text" value="${moneyInput(state.revenueAssumptions.fy2028RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2028RevenueReduction" data-format="currency" ${isStaffMode ? "" : "disabled"}></label><label class="assumption-control"><span>FY2029 Revenue Reduction</span><input type="text" value="${moneyInput(state.revenueAssumptions.fy2029RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2029RevenueReduction" data-format="currency" ${isStaffMode ? "" : "disabled"}></label><div class="forecast-table-wrap"><table class="forecast-table"><thead><tr><th>Fiscal Year</th><th>Revenue</th><th>Supported Expense</th><th>Status</th><th>Revenue Shortfall</th></tr></thead><tbody id="forecastTable"></tbody></table></div>`;
@@ -604,6 +713,7 @@ function rerender() {
   renderDepartments();
   renderAssumptions();
   renderScenarioManager();
+  setupScenarioAccordions();
   updateResults();
 }
 
@@ -632,7 +742,6 @@ document.addEventListener("input", (event) => {
     state.revenueAssumptions[assumption] = assumption.includes("Rate") ? value / 100 : value;
     updateResults();
   }
-  if (control === "personnel-driver" && isStaffMode) { state.personnelDrivers[event.target.dataset.driver] = Number(event.target.value || 0) / 100; rerender(); }
   if (control === "ranking-search") { state.rankingSearch = event.target.value; renderRankings(); }
   if (control === "scenario-meta") { state.scenarioMeta[event.target.dataset.field] = event.target.value; }
   if (control === "millage" && isStaffMode) { state.proposedMillage = Number(event.target.value || 0); updateResults(); }
@@ -699,6 +808,7 @@ function init() {
   renderDepartments();
   renderAssumptions();
   renderScenarioManager();
+  setupScenarioAccordions();
   renderCharts();
   searchParcels();
   updateResults();
