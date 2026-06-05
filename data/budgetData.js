@@ -138,10 +138,10 @@ const budgetData = {
     baselineYear: "FY2026-2027",
     scenarioYear: "FY2028",
     revenueAssumptions: [
-      "FY2027 revenue forecast is $163,473,140.",
-      "FY2028 revenue equals FY2027 x 1.03 minus the FY2028 revenue reduction.",
-      "FY2029 revenue equals the reduced FY2028 revenue x 1.02 minus the FY2029 revenue reduction.",
-      "FY2030 through FY2032 revenue uses the editable future revenue growth rate."
+      "FY2026 base revenue is $163,473,140.",
+      "FY2027 revenue equals the FY2026 base amount minus the first revenue reduction, with no rate adjustment.",
+      "FY2028 revenue equals the reduced FY2027 amount minus the second revenue reduction, with no rate adjustment.",
+      "FY2029 through FY2032 revenue uses the editable future revenue growth rate."
     ],
     methodology: [
       "The projected revenue shortfall is calculated as the difference between the internal no-reduction revenue baseline and the reduced revenue scenario.",
