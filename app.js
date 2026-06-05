@@ -13,7 +13,7 @@ const state = {
     baselineRevenue: budgetData.revenueForecast.baseRevenue,
     baselineExpense: budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline,
     futureRevenueGrowthRate: 0.01,
-    futureExpenseInflationRate: 0.05,
+    futureExpenseInflationRate: 0.03,
     fy2029RevenueReduction: 9700000
   },
   personnelDrivers: { ...budgetData.personnelCostDrivers },
