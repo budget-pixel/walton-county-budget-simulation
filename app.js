@@ -4,6 +4,13 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0
 });
 
+const currencyInputFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+
 const numberFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 1
 });
@@ -25,6 +32,14 @@ let savingsChart;
 
 function formatCurrency(value) {
   return currencyFormatter.format(Math.round(value));
+}
+
+function formatCurrencyInput(value) {
+  return currencyInputFormatter.format(Number(value || 0));
+}
+
+function parseCurrencyInput(value) {
+  return Number(String(value || "").replace(/[^0-9.-]/g, "")) || 0;
 }
 
 function formatNumber(value) {
@@ -49,18 +64,33 @@ function getFiscalYears() {
   const fy2032 = fy2031 * (1 + futureGrowth);
   const expenseBaseline = budgetData.budgetBaselineTotals.totalBudgetBaseline;
 
-  return [
-    { year: "FY2027", projectedRevenue: fy2027, projectedExpense: expenseBaseline, revenueReduction: 0 },
-    { year: "FY2028", projectedRevenue: fy2028, projectedExpense: expenseBaseline, revenueReduction: fy2028Reduction },
-    { year: "FY2029", projectedRevenue: fy2029, projectedExpense: expenseBaseline, revenueReduction: fy2029Reduction },
-    { year: "FY2030", projectedRevenue: fy2030, projectedExpense: expenseBaseline, revenueReduction: 0 },
-    { year: "FY2031", projectedRevenue: fy2031, projectedExpense: expenseBaseline, revenueReduction: 0 },
-    { year: "FY2032", projectedRevenue: fy2032, projectedExpense: expenseBaseline, revenueReduction: 0 }
+  const historicalYears = (budgetData.revenueForecast.historicalRevenue || []).map((item) => ({
+    year: item.year,
+    projectedRevenue: item.revenue,
+    projectedExpense: null,
+    revenueReduction: 0,
+    type: item.type,
+    historical: true
+  }));
+
+  const forecastYears = [
+    { year: "FY2027", projectedRevenue: fy2027, projectedExpense: expenseBaseline, revenueReduction: 0, type: "Forecast", historical: false },
+    { year: "FY2028", projectedRevenue: fy2028, projectedExpense: expenseBaseline, revenueReduction: fy2028Reduction, type: "Forecast", historical: false },
+    { year: "FY2029", projectedRevenue: fy2029, projectedExpense: expenseBaseline, revenueReduction: fy2029Reduction, type: "Forecast", historical: false },
+    { year: "FY2030", projectedRevenue: fy2030, projectedExpense: expenseBaseline, revenueReduction: 0, type: "Forecast", historical: false },
+    { year: "FY2031", projectedRevenue: fy2031, projectedExpense: expenseBaseline, revenueReduction: 0, type: "Forecast", historical: false },
+    { year: "FY2032", projectedRevenue: fy2032, projectedExpense: expenseBaseline, revenueReduction: 0, type: "Forecast", historical: false }
   ];
+
+  return [...historicalYears, ...forecastYears];
+}
+
+function getForecastYears() {
+  return getFiscalYears().filter((year) => !year.historical);
 }
 
 function getScenario() {
-  return getFiscalYears().find((year) => year.year === budgetData.scenarioYear);
+  return getForecastYears().find((year) => year.year === budgetData.scenarioYear);
 }
 
 function getBudgetGap() {
@@ -232,12 +262,12 @@ function createCapitalControls() {
 }
 
 function getFteAdjustmentLabel(department) {
-  if (department.nonFteAdjustable) {
-    return "Not FTE-adjustable";
-  }
-
   if (department.fteCount === 0) {
     return "No FTE baseline";
+  }
+
+  if (department.nonFteAdjustable) {
+    return "Not FTE-adjustable";
   }
 
   return "FTE-adjustable";
@@ -318,24 +348,24 @@ function createRevenueAssumptionsPanel() {
       <span>FY2028 Revenue Reduction</span>
       <input
         id="fy2028RevenueReduction"
-        type="number"
-        min="0"
-        step="100000"
-        value="${state.revenueAssumptions.fy2028RevenueReduction}"
+        type="text"
+        inputmode="decimal"
+        value="${formatCurrencyInput(state.revenueAssumptions.fy2028RevenueReduction)}"
         data-control="revenue-assumption"
         data-assumption="fy2028RevenueReduction"
+        data-format="currency"
       >
     </label>
     <label class="assumption-control" for="fy2029RevenueReduction">
       <span>FY2029 Revenue Reduction</span>
       <input
         id="fy2029RevenueReduction"
-        type="number"
-        min="0"
-        step="100000"
-        value="${state.revenueAssumptions.fy2029RevenueReduction}"
+        type="text"
+        inputmode="decimal"
+        value="${formatCurrencyInput(state.revenueAssumptions.fy2029RevenueReduction)}"
         data-control="revenue-assumption"
         data-assumption="fy2029RevenueReduction"
+        data-format="currency"
       >
     </label>
     <div class="forecast-table-wrap">
@@ -343,7 +373,8 @@ function createRevenueAssumptionsPanel() {
         <thead>
           <tr>
             <th>Fiscal Year</th>
-            <th>Forecast Revenue</th>
+            <th>Revenue</th>
+            <th>Status</th>
             <th>Projected Gap</th>
           </tr>
         </thead>
@@ -355,13 +386,17 @@ function createRevenueAssumptionsPanel() {
 
 function updateForecastTable() {
   document.querySelector("#forecastTable").innerHTML = getFiscalYears()
-    .map((year) => `
-      <tr>
-        <td><strong>${year.year}</strong></td>
-        <td>${formatCurrency(year.projectedRevenue)}</td>
-        <td>${formatCurrency(Math.max(year.projectedExpense - year.projectedRevenue, 0))}</td>
-      </tr>
-    `)
+    .map((year) => {
+      const gap = year.projectedExpense === null ? "—" : formatCurrency(Math.max(year.projectedExpense - year.projectedRevenue, 0));
+      return `
+        <tr>
+          <td><strong>${year.year}</strong></td>
+          <td>${formatCurrency(year.projectedRevenue)}</td>
+          <td>${year.type}</td>
+          <td>${gap}</td>
+        </tr>
+      `;
+    })
     .join("");
 }
 
@@ -389,7 +424,7 @@ function createCharts() {
   const years = fiscalYears.map((year) => year.year);
   const revenues = fiscalYears.map((year) => year.projectedRevenue);
   const expenses = fiscalYears.map((year) => year.projectedExpense);
-  const gaps = fiscalYears.map((year) => Math.max(year.projectedExpense - year.projectedRevenue, 0));
+  const gaps = fiscalYears.map((year) => year.projectedExpense === null ? null : Math.max(year.projectedExpense - year.projectedRevenue, 0));
 
   Chart.defaults.font.family = "Arial, Helvetica, sans-serif";
   Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue("--color-text-muted").trim();
@@ -400,7 +435,7 @@ function createCharts() {
       labels: years,
       datasets: [
         {
-          label: "Projected Revenues",
+          label: "Ad Valorem Revenue",
           data: revenues,
           borderColor: "rgb(56, 106, 125)",
           backgroundColor: "rgba(56, 106, 125, 0.14)",
@@ -413,7 +448,8 @@ function createCharts() {
           borderColor: "rgb(138, 109, 59)",
           backgroundColor: "rgba(138, 109, 59, 0.12)",
           tension: 0.25,
-          fill: true
+          fill: true,
+          spanGaps: false
         }
       ]
     },
@@ -499,7 +535,7 @@ function getBarChartOptions() {
     plugins: {
       tooltip: {
         callbacks: {
-          label: (context) => `${context.dataset.label}: ${formatCurrency(context.raw)}`
+          label: (context) => `${context.dataset.label}: ${context.raw === null ? "N/A" : formatCurrency(context.raw)}`
         }
       }
     },
@@ -519,7 +555,7 @@ function updateCharts() {
   const years = fiscalYears.map((year) => year.year);
   const revenues = fiscalYears.map((year) => year.projectedRevenue);
   const expenses = fiscalYears.map((year) => year.projectedExpense);
-  const gaps = fiscalYears.map((year) => Math.max(year.projectedExpense - year.projectedRevenue, 0));
+  const gaps = fiscalYears.map((year) => year.projectedExpense === null ? null : Math.max(year.projectedExpense - year.projectedRevenue, 0));
 
   trendChart.data.labels = years;
   trendChart.data.datasets[0].data = revenues;
@@ -616,7 +652,7 @@ function bindEvents() {
 
     if (target.dataset.control === "revenue-assumption") {
       const assumption = target.dataset.assumption;
-      const value = Number(target.value || 0);
+      const value = target.dataset.format === "currency" ? parseCurrencyInput(target.value) : Number(target.value || 0);
       state.revenueAssumptions[assumption] = assumption === "futureRevenueGrowthRate" ? value / 100 : value;
       updateScenario();
     }
@@ -629,7 +665,19 @@ function bindEvents() {
       state.keptProjects[target.dataset.project] = target.checked;
       updateScenario();
     }
+
+    if (target.dataset.control === "revenue-assumption" && target.dataset.format === "currency") {
+      target.value = formatCurrencyInput(parseCurrencyInput(target.value));
+    }
   });
+
+  document.addEventListener("blur", (event) => {
+    const target = event.target;
+
+    if (target.dataset.control === "revenue-assumption" && target.dataset.format === "currency") {
+      target.value = formatCurrencyInput(parseCurrencyInput(target.value));
+    }
+  }, true);
 }
 
 function init() {
