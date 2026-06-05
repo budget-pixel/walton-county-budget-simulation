@@ -44,6 +44,9 @@ const moneyInput = (value) => currencyInputFormatter.format(Number(value || 0));
 const parseMoney = (value) => Number(String(value || "").replace(/[^0-9.-]/g, "")) || 0;
 const number = (value) => numberFormatter.format(Number(value || 0));
 const percent = (value) => `${percentFormatter.format(Number(value || 0))}%`;
+const signedMoney = (value) => `${Number(value || 0) < 0 ? "-" : ""}${money(Math.abs(Number(value || 0)))}`;
+const negativeMoney = (value) => `-${money(Math.abs(Number(value || 0)))}`;
+const toneClass = (value) => Number(value || 0) < 0 ? "negative-value" : Number(value || 0) > 0 ? "positive-value" : "";
 const millage = (value) => Number(value || 0).toFixed(4).replace(/0$/, "").replace(/0$/, "");
 const constitutional = (department) => budgetData.constitutionalOfficeIds.includes(department.id);
 const excluded = (department) => budgetData.excludedScenarioDepartmentIds.includes(department.id);
@@ -291,7 +294,9 @@ function renderOperating() {
   $("#operatingControls").innerHTML = `<section class="protected-operating-card"><div class="protected-operating-header"><div><h4>Constitutional Office Operating Budgets</h4><p>Shown for context and not adjustable.</p></div><strong>${money(protectedDepartments.reduce((total, department) => total + department.operatingBudget, 0))}</strong></div><div class="protected-operating-list">${protectedDepartments.map((department) => `<div><span>${department.name}</span><strong>${money(department.operatingBudget)}</strong></div>`).join("")}</div></section>` + adjustableDepartments.map((department) => {
     const isLocked = locked(department.id);
     if (isLocked) state.operatingReductions[department.id] = 0;
-    return `<div class="slider-row ${isLocked ? "locked-row" : ""}"><div><label>${department.name}</label><div class="slider-meta">Operating budget: ${money(department.operatingBudget)}${isLocked ? " | Locked" : ""}</div></div><input class="operating-slider" type="range" min="0" max="100" value="${state.operatingReductions[department.id] || 0}" data-control="operating" data-department="${department.id}" ${isLocked ? "disabled" : ""}><label class="percent-entry"><input type="number" min="0" max="100" step="1" value="${state.operatingReductions[department.id] || 0}" data-control="operating-percent" data-department="${department.id}" ${isLocked ? "disabled" : ""}><span>%</span></label></div>`;
+    const reductionPercent = Number(state.operatingReductions[department.id] || 0);
+    const newOperatingBudget = department.operatingBudget * (1 - reductionPercent / 100);
+    return `<div class="slider-row ${isLocked ? "locked-row" : ""}"><div><label>${department.name}</label><div class="slider-meta">Operating budget: ${money(department.operatingBudget)}${isLocked ? " | Locked" : ""}</div><div class="slider-meta slider-meta-secondary">New operating budget: ${money(newOperatingBudget)}</div></div><input class="operating-slider" type="range" min="0" max="100" value="${reductionPercent}" data-control="operating" data-department="${department.id}" ${isLocked ? "disabled" : ""}><label class="percent-entry"><input type="number" min="0" max="100" step="1" value="${reductionPercent}" data-control="operating-percent" data-department="${department.id}" ${isLocked ? "disabled" : ""}><span>%</span></label></div>`;
   }).join("") + `<button type="button" class="clear-section-button" data-control="clear-operating">Clear Operating Reductions</button>`;
 }
 
@@ -621,7 +626,7 @@ function renderAssumptions() {
 }
 
 function renderForecast() {
-  $("#forecastTable").innerHTML = fiscalYears().map((year) => `<tr><td><strong>${year.year}</strong></td><td>${money(year.revenue)}</td><td>${year.historicalSupportedExpense == null ? money(year.projectedSupportedExpense) : money(year.historicalSupportedExpense)}</td><td>${year.type}</td><td>${year.historical ? "-" : money(year.revenueShortfall)}</td></tr>`).join("");
+  $("#forecastTable").innerHTML = fiscalYears().map((year) => `<tr><td><strong>${year.year}</strong></td><td>${money(year.revenue)}</td><td>${year.historicalSupportedExpense == null ? money(year.projectedSupportedExpense) : money(year.historicalSupportedExpense)}</td><td>${year.type}</td><td class="${!year.historical && year.revenueShortfall ? "negative-value" : ""}">${year.historical ? "-" : year.revenueShortfall ? negativeMoney(year.revenueShortfall) : "$0"}</td></tr>`).join("");
 }
 
 function chartOptions(bar = false) {
@@ -696,10 +701,18 @@ function renderMillage() {
     if (revenueTargetWrapper) revenueTargetWrapper.hidden = true;
   }
   $("#estimatedMillageRevenue").textContent = money(estimatedRevenue);
-  $("#millageRevenueImpact").textContent = money(estimatedRevenue - currentMillageRevenue());
-  $("#rollbackRevenueImpact").textContent = money(estimatedRevenue - budgetData.millageAssumptions.fy2026BudgetedAdValoremRevenue);
+  const currentMillageImpact = estimatedRevenue - currentMillageRevenue();
+  const currentMillageImpactElement = $("#millageRevenueImpact");
+  currentMillageImpactElement.textContent = signedMoney(currentMillageImpact);
+  currentMillageImpactElement.className = toneClass(currentMillageImpact);
+  const rollbackImpact = estimatedRevenue - budgetData.millageAssumptions.fy2026BudgetedAdValoremRevenue;
+  const rollbackImpactElement = $("#rollbackRevenueImpact");
+  rollbackImpactElement.textContent = signedMoney(rollbackImpact);
+  rollbackImpactElement.className = toneClass(rollbackImpact);
   const totals = scenarioTotals();
-  $("#millageShortfallImpact").textContent = totals.remainingShortfall ? money(totals.remainingShortfall) : isStaffMode && totals.surplus ? `${money(totals.surplus)} Modeled Surplus` : "$0";
+  const millageShortfallImpactElement = $("#millageShortfallImpact");
+  millageShortfallImpactElement.textContent = totals.remainingShortfall ? negativeMoney(totals.remainingShortfall) : isStaffMode && totals.surplus ? `${money(totals.surplus)} Modeled Surplus` : "$0";
+  millageShortfallImpactElement.classList.toggle("negative-value", totals.remainingShortfall > 0);
   $("#taxpayerImpact").textContent = money((state.proposedMillage - budgetData.millageAssumptions.adoptedMillage) * 100);
 }
 
@@ -716,11 +729,17 @@ function updateResults() {
   if (!totals.remainingShortfall && $("#publicCapMessage")?.textContent && !$("#publicCapMessage").textContent.includes("cannot exceed")) $("#publicCapMessage").textContent = "";
   const scenario = scenarioYear();
   const addressed = totals.revenueShortfall ? Math.min(totals.totalReductions / totals.revenueShortfall * 100, 100) : 100;
-  $("#heroRevenueShortfall").textContent = money(scenario.revenueShortfall);
-  $("#startingShortfall").textContent = money(totals.revenueShortfall);
-  $("#resultRevenueShortfall").textContent = money(totals.revenueShortfall);
+  ["#heroRevenueShortfall", "#startingShortfall", "#resultRevenueShortfall"].forEach((selector) => {
+    const element = $(selector);
+    if (element) {
+      element.textContent = negativeMoney(totals.revenueShortfall);
+      element.classList.add("negative-value");
+    }
+  });
   $("#resultSelectedReductions").textContent = money(totals.totalReductions);
-  $("#resultRemainingShortfall").textContent = totals.remainingShortfall ? money(totals.remainingShortfall) : "$0";
+  const remainingShortfallElement = $("#resultRemainingShortfall");
+  remainingShortfallElement.textContent = totals.remainingShortfall ? negativeMoney(totals.remainingShortfall) : "$0";
+  remainingShortfallElement.classList.toggle("negative-value", totals.remainingShortfall > 0);
   $("#resultPersonnelReductions").textContent = money(totals.personnelReductions);
   $("#resultOperatingReductions").textContent = money(totals.operatingReductions);
   $("#resultCapitalReductions").textContent = money(totals.capitalReductions);
