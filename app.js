@@ -562,10 +562,22 @@ function renderMillage() {
   const estimatedRevenue = estimatedMillageRevenue();
   $("#currentMillage").textContent = budgetData.millageAssumptions.adoptedMillage.toFixed(3);
   $("#rollbackRate").textContent = `${rollback.toFixed(4)} mills`;
-  $("#proposedMillage").value = Number(state.proposedMillage || 0).toFixed(4);
-  $("#proposedMillage").disabled = !isStaffMode;
+  const proposedMillageInput = $("#proposedMillage");
+  if (proposedMillageInput) {
+    proposedMillageInput.type = "text";
+    proposedMillageInput.inputMode = "decimal";
+    proposedMillageInput.placeholder = "Enter millage";
+    proposedMillageInput.disabled = !isStaffMode;
+    if (document.activeElement !== proposedMillageInput) {
+      proposedMillageInput.value = Number(state.proposedMillage || 0).toFixed(4);
+    }
+  }
+
   const revenueTarget = $("#revenueTarget");
-  if (revenueTarget) revenueTarget.value = moneyInput(estimatedRevenue);
+  if (revenueTarget) {
+    const revenueTargetWrapper = revenueTarget.closest("label, .metric-box, .assumption-control, .scenario-control, div");
+    if (revenueTargetWrapper) revenueTargetWrapper.hidden = true;
+  }
   $("#estimatedMillageRevenue").textContent = money(estimatedRevenue);
   $("#millageRevenueImpact").textContent = money(estimatedRevenue - currentMillageRevenue());
   $("#rollbackRevenueImpact").textContent = money(estimatedRevenue - budgetData.millageAssumptions.fy2026BudgetedAdValoremRevenue);
@@ -801,8 +813,19 @@ document.addEventListener("input", (event) => {
   if (control === "ranking-search") { state.rankingSearch = event.target.value; renderRankings(); }
   if (control === "department-search") { state.departmentSearch = event.target.value; state.showAllDepartmentCards = false; renderDepartments(); }
   if (control === "scenario-meta") { state.scenarioMeta[event.target.dataset.field] = event.target.value; }
-  if (control === "millage" && isStaffMode) { state.proposedMillage = Number(event.target.value || 0); updateResults(); }
-  if (control === "revenue-target" && isStaffMode) { state.proposedMillage = parseMoney(event.target.value) / budgetData.millageAssumptions.taxableValueBase * 1000; updateResults(); }
+  if (control === "millage" && isStaffMode) {
+    const cleanedMillage = String(event.target.value || "").replace(/[^0-9.]/g, "");
+    const parsedMillage = Number(cleanedMillage);
+    if (cleanedMillage === "") {
+      state.proposedMillage = 0;
+      updateResults();
+      return;
+    }
+    if (!Number.isNaN(parsedMillage)) {
+      state.proposedMillage = parsedMillage;
+      updateResults();
+    }
+  }
   if (control === "parcel-search") { state.parcelQuery = event.target.value; searchParcels(); }
 });
 
