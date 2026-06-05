@@ -106,7 +106,7 @@ function fiscalYears() {
   const fy2028Reduction = Number(state.revenueAssumptions.fy2028RevenueReduction || 0);
   const fy2029Reduction = Number(state.revenueAssumptions.fy2029RevenueReduction || 0);
   const revenue = [baseRevenue, baseRevenue - fy2028Reduction, baseRevenue - fy2028Reduction - fy2029Reduction];
-  const expense = [baselineExpense, 164673140];
+  const expense = [baselineExpense, 164247268];
   for (let index = 2; index < 6; index += 1) {
     if (index > 2) revenue[index] = revenue[index - 1] * (1 + growth);
     expense[index] = expense[index - 1] * (1 + expenseGrowth);
