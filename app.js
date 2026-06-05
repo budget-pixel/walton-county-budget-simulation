@@ -1,144 +1,707 @@
-const fmt=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}),fmt2=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}),num=new Intl.NumberFormat('en-US',{maximumFractionDigits:1}),pct=new Intl.NumberFormat('en-US',{maximumFractionDigits:1});
-const hist=[['FY2022',89972682],['FY2023',110875024],['FY2024',131679989],['FY2025',149437335],['FY2026',152900634]],hfund=window.historicalDepartmentFunding||[],staff=new URLSearchParams(location.search).get('mode')==='staff',KEY='waltonBudgetScenario.v2';
-const S={rev:{...budgetData.revenueForecast.defaultAssumptions,futureRevenueGrowthRate:.01,futureExpenseInflationRate:.05},drv:{...budgetData.personnelCostDrivers},meta:{name:'',author:'',notes:''},fte:{},buy:{},buyCost:{},op:{},keep:{},lock:{},deptYear:'FY2027 Budget',svcYear:'FY2027 Budget',rank:'support',q:'',allSvc:false,allDept:false,allRank:false,showRank:false,showImpact:false,millage:budgetData.millageAssumptions.adoptedMillage,parcel:budgetData.sampleParcels[0],parcelQ:'',homestead:true};
-let trendChart,shortfallChart;
-const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s)),money=v=>fmt.format(Math.round(+v||0)),money2=v=>fmt2.format(+v||0),percent=v=>`${pct.format(+v||0)}%`,n=v=>num.format(+v||0),parseMoney=v=>+String(v||'').replace(/[^0-9.-]/g,'')||0;
-const constitutional=d=>budgetData.constitutionalOfficeIds.includes(d.id),excluded=d=>budgetData.excludedScenarioDepartmentIds.includes(d.id),locked=id=>staff&&!!S.lock[id],deps=()=>budgetData.departments.filter(d=>!excluded(d)),dname=id=>budgetData.departments.find(d=>d.id===id)?.name||'Countywide';
-function histSupport(y){return hfund.reduce((t,d)=>t+(d.history.find(r=>r.fiscalYear===y)?.adValoremSupport||0),0)}
-function fy27Support(d){let total=deps().reduce((t,x)=>t+x.totalBudget,0)||1;return d.totalBudget/total*budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline}
-function support(d,y='FY2027 Budget'){return y==='FY2027 Budget'?fy27Support(d):(hfund.find(x=>x.department===d.name)?.history.find(r=>r.fiscalYear===y)?.adValoremSupport||0)}
-function millageImpact(){return((+S.millage||0)-budgetData.millageAssumptions.adoptedMillage)*budgetData.millageAssumptions.taxableValueBase/1000}
-function years(){let b=budgetData.revenueForecast.baseRevenue,g=+S.rev.futureRevenueGrowthRate||0,eg=+S.rev.futureExpenseInflationRate||0,mi=millageImpact(),r28=+S.rev.fy2028RevenueReduction||0,r29=+S.rev.fy2029RevenueReduction||0,rev=[b+mi,b-r28-r29+mi],exp=[budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline,154000000];for(let i=2;i<6;i++){rev[i]=rev[i-1]*(1+g);exp[i]=exp[i-1]*(1+eg)}let f=['FY2027','FY2028','FY2029','FY2030','FY2031','FY2032'].map((y,i)=>({year:y,revenue:rev[i],projectedSupportedExpense:exp[i],revenueShortfall:Math.max(exp[i]-rev[i],0),type:'Forecast'}));return hist.map(([y,r])=>({year:y,revenue:r,historicalSupportedExpense:y==='FY2026'?null:histSupport(y),revenueShortfall:0,type:y==='FY2026'?'Budget':'Actual',historical:true})).concat(f)}
-const forecast=()=>years().filter(y=>!y.historical),scenario=()=>forecast().find(y=>y.year===budgetData.scenarioYear),drvTotal=()=>Object.values(S.drv).reduce((t,v)=>t+(+v||0),0)||1,baseDrv=()=>Object.values(budgetData.personnelCostDrivers).reduce((t,v)=>t+v,0),fteCost=d=>Math.round((d.averageFteCost||0)*drvTotal()/baseDrv());
-function totals(){let short=scenario().revenueShortfall,per=0,op=0,one=0,imp=budgetData.departments.map(d=>{let l=locked(d.id)||excluded(d),fc=fteCost(d),fr=!l&&d.fteCount>0&&!d.nonFteAdjustable?(+S.fte[d.id]||0):0,bc=l?0:Math.min(+S.buy[d.id]||0,Math.max(d.fteCount-fr,0)),bcost=l?0:(+S.buyCost[d.id]||0),opr=l||constitutional(d)?0:(+S.op[d.id]||0),pr=(fr+bc)*fc,ot=bc*bcost,oa=d.operatingBudget*opr/100;per+=pr;op+=oa;one+=ot;return{department:d,locked:l,fteReduction:fr,buyoutCount:bc,buyoutCost:bcost,personnelReduction:pr,buyoutOneTimeCost:ot,firstYearNetImpact:pr-ot,operatingReduction:opr,operatingReductionAmount:oa,totalReduction:pr+oa}}),cap=budgetData.capitalProjects.reduce((t,p)=>locked(p.departmentId)||S.keep[p.id]?t:t+p.cost,0),total=per+op+cap;return{revenueShortfall:short,personnelReductions:per,buyoutOneTimeCosts:one,operatingReductions:op,capitalReductions:cap,totalReductions:total,remainingShortfall:Math.max(short-total,0),surplus:Math.max(total-short,0),departmentImpacts:imp}}
-function sortDisp(a,b){let ad=a.department||a,bd=b.department||b,ap=constitutional(ad),bp=constitutional(bd);return ap!==bp?ap?-1:1:ad.name.localeCompare(bd.name)}
-function chrome(){$('#brandMount').innerHTML=window.WaltonSplitLogo.getHtml();$('#modeLabel').textContent=staff?'Staff Exercise':'Public View';$$('[data-staff-only]').forEach(e=>e.hidden=!staff)}
-function renderDrivers(){let labels={baseSalary:'Base Salary',cola:'COLA',frs:'FRS Contribution',insurance:'Health Insurance',fica:'FICA',otherBenefits:'Other Benefits'},tot=budgetData.budgetBaselineTotals.personnelBudgetTotal;$('#personnelDriverControls').innerHTML=Object.entries(labels).map(([k,l])=>`<div class="driver-card"><span>${l}</span>${staff?`<input type="number" step="0.1" value="${(S.drv[k]*100).toFixed(1)}" data-control="personnel-driver" data-driver="${k}">`:`<strong>${percent(S.drv[k]*100)}</strong>`}<small>${money(tot*S.drv[k])} countywide impact</small></div>`).join('')+`<div class="driver-card total-driver"><span>Total Personnel Cost Impact</span><strong>${money(tot*drvTotal())}</strong><small>${staff?'Editable':'Read-only'} assumptions</small></div>`}
-function renderLocks(){let c=$('#departmentLocks');if(!c)return;c.innerHTML=deps().sort(sortDisp).map(d=>`<label class="lock-card ${constitutional(d)?'constitutional-card':''}"><input type="checkbox" ${S.lock[d.id]?'checked':''} data-control="department-lock" data-department="${d.id}"><span>${d.name}</span></label>`).join('')}
-function renderPersonnel(){$('#personnelControls').innerHTML=deps().filter(d=>d.fteCount>0&&!d.nonFteAdjustable).sort(sortDisp).map(d=>{let l=locked(d.id),c=fteCost(d);S.buyCost[d.id]??=Math.round(c*.35);if(l){S.fte[d.id]=0;S.buy[d.id]=0}let rec=((+S.fte[d.id]||0)+(+S.buy[d.id]||0))*c,one=(+S.buy[d.id]||0)*(+S.buyCost[d.id]||0);return`<tr class="${l?'locked-row':''}"><td><strong>${d.name}</strong>${l?'<small>Locked</small>':''}</td><td>${n(d.fteCount)}</td><td>${money(c)}</td><td><input type="number" step="0.5" value="${S.fte[d.id]||0}" data-control="fte" data-department="${d.id}" ${l?'disabled':''}></td><td><input type="number" step="1" value="${S.buy[d.id]||0}" data-control="buyout-count" data-department="${d.id}" ${l?'disabled':''}></td><td><input type="text" value="${money2(S.buyCost[d.id])}" data-control="buyout-cost" data-department="${d.id}" ${l?'disabled':''}></td><td id="personnel-reduction-${d.id}">${money(rec)}</td><td id="first-year-impact-${d.id}">${money(rec-one)}</td></tr>`}).join('')}
-function renderOperating(){let prot=deps().filter(d=>d.operatingBudget>0&&constitutional(d)),adj=deps().filter(d=>d.operatingBudget>0&&!constitutional(d)).sort(sortDisp);$('#operatingControls').innerHTML=`<section class="protected-operating-card"><div class="protected-operating-header"><div><h4>Constitutional Office Operating Budgets</h4><p>Shown for context and not adjustable.</p></div><strong>${money(prot.reduce((t,d)=>t+d.operatingBudget,0))}</strong></div><div class="protected-operating-list">${prot.map(d=>`<div><span>${d.name}</span><strong>${money(d.operatingBudget)}</strong></div>`).join('')}</div></section>`+adj.map(d=>{let l=locked(d.id);if(l)S.op[d.id]=0;return`<div class="slider-row ${l?'locked-row':''}"><div><label>${d.name}</label><div class="slider-meta">Operating budget: ${money(d.operatingBudget)}${l?' | Locked':''}</div></div><input type="range" min="0" max="100" value="${S.op[d.id]||0}" data-control="operating" data-department="${d.id}" ${l?'disabled':''}><div class="percent-pill" id="operating-percent-${d.id}">${percent(S.op[d.id]||0)}</div></div>`}).join('')}
-function renderCapital(){$('#capitalControls').innerHTML=budgetData.capitalProjects.map(p=>{S.keep[p.id]??=true;let l=locked(p.departmentId);if(l)S.keep[p.id]=true;return`<div class="project-card ${l?'locked-row':''}"><input type="checkbox" ${S.keep[p.id]?'checked':''} data-control="capital" data-project="${p.id}" ${l?'disabled':''}><div><label>${p.name}</label><p>${dname(p.departmentId)} | ${money(p.cost)}${l?' | Locked':''}</p></div></div>`}).join('')}
-function rankRows(y=S.svcYear){return deps().map(d=>({name:d.name,id:d.id,support:support(d,y),fte:d.fteCount,budget:d.totalBudget,constitutional:constitutional(d),department:d}))}
-function renderTop(){let rows=rankRows(S.svcYear).filter(r=>r.support>0).sort((a,b)=>b.support-a.support),vis=S.allSvc?rows:rows.slice(0,6),max=Math.max(...rows.map(r=>r.support),1);$('#topServicesBars').innerHTML=vis.map((r,i)=>`<div class="rank-bar-row ${r.constitutional?'constitutional-row':''}"><div class="rank-label"><strong>${i+1}. ${r.name}</strong><span>${money(r.support)}</span></div><div class="bar-track"><div class="bar-fill" style="width:${r.support/max*100}%"></div></div></div>`).join('')+(rows.length>6?`<button class="view-all-button" data-control="toggle-top-services">${S.allSvc?'Show Less':'View All'}</button>`:'')}
-function renderRanks(){let rows=rankRows('FY2027 Budget').filter(r=>!S.q||r.name.toLowerCase().includes(S.q.toLowerCase())).sort(sortDisp),cards=S.allRank?rows:rows.slice(0,8);$('#rankingCards').innerHTML=cards.map((r,i)=>`<article class="ranking-card ${r.constitutional?'constitutional-card':''}"><div><span>${i+1}</span><strong>${r.name}</strong></div><dl><div><dt>Ad Valorem Support</dt><dd>${money(r.support)}</dd></div><div><dt>FTE</dt><dd>${n(r.fte)}</dd></div><div><dt>Budget</dt><dd>${money(r.budget)}</dd></div></dl></article>`).join('')+(rows.length>8?`<button class="view-all-button" data-control="toggle-rankings">${S.allRank?'Show Less':'View All'}</button>`:'');$('#rankingTable').innerHTML=rows.map(r=>`<tr class="${r.constitutional?'constitutional-row':''}"><td><strong>${r.name}</strong></td><td>${money(r.support)}</td><td>${n(r.fte)}</td><td>${money(r.budget)}</td></tr>`).join('');$('#rankingTableWrap').hidden=!S.showRank;$('[data-control="toggle-ranking-table"]').textContent=S.showRank?'Show Less':'View All'}
-function renderDept(){let rows=deps().sort(sortDisp),vis=S.allDept?rows:rows.slice(0,4),bud=S.deptYear==='FY2027 Budget';$('#departmentCards').innerHTML=vis.map(d=>{let rec=hfund.find(x=>x.department===d.name)?.history.find(r=>r.fiscalYear===S.deptYear),val=bud?support(d):rec?.adValoremSupport;return`<article class="panel department-card ${constitutional(d)?'constitutional-card':''}"><h3>${d.name}</h3><div class="department-primary-metric"><span>${bud?'FY2027 Ad Valorem Support':'Ad Valorem Support'}</span><strong>${money(val||0)}</strong></div><div class="detail-grid">${bud?detail('Personnel Budget',d.personnelBudget)+detail('Operating Budget',d.operatingBudget)+detail('Capital Budget',d.capitalBudget)+detail('Total Budget',d.totalBudget)+detail('FTE Count',d.fteCount,n)+detail('Average Personnel Cost',fteCost(d)):rec?detail('Gross Expense',rec.grossExpense)+detail('Department Revenue',rec.departmentRevenue)+detail('Net Expense',rec.netExpense)+detail('Ad Valorem Support',rec.adValoremSupport):'<p class="historical-note">No record available.</p>'}</div></article>`}).join('')+(rows.length>4?`<button class="view-all-button department-view-all-button" data-control="toggle-department-cards">${S.allDept?'Show Less':'View All'}</button>`:'')}
-function detail(l,v,f=money){return`<div class="detail-item"><span>${l}</span><strong>${f(v||0)}</strong></div>`}
-function setupScenarioAccordions(){
-  const titles=[
-    'Scenario Tools',
-    'Budget Exercise Mode',
-    'Personnel Reduction',
-    'Personnel Reductions',
-    'Reduce FTE Positions',
-    'Operating Reduction',
-    'Operating Reductions',
-    'Adjust Department Operating Budgets',
-    'Equipment and Capital Reductions',
-    'Capital Reduction',
-    'Capital Reductions'
-  ];
+const currencyFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const currencyInputFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+const percentFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+const historicalActualRevenues = [["FY2022", 89972682], ["FY2023", 110875024], ["FY2024", 131679989], ["FY2025", 149437335], ["FY2026", 152900634]];
+const historicalFundingData = window.historicalDepartmentFunding || [];
+const isStaffMode = new URLSearchParams(window.location.search).get("mode") === "staff";
+const scenarioStoreKey = "waltonBudgetScenarios";
 
-  if(!$('#scenarioAccordionStyles')){
-    const style=document.createElement('style');
-    style.id='scenarioAccordionStyles';
-    style.textContent=`
-      .scenario-accordion-panel .panel-header{
-        cursor:pointer;
-      }
+const state = {
+  revenueAssumptions: { ...budgetData.revenueForecast.defaultAssumptions, futureRevenueGrowthRate: 0.01, futureExpenseInflationRate: 0.05 },
+  personnelDrivers: { ...budgetData.personnelCostDrivers },
+  scenarioMeta: { name: "", author: "", notes: "" },
+  fteReductions: {},
+  buyoutCounts: {},
+  buyoutCosts: {},
+  operatingReductions: {},
+  keptProjects: {},
+  lockedDepartments: {},
+  departmentFiscalYear: "FY2027 Budget",
+  overviewFiscalYear: "FY2027 Budget",
+  rankingTab: "support",
+  rankingSearch: "",
+  showAllTopServices: false,
+  showAllDepartmentCards: false,
+  showAllRankings: false,
+  showImpactTable: false,
+  proposedMillage: budgetData.millageAssumptions.adoptedMillage,
+  selectedScenarioName: "",
+  selectedParcel: budgetData.sampleParcels[0],
+  parcelQuery: "",
+  useHomesteadExemption: true
+};
 
-      .scenario-accordion-panel .panel-header h3{
-        margin-bottom:0;
-      }
+let trendChart;
+let shortfallChart;
 
-      .scenario-accordion-toggle{
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        min-width:38px;
-        height:38px;
-        border:1px solid rgba(0,98,49,.24);
-        border-radius:999px;
-        background:#fff;
-        color:#006231;
-        font-size:20px;
-        font-weight:900;
-        line-height:1;
-        cursor:pointer;
-      }
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+const money = (value) => currencyFormatter.format(Math.round(Number(value || 0)));
+const moneyInput = (value) => currencyInputFormatter.format(Number(value || 0));
+const parseMoney = (value) => Number(String(value || "").replace(/[^0-9.-]/g, "")) || 0;
+const number = (value) => numberFormatter.format(Number(value || 0));
+const percent = (value) => `${percentFormatter.format(Number(value || 0))}%`;
+const millage = (value) => Number(value || 0).toFixed(4).replace(/0$/, "").replace(/0$/, "");
+const constitutional = (department) => budgetData.constitutionalOfficeIds.includes(department.id);
+const excluded = (department) => budgetData.excludedScenarioDepartmentIds.includes(department.id);
+const locked = (id) => isStaffMode && Boolean(state.lockedDepartments[id]);
+const departments = () => budgetData.departments.filter((department) => !excluded(department));
+const departmentName = (id) => budgetData.departments.find((department) => department.id === id)?.name || "Countywide";
 
-      .scenario-accordion-toggle:hover,
-      .scenario-accordion-toggle:focus{
-        background:rgba(0,98,49,.08);
-        outline:none;
-      }
-
-      .scenario-accordion-content[hidden]{
-        display:none;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  $$('article.panel').forEach((panel,index)=>{
-    if(panel.classList.contains('scenario-accordion-panel')) return;
-
-    const heading=panel.querySelector('h3');
-    const title=heading?.textContent?.trim();
-    if(!title||!titles.includes(title)) return;
-
-    const header=panel.querySelector('.panel-header')||heading.parentElement;
-    if(!header) return;
-
-    const content=document.createElement('div');
-    content.className='scenario-accordion-content';
-    content.id=`scenario-accordion-${index}`;
-    content.hidden=true;
-
-    Array.from(panel.children).forEach(child=>{
-      if(child!==header) content.appendChild(child);
-    });
-
-    const button=document.createElement('button');
-    button.type='button';
-    button.className='scenario-accordion-toggle';
-    button.setAttribute('aria-expanded','false');
-    button.setAttribute('aria-controls',content.id);
-    button.setAttribute('aria-label',`Expand ${title}`);
-    button.textContent='+';
-
-    header.appendChild(button);
-    panel.appendChild(content);
-    panel.classList.add('scenario-accordion-panel');
-
-    header.addEventListener('click',event=>{
-      if(event.target.closest('a,input,select,textarea,label')) return;
-      const expanded=button.getAttribute('aria-expanded')==='true';
-      button.setAttribute('aria-expanded',String(!expanded));
-      button.setAttribute('aria-label',`${expanded?'Expand':'Collapse'} ${title}`);
-      button.textContent=expanded?'+':'−';
-      content.hidden=expanded;
-    });
-  });
+function showMessage(text) {
+  const message = $("#scenarioMessage");
+  const publicMessage = $("#publicCapMessage");
+  if (message) message.textContent = text;
+  if (publicMessage) publicMessage.textContent = text;
 }
 
-function renderAssumptions(){$('#revenueAssumptionControls').innerHTML=`<label class="assumption-control"><span>Revenue Growth Rate</span><input type="number" step="0.1" value="${S.rev.futureRevenueGrowthRate*100}" data-control="revenue-assumption" data-assumption="futureRevenueGrowthRate" ${staff?'':'disabled'}></label><label class="assumption-control"><span>FY2029+ Supported Expense Inflation Rate</span><input type="number" step="0.1" value="${S.rev.futureExpenseInflationRate*100}" data-control="revenue-assumption" data-assumption="futureExpenseInflationRate" ${staff?'':'disabled'}></label><label class="assumption-control"><span>FY2028 Revenue Reduction</span><input type="text" value="${money2(S.rev.fy2028RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2028RevenueReduction" data-format="currency" ${staff?'':'disabled'}></label><label class="assumption-control"><span>FY2029 Revenue Reduction</span><input type="text" value="${money2(S.rev.fy2029RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2029RevenueReduction" data-format="currency" ${staff?'':'disabled'}></label><div class="forecast-table-wrap"><table class="forecast-table"><thead><tr><th>Fiscal Year</th><th>Revenue</th><th>Supported Expense</th><th>Status</th><th>Revenue Shortfall</th></tr></thead><tbody id="forecastTable"></tbody></table></div>`;$('#revenueAssumptions').innerHTML='<li>FY2027 revenue and supported expense are $163,473,140 before millage changes.</li><li>FY2028 supported expense is approximately $154,000,000.</li><li>Revenue shortfall equals projected supported expense minus projected revenue.</li>';$('#inflationAssumptions').innerHTML='<li>Personnel cost drivers are visible countywide.</li><li>Staff mode can edit assumptions and department locks.</li>';$('#methodologyList').innerHTML='<li>CSV exports include visible rows.</li><li>PDF export uses the browser print engine.</li><li>Property tax allocation follows the embedded calculator methodology.</li>';$('#formulaDefinitions').innerHTML=['Revenue Shortfall = Projected Supported Expense - Projected Revenue','Millage Revenue Impact = Taxable Value Base x Millage Change / 1,000','Buy-Out First-Year Net = Recurring Reduction - One-Time Cost'].map(x=>`<div class="formula-item"><code>${x}</code></div>`).join('')}
-function renderForecast(){$('#forecastTable').innerHTML=years().map(y=>`<tr><td><strong>${y.year}</strong></td><td>${money(y.revenue)}</td><td>${y.historicalSupportedExpense==null?money(y.projectedSupportedExpense):money(y.historicalSupportedExpense)}</td><td>${y.type}</td><td>${y.historical?'-':money(y.revenueShortfall)}</td></tr>`).join('')}
-function charts(){let f=forecast(),s=f.filter(y=>y.year!=='FY2027');Chart.defaults.font.family='Arial, Helvetica, sans-serif';trendChart=new Chart($('#trendChart'),{type:'line',data:{labels:f.map(y=>y.year),datasets:[{label:'Projected Revenue',data:f.map(y=>y.revenue),borderColor:'#006231',borderDash:[6,6]},{label:'Projected Ad Valorem Supported Expense',data:f.map(y=>y.projectedSupportedExpense),borderColor:'#d1be78'}]},options:chartOpt()});shortfallChart=new Chart($('#shortfallChart'),{type:'bar',data:{labels:s.map(y=>y.year),datasets:[{label:'Projected Revenue Shortfall',data:s.map(y=>y.revenueShortfall),backgroundColor:'rgba(0,98,49,.74)'}]},options:chartOpt(true)})}
-function chartOpt(bar){return{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:!!bar,ticks:{callback:v=>money(v)}}},plugins:{tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${money(c.raw)}`}}}}}
-function updateCharts(){let f=forecast(),s=f.filter(y=>y.year!=='FY2027');trendChart.data.labels=f.map(y=>y.year);trendChart.data.datasets[0].data=f.map(y=>y.revenue);trendChart.data.datasets[1].data=f.map(y=>y.projectedSupportedExpense);trendChart.update();shortfallChart.data.labels=s.map(y=>y.year);shortfallChart.data.datasets[0].data=s.map(y=>y.revenueShortfall);shortfallChart.update()}
-function renderTax(){let p=S.parcel,taxable=Math.max((p?.taxableValue||0)-(S.homestead?150000:0),0),orig=(p?.taxableValue||0)*budgetData.millageAssumptions.adoptedMillage/1000,tax=taxable*S.millage/1000;$('#useHomesteadExemption').checked=S.homestead;$('#parcelResults').innerHTML=`<div class="metric-box"><span>Selected Parcel</span><strong>${p.address}</strong><small>${p.city}, FL ${p.zip}</small></div><div class="metric-box"><span>Taxable Value</span><strong>${money(p.taxableValue)}</strong></div><div class="metric-box"><span>Adjusted Taxable Value</span><strong>${money(taxable)}</strong></div><div class="metric-box"><span>Estimated County Tax</span><strong>${money(tax)}</strong><small>${money(tax-orig)} change from adopted millage</small></div>`;let total=budgetData.propertyTaxCategories.reduce((t,x)=>t+x.allocation,0),imp=totals().departmentImpacts;$('#taxBreakdown').innerHTML=budgetData.propertyTaxCategories.map(x=>{let m=imp.find(i=>i.department.id===x.departmentId),r=m?Math.min(m.totalReduction/Math.max(m.department.totalBudget,1),1):0,st=r>=.99?'eliminated':r>0?'reduced':'active';return`<div class="service-row service-${st}"><div><strong>${x.name}</strong><small>${st==='active'?'Active service':st==='reduced'?percent(r*100)+' reduced in scenario':'Eliminated in scenario'}</small></div><span>${money(tax*x.allocation/total)}</span></div>`}).join('')}
-function update(){let t=totals(),sc=scenario(),done=t.revenueShortfall?Math.min(t.totalReductions/t.revenueShortfall*100,100):100;$('#heroRevenueShortfall').textContent=money(sc.revenueShortfall);updateCharts();renderForecast();$('#startingShortfall').textContent=money(t.revenueShortfall);$('#resultRevenueShortfall').textContent=money(t.revenueShortfall);$('#resultSelectedReductions').textContent=money(t.totalReductions);$('#resultRemainingShortfall').textContent=t.remainingShortfall?money(t.remainingShortfall):money(t.surplus)+' surplus';$('#resultPersonnelReductions').textContent=money(t.personnelReductions);$('#resultOperatingReductions').textContent=money(t.operatingReductions);$('#resultCapitalReductions').textContent=money(t.capitalReductions);$('#shortfallAddressedPercent').textContent=percent(done);$('#shortfallProgress').style.width=done+'%';$('#budgetStatus').className='status-banner '+(t.remainingShortfall?'status-deficit':'status-balanced');$('#budgetStatus').textContent=t.remainingShortfall?money(t.remainingShortfall)+' revenue shortfall remaining':money(t.surplus)+' projected surplus after selected reductions';$('#currentMillage').textContent=(budgetData.millageAssumptions.adoptedMillage).toFixed(3);$('#proposedMillage').value=(+S.millage).toFixed(3);$('#proposedMillage').disabled=!staff;$('#millageRevenueImpact').textContent=money(millageImpact());$('#millageShortfallImpact').textContent=t.remainingShortfall?money(t.remainingShortfall):money(t.surplus)+' surplus';$('#taxpayerImpact').textContent=money((S.millage-budgetData.millageAssumptions.adoptedMillage)*100);renderTax();renderImpact();renderCompare()}
-function renderImpact(){let rows=totals().departmentImpacts.filter(i=>!excluded(i.department)).sort(sortDisp);$('#impactTable').innerHTML=rows.map(i=>`<tr class="${constitutional(i.department)?'constitutional-row':''} ${i.locked?'locked-row':''}"><td><strong>${i.department.name}</strong>${i.locked?'<small>Locked</small>':''}</td><td>${n(i.fteReduction)}</td><td>${constitutional(i.department)?'Protected':percent(i.operatingReduction)}</td><td>${money(i.personnelReduction)}</td><td>${money(i.operatingReductionAmount)}</td><td>${money(i.totalReduction)}</td></tr>`).join('');$('#impactTableWrap').hidden=!S.showImpact;$('[data-control="toggle-impact-table"]').textContent=S.showImpact?'Show Less':'View All';$('#validationWarnings').innerHTML=staff?`<p>${Object.values(S.lock).filter(Boolean).length} departments locked.</p>`:''}
-function csv(name,heads,rows){let text=[heads,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
-function rows(sel){return $$(sel+' tr').map(r=>Array.from(r.cells).map(c=>c.textContent.trim()))}
-function save(){let t=totals(),sc=scenario();localStorage.setItem(KEY,JSON.stringify({...S,snapshot:{revenue:sc.revenue,expense:sc.projectedSupportedExpense,remainingShortfall:t.remainingShortfall,personnelReductions:t.personnelReductions,operatingReductions:t.operatingReductions,capitalReductions:t.capitalReductions}}));$('#scenarioMessage').textContent='Scenario saved in this browser.';renderCompare()}
-function load(){let raw=localStorage.getItem(KEY);if(!raw){$('#scenarioMessage').textContent='No saved scenario found.';return}Object.assign(S,JSON.parse(raw));syncMeta();rerender();$('#scenarioMessage').textContent='Scenario loaded.'}
-function syncMeta(){$('#scenarioName').value=S.meta.name||'';$('#scenarioAuthor').value=S.meta.author||'';$('#scenarioNotes').value=S.meta.notes||''}
-function renderCompare(){let raw=localStorage.getItem(KEY),box=$('#scenarioComparison');if(!raw){box.innerHTML='<div class="comparison-item"><span>Comparison</span><strong>No saved scenario</strong></div>';return}let snap=JSON.parse(raw).snapshot||{},t=totals(),sc=scenario(),items=[['Revenue',sc.revenue-snap.revenue],['Expense',sc.projectedSupportedExpense-snap.expense],['Shortfall',t.remainingShortfall-snap.remainingShortfall],['Personnel',t.personnelReductions-snap.personnelReductions],['Operating',t.operatingReductions-snap.operatingReductions],['Capital',t.capitalReductions-snap.capitalReductions]];box.innerHTML=items.map(([l,v])=>`<div class="comparison-item"><span>${l} vs Saved</span><strong>${money(v)}</strong></div>`).join('')}
-function pdf(){let t=totals(),w=open('','_blank');if(!w)return;w.document.write(`<html><body style="font-family:Arial;padding:24px"><h1>Walton County Budget Simulation</h1><p>Generated ${new Date().toLocaleString()}</p><h2>${S.meta.name||'Scenario Export'}</h2><p><b>Author:</b> ${S.meta.author||'Not specified'}</p><p>${S.meta.notes||''}</p><p>Revenue Shortfall: ${money(t.revenueShortfall)}</p><p>Selected Reductions: ${money(t.totalReductions)}</p><p>Remaining Shortfall: ${money(t.remainingShortfall)}</p><pre>${JSON.stringify({revenue:S.rev,personnelDrivers:S.drv,millage:S.millage},null,2)}</pre></body></html>`);w.document.close();w.print()}
-function searchParcels(){let q=(S.parcelQ||'').toUpperCase();$('#parcelSuggestions').innerHTML=q?budgetData.sampleParcels.filter(p=>(p.address+p.city+p.parcel).toUpperCase().includes(q)).map(p=>`<button class="suggestion-button" data-control="select-parcel" data-parcel="${p.parcel}"><strong>${p.address}</strong><span>${p.city}, FL ${p.zip} | ${p.parcel}</span></button>`).join(''):''}
-function rerender(){renderDrivers();renderLocks();renderPersonnel();renderOperating();renderCapital();renderTop();renderRanks();renderDept();renderAssumptions();update()}
-document.addEventListener('input',e=>{let x=e.target,c=x.dataset.control;if(c==='fte'){S.fte[x.dataset.department]=+x.value||0;update()}if(c==='buyout-count'){S.buy[x.dataset.department]=+x.value||0;update()}if(c==='buyout-cost'){S.buyCost[x.dataset.department]=parseMoney(x.value);update()}if(c==='operating'){S.op[x.dataset.department]=+x.value||0;update()}if(c==='revenue-assumption'&&staff){let a=x.dataset.assumption,v=x.dataset.format==='currency'?parseMoney(x.value):+x.value||0;S.rev[a]=a.includes('Rate')?v/100:v;update()}if(c==='personnel-driver'&&staff){S.drv[x.dataset.driver]=(+x.value||0)/100;rerender()}if(c==='ranking-search'){S.q=x.value;renderRanks()}if(c==='scenario-meta'){S.meta[x.dataset.field]=x.value}if(c==='millage'&&staff){S.millage=+x.value||0;update()}if(c==='parcel-search'){S.parcelQ=x.value;searchParcels()}});
-document.addEventListener('change',e=>{let x=e.target,c=x.dataset.control;if(c==='capital'){S.keep[x.dataset.project]=x.checked;update()}if(c==='department-lock'){S.lock[x.dataset.department]=x.checked;rerender()}if(c==='department-year'){S.deptYear=x.value;renderDept()}if(c==='overview-year'){S.svcYear=x.value;renderTop()}if(c==='homestead'){S.homestead=x.checked;renderTax()}});
-document.addEventListener('click',e=>{let b=e.target.closest('[data-control]');if(!b)return;let c=b.dataset.control;if(c==='toggle-top-services'){S.allSvc=!S.allSvc;renderTop()}if(c==='toggle-department-cards'){S.allDept=!S.allDept;renderDept()}if(c==='toggle-rankings'){S.allRank=!S.allRank;renderRanks()}if(c==='toggle-ranking-table'){S.showRank=!S.showRank;renderRanks()}if(c==='toggle-impact-table'){S.showImpact=!S.showImpact;renderImpact()}if(c==='export-rankings'){S.showRank=true;renderRanks();csv('department-rankings.csv',['Department','Ad Valorem Support','FTE','Budget'],rows('#rankingTable'))}if(c==='export-impact'){S.showImpact=true;renderImpact();csv('scenario-impact.csv',['Department','FTE Reduced','Operating Reduction','Personnel Reduction','Operating Reduction Amount','Total Department Reduction'],rows('#impactTable'))}if(c==='export-pdf')pdf();if(c==='save-scenario')save();if(c==='load-scenario')load();if(c==='reset-scenario'){localStorage.removeItem(KEY);location.reload()}if(c==='reset-millage'&&staff){S.millage=budgetData.millageAssumptions.adoptedMillage;update()}if(c==='select-parcel'){S.parcel=budgetData.sampleParcels.find(p=>p.parcel===b.dataset.parcel);$('#parcelSearch').value=S.parcel.address;$('#parcelSuggestions').innerHTML='';renderTax()}});
-function init(){chrome();syncMeta();renderDrivers();renderLocks();renderPersonnel();renderOperating();renderCapital();renderTop();renderRanks();renderDept();renderAssumptions();setupScenarioAccordions();charts();searchParcels();update()}init();
+function historicalSupport(year) {
+  return historicalFundingData.reduce((total, department) => total + (department.history.find((record) => record.fiscalYear === year)?.adValoremSupport || 0), 0);
+}
+
+function fy2027Support(department) {
+  const total = departments().reduce((sum, item) => sum + item.totalBudget, 0) || 1;
+  return department.totalBudget / total * budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline;
+}
+
+function departmentSupport(department, fiscalYear = "FY2027 Budget") {
+  if (fiscalYear === "FY2027 Budget") return fy2027Support(department);
+  return historicalFundingData.find((item) => item.department === department.name)?.history.find((record) => record.fiscalYear === fiscalYear)?.adValoremSupport || 0;
+}
+
+function currentMillageRevenue() {
+  return budgetData.millageAssumptions.taxableValueBase * budgetData.millageAssumptions.adoptedMillage / 1000;
+}
+
+function estimatedMillageRevenue(rate = state.proposedMillage) {
+  return budgetData.millageAssumptions.taxableValueBase * Number(rate || 0) / 1000;
+}
+
+function rollbackRate() {
+  return budgetData.millageAssumptions.fy2026BudgetedAdValoremRevenue / budgetData.millageAssumptions.taxableValueBase * 1000;
+}
+
+function millageRevenueImpact() {
+  return estimatedMillageRevenue() - currentMillageRevenue();
+}
+
+function fiscalYears() {
+  const baseRevenue = budgetData.revenueForecast.baseRevenue;
+  const growth = Number(state.revenueAssumptions.futureRevenueGrowthRate || 0);
+  const expenseGrowth = Number(state.revenueAssumptions.futureExpenseInflationRate || 0);
+  const fy2028Reduction = Number(state.revenueAssumptions.fy2028RevenueReduction || 0);
+  const fy2029Reduction = Number(state.revenueAssumptions.fy2029RevenueReduction || 0);
+  const revenue = [baseRevenue + millageRevenueImpact(), baseRevenue - fy2028Reduction - fy2029Reduction + millageRevenueImpact()];
+  const expense = [budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline, 154000000];
+  for (let index = 2; index < 6; index += 1) {
+    revenue[index] = revenue[index - 1] * (1 + growth);
+    expense[index] = expense[index - 1] * (1 + expenseGrowth);
+  }
+  const forecastYears = ["FY2027", "FY2028", "FY2029", "FY2030", "FY2031", "FY2032"].map((year, index) => ({
+    year,
+    revenue: revenue[index],
+    projectedSupportedExpense: expense[index],
+    revenueShortfall: Math.max(expense[index] - revenue[index], 0),
+    type: "Forecast",
+    historical: false
+  }));
+  return historicalActualRevenues.map(([year, revenueValue]) => ({
+    year,
+    revenue: revenueValue,
+    historicalSupportedExpense: year === "FY2026" ? null : historicalSupport(year),
+    revenueShortfall: 0,
+    type: year === "FY2026" ? "Budget" : "Actual",
+    historical: true
+  })).concat(forecastYears);
+}
+
+function forecastYears() { return fiscalYears().filter((year) => !year.historical); }
+function scenarioYear() { return forecastYears().find((year) => year.year === budgetData.scenarioYear); }
+function driverTotal() { return Object.values(state.personnelDrivers).reduce((total, value) => total + Number(value || 0), 0) || 1; }
+function baseDriverTotal() { return Object.values(budgetData.personnelCostDrivers).reduce((total, value) => total + value, 0) || 1; }
+function fteCost(department) { return Math.round((department.averageFteCost || 0) * driverTotal() / baseDriverTotal()); }
+
+function scenarioTotals(raw = false) {
+  const revenueShortfall = scenarioYear().revenueShortfall;
+  let personnelReductions = 0;
+  let operatingReductions = 0;
+  let buyoutOneTimeCosts = 0;
+  const departmentImpacts = budgetData.departments.map((department) => {
+    const isLocked = locked(department.id) || excluded(department);
+    const averageCost = fteCost(department);
+    const fteReduction = !isLocked && department.fteCount > 0 && !department.nonFteAdjustable ? Number(state.fteReductions[department.id] || 0) : 0;
+    const buyoutCount = isLocked ? 0 : Math.min(Number(state.buyoutCounts[department.id] || 0), Math.max(department.fteCount - fteReduction, 0));
+    const buyoutCost = isLocked ? 0 : Number(state.buyoutCosts[department.id] || 0);
+    const operatingPercent = isLocked || constitutional(department) ? 0 : Number(state.operatingReductions[department.id] || 0);
+    const personnelReduction = (fteReduction + buyoutCount) * averageCost;
+    const oneTimeBuyoutCost = buyoutCount * buyoutCost;
+    const operatingReductionAmount = department.operatingBudget * operatingPercent / 100;
+    personnelReductions += personnelReduction;
+    operatingReductions += operatingReductionAmount;
+    buyoutOneTimeCosts += oneTimeBuyoutCost;
+    return {
+      department,
+      locked: isLocked,
+      fteReduction,
+      buyoutCount,
+      buyoutCost,
+      personnelReduction,
+      buyoutOneTimeCost: oneTimeBuyoutCost,
+      firstYearNetImpact: personnelReduction - oneTimeBuyoutCost,
+      operatingReduction: operatingPercent,
+      operatingReductionAmount,
+      totalReduction: personnelReduction + operatingReductionAmount
+    };
+  });
+  const capitalReductions = budgetData.capitalProjects.reduce((total, project) => locked(project.departmentId) || state.keptProjects[project.id] ? total : total + project.cost, 0);
+  const actualTotalReductions = personnelReductions + operatingReductions + capitalReductions;
+  const displayTotalReductions = !isStaffMode && !raw ? Math.min(actualTotalReductions, revenueShortfall) : actualTotalReductions;
+  return {
+    revenueShortfall,
+    personnelReductions,
+    buyoutOneTimeCosts,
+    operatingReductions,
+    capitalReductions,
+    actualTotalReductions,
+    totalReductions: displayTotalReductions,
+    remainingShortfall: Math.max(revenueShortfall - displayTotalReductions, 0),
+    surplus: isStaffMode ? Math.max(actualTotalReductions - revenueShortfall, 0) : 0,
+    departmentImpacts
+  };
+}
+
+function currentReductionValue(type, id) {
+  if (type === "fte") {
+    const department = budgetData.departments.find((item) => item.id === id);
+    return department ? Number(state.fteReductions[id] || 0) * fteCost(department) : 0;
+  }
+  if (type === "buyout") {
+    const department = budgetData.departments.find((item) => item.id === id);
+    return department ? Number(state.buyoutCounts[id] || 0) * fteCost(department) : 0;
+  }
+  if (type === "operating") {
+    const department = budgetData.departments.find((item) => item.id === id);
+    return department ? department.operatingBudget * Number(state.operatingReductions[id] || 0) / 100 : 0;
+  }
+  if (type === "capital") {
+    const project = budgetData.capitalProjects.find((item) => item.id === id);
+    return project && !state.keptProjects[id] ? project.cost : 0;
+  }
+  return 0;
+}
+
+function availableShortfallExcluding(type, id) {
+  const totals = scenarioTotals(true);
+  return Math.max(totals.revenueShortfall - (totals.actualTotalReductions - currentReductionValue(type, id)), 0);
+}
+
+function capPublicFte(department, requested) {
+  if (isStaffMode) return Math.min(Math.max(requested, 0), department.fteCount);
+  const cost = fteCost(department);
+  const maxByShortfall = cost > 0 ? Math.floor((availableShortfallExcluding("fte", department.id) / cost) * 2) / 2 : 0;
+  const capped = Math.min(Math.max(requested, 0), department.fteCount, maxByShortfall);
+  if (capped < requested) showMessage("Selected reductions cannot exceed the projected revenue shortfall.");
+  return capped;
+}
+
+function capPublicBuyout(department, requested) {
+  const maxPositions = Math.max(department.fteCount - Number(state.fteReductions[department.id] || 0), 0);
+  if (isStaffMode) return Math.min(Math.max(requested, 0), maxPositions);
+  const cost = fteCost(department);
+  const maxByShortfall = cost > 0 ? Math.floor(availableShortfallExcluding("buyout", department.id) / cost) : 0;
+  const capped = Math.min(Math.max(requested, 0), maxPositions, maxByShortfall);
+  if (capped < requested) showMessage("Selected reductions cannot exceed the projected revenue shortfall.");
+  return capped;
+}
+
+function capPublicOperating(department, requested) {
+  if (isStaffMode) return Math.min(Math.max(requested, 0), 100);
+  const maxPercent = department.operatingBudget > 0 ? Math.floor(availableShortfallExcluding("operating", department.id) / department.operatingBudget * 100) : 0;
+  const capped = Math.min(Math.max(requested, 0), 100, maxPercent);
+  if (capped < requested) showMessage("Selected reductions cannot exceed the projected revenue shortfall.");
+  return capped;
+}
+
+function sortDepartments(a, b) {
+  const departmentA = a.department || a;
+  const departmentB = b.department || b;
+  const constitutionalA = constitutional(departmentA);
+  const constitutionalB = constitutional(departmentB);
+  if (constitutionalA !== constitutionalB) return constitutionalA ? -1 : 1;
+  return departmentA.name.localeCompare(departmentB.name);
+}
+
+function renderChrome() {
+  if (window.WaltonSplitLogo) {
+    $("#brandMount").innerHTML = window.WaltonSplitLogo.getHtml();
+    window.WaltonSplitLogo.injectStyles?.();
+  }
+  $("#modeLabel").textContent = isStaffMode ? "Staff Exercise" : "Public View";
+  document.body.classList.toggle("staff-mode", isStaffMode);
+  $$('[data-staff-only]').forEach((element) => { element.hidden = !isStaffMode; });
+}
+
+function infoButton(text) {
+  return `<button class="info-button" type="button" aria-label="More information" data-tip="${text.replace(/"/g, "&quot;")}">i</button>`;
+}
+
+function renderDrivers() {
+  const total = budgetData.personnelCostFactors.reduce((sum, factor) => sum + factor.amount, 0);
+  $("#personnelDriverControls").innerHTML = budgetData.personnelCostFactors.map((factor) => {
+    const control = isStaffMode ? `<input type="number" min="0" step="0.01" value="${(state.personnelDrivers[factor.id] * 100).toFixed(2)}" data-control="personnel-driver" data-driver="${factor.id}">` : `<strong>${percent(factor.percentOfTotal)}</strong>`;
+    const baseNote = factor.baseWagePercent ? `<small>${percent(factor.baseWagePercent)} of base wages; ${percent(factor.percentOfTotal)} of total personnel cost</small>` : `<small>${percent(factor.percentOfTotal)} of total personnel cost</small>`;
+    return `<div class="driver-card"><span>${factor.label} ${infoButton(factor.note)}</span>${control}<strong>${money(factor.amount)}</strong>${baseNote}</div>`;
+  }).join("") + `<div class="driver-card total-driver"><span>Displayed Factor Total</span><strong>${money(total)}</strong><small>Listed factors reconcile to approximately ${money(total)}.</small></div>`;
+}
+
+function renderLocks() {
+  const container = $("#departmentLocks");
+  if (!container) return;
+  container.innerHTML = departments().sort(sortDepartments).map((department) => `<label class="lock-card ${constitutional(department) ? "constitutional-card" : ""}"><input type="checkbox" ${state.lockedDepartments[department.id] ? "checked" : ""} data-control="department-lock" data-department="${department.id}"><span>${department.name}</span></label>`).join("");
+}
+
+function renderPersonnel() {
+  $("#personnelControls").innerHTML = departments().filter((department) => department.fteCount > 0 && !department.nonFteAdjustable).sort(sortDepartments).map((department) => {
+    const isLocked = locked(department.id);
+    const averageCost = fteCost(department);
+    state.buyoutCosts[department.id] ??= Math.round(averageCost * 0.35);
+    if (isLocked) { state.fteReductions[department.id] = 0; state.buyoutCounts[department.id] = 0; }
+    const recurring = (Number(state.fteReductions[department.id] || 0) + Number(state.buyoutCounts[department.id] || 0)) * averageCost;
+    const oneTime = Number(state.buyoutCounts[department.id] || 0) * Number(state.buyoutCosts[department.id] || 0);
+    return `<tr class="${isLocked ? "locked-row" : ""}"><td><strong>${department.name}</strong>${isLocked ? "<small>Locked</small>" : ""}</td><td>${number(department.fteCount)}</td><td>${money(averageCost)}</td><td><input type="number" step="0.5" min="0" max="${department.fteCount}" value="${state.fteReductions[department.id] || 0}" data-control="fte" data-department="${department.id}" ${isLocked ? "disabled" : ""}></td><td><input type="number" step="1" min="0" max="${department.fteCount}" value="${state.buyoutCounts[department.id] || 0}" data-control="buyout-count" data-department="${department.id}" ${isLocked ? "disabled" : ""}></td><td><input type="text" value="${moneyInput(state.buyoutCosts[department.id])}" data-control="buyout-cost" data-department="${department.id}" ${isLocked ? "disabled" : ""}></td><td>${money(recurring)}</td><td>${money(recurring - oneTime)}</td></tr>`;
+  }).join("");
+}
+
+function renderOperating() {
+  const protectedDepartments = departments().filter((department) => department.operatingBudget > 0 && constitutional(department));
+  const adjustableDepartments = departments().filter((department) => department.operatingBudget > 0 && !constitutional(department)).sort(sortDepartments);
+  $("#operatingControls").innerHTML = `<section class="protected-operating-card"><div class="protected-operating-header"><div><h4>Constitutional Office Operating Budgets</h4><p>Shown for context and not adjustable.</p></div><strong>${money(protectedDepartments.reduce((total, department) => total + department.operatingBudget, 0))}</strong></div><div class="protected-operating-list">${protectedDepartments.map((department) => `<div><span>${department.name}</span><strong>${money(department.operatingBudget)}</strong></div>`).join("")}</div></section>` + adjustableDepartments.map((department) => {
+    const isLocked = locked(department.id);
+    if (isLocked) state.operatingReductions[department.id] = 0;
+    return `<div class="slider-row ${isLocked ? "locked-row" : ""}"><div><label>${department.name}</label><div class="slider-meta">Operating budget: ${money(department.operatingBudget)}${isLocked ? " | Locked" : ""}</div></div><input type="range" min="0" max="100" value="${state.operatingReductions[department.id] || 0}" data-control="operating" data-department="${department.id}" ${isLocked ? "disabled" : ""}><div class="percent-pill">${percent(state.operatingReductions[department.id] || 0)}</div></div>`;
+  }).join("");
+}
+
+function renderCapital() {
+  $("#capitalControls").innerHTML = budgetData.capitalProjects.map((project) => {
+    state.keptProjects[project.id] ??= true;
+    const isLocked = locked(project.departmentId);
+    if (isLocked) state.keptProjects[project.id] = true;
+    return `<div class="project-card ${isLocked ? "locked-row" : ""}"><input type="checkbox" ${state.keptProjects[project.id] ? "checked" : ""} data-control="capital" data-project="${project.id}" ${isLocked ? "disabled" : ""}><div><label>${project.name}</label><p>${departmentName(project.departmentId)} | ${money(project.cost)}${isLocked ? " | Locked" : ""}</p></div></div>`;
+  }).join("");
+}
+
+function rankingRows(fiscalYear = state.overviewFiscalYear) {
+  return departments().map((department) => ({ name: department.name, id: department.id, support: departmentSupport(department, fiscalYear), fte: department.fteCount, budget: department.totalBudget, constitutional: constitutional(department), department }));
+}
+
+function sortedRankingRows() {
+  const rows = rankingRows("FY2027 Budget").filter((row) => !state.rankingSearch || row.name.toLowerCase().includes(state.rankingSearch.toLowerCase()));
+  if (state.rankingTab === "fte") return rows.sort((a, b) => b.fte - a.fte || sortDepartments(a, b));
+  if (state.rankingTab === "budget") return rows.sort((a, b) => b.budget - a.budget || sortDepartments(a, b));
+  return rows.sort((a, b) => b.support - a.support || sortDepartments(a, b));
+}
+
+function renderTopServices() {
+  const rows = rankingRows(state.overviewFiscalYear).filter((row) => row.support > 0).sort((a, b) => b.support - a.support);
+  const visibleRows = state.showAllTopServices ? rows : rows.slice(0, 6);
+  const max = Math.max(...rows.map((row) => row.support), 1);
+  $("#topServicesBars").innerHTML = visibleRows.map((row, index) => `<div class="rank-bar-row ${row.constitutional ? "constitutional-row" : ""}"><div class="rank-label"><strong>${index + 1}. ${row.name}</strong><span>${money(row.support)}</span></div><div class="bar-track"><div class="bar-fill" style="width:${row.support / max * 100}%"></div></div></div>`).join("") + (rows.length > 6 ? `<button class="view-all-button" data-control="toggle-top-services">${state.showAllTopServices ? "Show Less" : "View All"}</button>` : "");
+}
+
+function renderRankings() {
+  const rows = sortedRankingRows();
+  const cards = state.showAllRankings ? rows : rows.slice(0, 8);
+  $("#rankingCards").innerHTML = cards.map((row, index) => `<article class="ranking-card ${row.constitutional ? "constitutional-card" : ""}"><div><span>${index + 1}</span><strong>${row.name}</strong></div><dl><div><dt>Ad Valorem Support</dt><dd>${money(row.support)}</dd></div><div><dt>FTE</dt><dd>${number(row.fte)}</dd></div><div><dt>Budget</dt><dd>${money(row.budget)}</dd></div></dl></article>`).join("") + (rows.length > 8 ? `<button class="view-all-button" data-control="toggle-rankings">${state.showAllRankings ? "Show Less" : "View All"}</button>` : "");
+  $("#rankingTable").innerHTML = rows.map((row) => `<tr><td>${row.name}</td><td>${money(row.support)}</td><td>${number(row.fte)}</td><td>${money(row.budget)}</td></tr>`).join("");
+  $("#rankingTableWrap").hidden = true;
+}
+
+function renderDepartments() {
+  const rows = departments().sort(sortDepartments);
+  const visibleRows = state.showAllDepartmentCards ? rows : rows.slice(0, 4);
+  const budgetYear = state.departmentFiscalYear === "FY2027 Budget";
+  $("#departmentCards").innerHTML = visibleRows.map((department) => {
+    const record = historicalFundingData.find((item) => item.department === department.name)?.history.find((item) => item.fiscalYear === state.departmentFiscalYear);
+    return `<article class="panel department-card ${constitutional(department) ? "constitutional-card" : ""}"><h3>${department.name}</h3><div class="department-primary-metric"><span>${budgetYear ? "FY2027 Ad Valorem Support" : "Ad Valorem Support"}</span><strong>${money(budgetYear ? departmentSupport(department) : record?.adValoremSupport || 0)}</strong></div><div class="detail-grid">${budgetYear ? detail("Personnel Budget", department.personnelBudget) + detail("Operating Budget", department.operatingBudget) + detail("Capital Budget", department.capitalBudget) + detail("Total Budget", department.totalBudget) + detail("FTE Count", department.fteCount, number) + detail("Average Personnel Cost", fteCost(department)) : record ? detail("Gross Expense", record.grossExpense) + detail("Department Revenue", record.departmentRevenue) + detail("Net Expense", record.netExpense) + detail("Ad Valorem Support", record.adValoremSupport) : '<p class="historical-note">No record available.</p>'}</div></article>`;
+  }).join("") + (rows.length > 4 ? `<button class="view-all-button department-view-all-button" data-control="toggle-department-cards">${state.showAllDepartmentCards ? "Show Less" : "View All"}</button>` : "");
+}
+
+function detail(label, value, formatter = money) { return `<div class="detail-item"><span>${label}</span><strong>${formatter(value || 0)}</strong></div>`; }
+
+function renderAssumptions() {
+  $("#revenueAssumptionControls").innerHTML = `<label class="assumption-control"><span>Revenue Growth Rate</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureRevenueGrowthRate * 100}" data-control="revenue-assumption" data-assumption="futureRevenueGrowthRate" ${isStaffMode ? "" : "disabled"}></label><label class="assumption-control"><span>FY2029+ Supported Expense Inflation Rate</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureExpenseInflationRate * 100}" data-control="revenue-assumption" data-assumption="futureExpenseInflationRate" ${isStaffMode ? "" : "disabled"}></label><label class="assumption-control"><span>FY2028 Revenue Reduction</span><input type="text" value="${moneyInput(state.revenueAssumptions.fy2028RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2028RevenueReduction" data-format="currency" ${isStaffMode ? "" : "disabled"}></label><label class="assumption-control"><span>FY2029 Revenue Reduction</span><input type="text" value="${moneyInput(state.revenueAssumptions.fy2029RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2029RevenueReduction" data-format="currency" ${isStaffMode ? "" : "disabled"}></label><div class="forecast-table-wrap"><table class="forecast-table"><thead><tr><th>Fiscal Year</th><th>Revenue</th><th>Supported Expense</th><th>Status</th><th>Revenue Shortfall</th></tr></thead><tbody id="forecastTable"></tbody></table></div>`;
+  $("#revenueAssumptions").innerHTML = "<li>FY2027 revenue and supported expense are $163,473,140 before millage changes.</li><li>FY2028 supported expense is approximately $154,000,000.</li><li>Revenue shortfall equals projected supported expense minus projected revenue.</li>";
+  $("#inflationAssumptions").innerHTML = "<li>Personnel cost factors show both dollars and percent of total personnel cost.</li><li>Staff mode can edit assumptions, millage targets, and department locks.</li>";
+  $("#methodologyList").innerHTML = "<li>Public reductions are capped at the projected revenue shortfall.</li><li>Staff mode may model surplus for internal planning.</li><li>Ranking exports are generated from internal data even though the full support table is hidden.</li>";
+  $("#formulaDefinitions").innerHTML = ["Revenue Shortfall = Projected Supported Expense - Projected Revenue", "Estimated Ad Valorem Revenue = Taxable Value Base x Millage / 1,000", "Required Millage = Target Revenue / Taxable Value Base x 1,000", "Rollback Rate = FY2026 Budgeted Ad Valorem Revenue / Taxable Value Base x 1,000", "Buy-Out First-Year Net = Recurring Reduction - One-Time Cost"].map((item) => `<div class="formula-item"><code>${item}</code></div>`).join("");
+}
+
+function renderForecast() {
+  $("#forecastTable").innerHTML = fiscalYears().map((year) => `<tr><td><strong>${year.year}</strong></td><td>${money(year.revenue)}</td><td>${year.historicalSupportedExpense == null ? money(year.projectedSupportedExpense) : money(year.historicalSupportedExpense)}</td><td>${year.type}</td><td>${year.historical ? "-" : money(year.revenueShortfall)}</td></tr>`).join("");
+}
+
+function chartOptions(bar = false) {
+  return { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: bar, ticks: { callback: (value) => money(value) } } }, plugins: { tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${money(context.raw)}` } } } };
+}
+
+function renderCharts() {
+  const forecast = forecastYears();
+  const shortfallYears = forecast.filter((year) => year.year !== "FY2027");
+  Chart.defaults.font.family = "Arial, Helvetica, sans-serif";
+  trendChart = new Chart($("#trendChart"), { type: "line", data: { labels: forecast.map((year) => year.year), datasets: [{ label: "Projected Revenue", data: forecast.map((year) => year.revenue), borderColor: "#006231", borderDash: [6, 6] }, { label: "Projected Ad Valorem Supported Expense", data: forecast.map((year) => year.projectedSupportedExpense), borderColor: "#d1be78" }] }, options: chartOptions() });
+  shortfallChart = new Chart($("#shortfallChart"), { type: "bar", data: { labels: shortfallYears.map((year) => year.year), datasets: [{ label: "Projected Revenue Shortfall", data: shortfallYears.map((year) => year.revenueShortfall), backgroundColor: "rgba(0,98,49,.74)" }] }, options: chartOptions(true) });
+}
+
+function updateCharts() {
+  const forecast = forecastYears();
+  const shortfallYears = forecast.filter((year) => year.year !== "FY2027");
+  trendChart.data.labels = forecast.map((year) => year.year);
+  trendChart.data.datasets[0].data = forecast.map((year) => year.revenue);
+  trendChart.data.datasets[1].data = forecast.map((year) => year.projectedSupportedExpense);
+  trendChart.update();
+  shortfallChart.data.labels = shortfallYears.map((year) => year.year);
+  shortfallChart.data.datasets[0].data = shortfallYears.map((year) => year.revenueShortfall);
+  shortfallChart.update();
+}
+
+function renderTax() {
+  const parcel = state.selectedParcel;
+  const taxable = Math.max((parcel?.taxableValue || 0) - (state.useHomesteadExemption ? 150000 : 0), 0);
+  const originalTax = (parcel?.taxableValue || 0) * budgetData.millageAssumptions.adoptedMillage / 1000;
+  const tax = taxable * state.proposedMillage / 1000;
+  $("#useHomesteadExemption").checked = state.useHomesteadExemption;
+  $("#parcelResults").innerHTML = `<div class="metric-box"><span>Selected Parcel</span><strong>${parcel.address}</strong><small>${parcel.city}, FL ${parcel.zip}</small></div><div class="metric-box"><span>Taxable Value</span><strong>${money(parcel.taxableValue)}</strong></div><div class="metric-box"><span>Adjusted Taxable Value</span><strong>${money(taxable)}</strong></div><div class="metric-box"><span>Estimated County Tax</span><strong>${money(tax)}</strong><small>${money(tax - originalTax)} change from current millage</small></div>`;
+  const allocationTotal = budgetData.propertyTaxCategories.reduce((sum, item) => sum + item.allocation, 0);
+  const impacts = scenarioTotals().departmentImpacts;
+  $("#taxBreakdown").innerHTML = budgetData.propertyTaxCategories.map((item) => {
+    const impact = impacts.find((entry) => entry.department.id === item.departmentId);
+    const reductionRate = impact ? Math.min(impact.totalReduction / Math.max(impact.department.totalBudget, 1), 1) : 0;
+    const status = reductionRate >= 0.99 ? "eliminated" : reductionRate > 0 ? "reduced" : "active";
+    const label = status === "active" ? "Active service" : status === "reduced" ? `${percent(reductionRate * 100)} reduced in scenario` : "Eliminated in scenario";
+    return `<div class="service-row service-${status}"><div><strong>${item.name}</strong><small>${label}</small></div><span>${money(tax * item.allocation / allocationTotal)}</span></div>`;
+  }).join("");
+}
+
+function renderImpact() {
+  const rows = scenarioTotals().departmentImpacts.filter((impact) => !excluded(impact.department)).sort(sortDepartments);
+  $("#impactTable").innerHTML = rows.map((impact) => `<tr class="${constitutional(impact.department) ? "constitutional-row" : ""} ${impact.locked ? "locked-row" : ""}"><td><strong>${impact.department.name}</strong>${impact.locked ? "<small>Locked/Protected</small>" : ""}</td><td>${number(impact.fteReduction)}</td><td>${constitutional(impact.department) ? "Protected" : percent(impact.operatingReduction)}</td><td>${money(impact.personnelReduction)}</td><td>${money(impact.operatingReductionAmount)}</td><td>${money(impact.totalReduction)}</td></tr>`).join("");
+  $("#impactTableWrap").hidden = !state.showImpactTable;
+  $('[data-control="toggle-impact-table"]').textContent = state.showImpactTable ? "Show Less" : "View All";
+  $("#validationWarnings").innerHTML = isStaffMode ? `<p>${Object.values(state.lockedDepartments).filter(Boolean).length} departments locked. Staff mode can exceed the shortfall and will label any surplus as Modeled Surplus.</p>` : "";
+}
+
+function renderMillage() {
+  const rollback = rollbackRate();
+  const estimatedRevenue = estimatedMillageRevenue();
+  $("#currentMillage").textContent = budgetData.millageAssumptions.adoptedMillage.toFixed(3);
+  $("#rollbackRate").textContent = `${rollback.toFixed(4)} mills`;
+  $("#proposedMillage").value = Number(state.proposedMillage || 0).toFixed(4);
+  $("#proposedMillage").disabled = !isStaffMode;
+  const revenueTarget = $("#revenueTarget");
+  if (revenueTarget) revenueTarget.value = moneyInput(estimatedRevenue);
+  $("#estimatedMillageRevenue").textContent = money(estimatedRevenue);
+  $("#millageRevenueImpact").textContent = money(estimatedRevenue - currentMillageRevenue());
+  $("#rollbackRevenueImpact").textContent = money(estimatedRevenue - budgetData.millageAssumptions.fy2026BudgetedAdValoremRevenue);
+  const totals = scenarioTotals();
+  $("#millageShortfallImpact").textContent = totals.remainingShortfall ? money(totals.remainingShortfall) : isStaffMode && totals.surplus ? `${money(totals.surplus)} Modeled Surplus` : "$0";
+  $("#taxpayerImpact").textContent = money((state.proposedMillage - budgetData.millageAssumptions.adoptedMillage) * 100);
+}
+
+function renderScenarioManager() {
+  const select = $("#scenarioSelect");
+  if (!select) return;
+  const store = getScenarioStore();
+  const names = Object.keys(store.scenarios).sort();
+  select.innerHTML = `<option value="">Select saved scenario</option>` + names.map((name) => `<option value="${name.replace(/"/g, "&quot;")}" ${state.selectedScenarioName === name ? "selected" : ""}>${name}</option>`).join("");
+}
+
+function updateResults() {
+  const totals = scenarioTotals();
+  if (!totals.remainingShortfall && $("#publicCapMessage")?.textContent && !$("#publicCapMessage").textContent.includes("cannot exceed")) $("#publicCapMessage").textContent = "";
+  const scenario = scenarioYear();
+  const addressed = totals.revenueShortfall ? Math.min(totals.totalReductions / totals.revenueShortfall * 100, 100) : 100;
+  $("#heroRevenueShortfall").textContent = money(scenario.revenueShortfall);
+  $("#startingShortfall").textContent = money(totals.revenueShortfall);
+  $("#resultRevenueShortfall").textContent = money(totals.revenueShortfall);
+  $("#resultSelectedReductions").textContent = money(totals.totalReductions);
+  $("#resultRemainingShortfall").textContent = totals.remainingShortfall ? money(totals.remainingShortfall) : "$0";
+  $("#resultPersonnelReductions").textContent = money(totals.personnelReductions);
+  $("#resultOperatingReductions").textContent = money(totals.operatingReductions);
+  $("#resultCapitalReductions").textContent = money(totals.capitalReductions);
+  $("#shortfallAddressedPercent").textContent = percent(addressed);
+  $("#shortfallProgress").style.width = `${addressed}%`;
+  $("#budgetStatus").className = `status-banner ${totals.remainingShortfall ? "status-deficit" : "status-balanced"}`;
+  $("#budgetStatus").textContent = totals.remainingShortfall ? `${money(totals.remainingShortfall)} revenue shortfall remaining` : isStaffMode && totals.surplus ? `${money(totals.surplus)} Modeled Surplus` : "Balanced scenario: remaining revenue shortfall is $0";
+  updateCharts();
+  renderForecast();
+  renderMillage();
+  renderTax();
+  renderImpact();
+  renderScenarioComparison();
+}
+
+function csv(name, headings, rows) {
+  const text = [headings, ...rows].map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")).join("\n");
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([text], { type: "text/csv" }));
+  link.download = name;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function scenarioSnapshot() {
+  return {
+    version: 2,
+    revenueAssumptions: state.revenueAssumptions,
+    personnelDrivers: state.personnelDrivers,
+    fteReductions: state.fteReductions,
+    buyoutCounts: state.buyoutCounts,
+    buyoutCosts: state.buyoutCosts,
+    operatingReductions: state.operatingReductions,
+    keptProjects: state.keptProjects,
+    lockedDepartments: state.lockedDepartments,
+    proposedMillage: state.proposedMillage,
+    scenarioMeta: state.scenarioMeta,
+    savedTotals: scenarioTotals()
+  };
+}
+
+function getScenarioStore() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(scenarioStoreKey) || "{}");
+    return parsed.version === 1 && parsed.scenarios ? parsed : { version: 1, scenarios: {} };
+  } catch {
+    return { version: 1, scenarios: {} };
+  }
+}
+
+function setScenarioStore(store) { localStorage.setItem(scenarioStoreKey, JSON.stringify(store)); }
+
+function saveScenario() {
+  const name = state.scenarioMeta.name.trim();
+  if (!name) { showMessage("Enter a scenario name before saving."); return; }
+  const store = getScenarioStore();
+  const existing = store.scenarios[name];
+  const now = new Date().toISOString();
+  store.scenarios[name] = {
+    name,
+    notes: state.scenarioMeta.notes,
+    author: state.scenarioMeta.author,
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
+    mode: isStaffMode ? "Staff" : "Public",
+    data: scenarioSnapshot()
+  };
+  state.selectedScenarioName = name;
+  setScenarioStore(store);
+  renderScenarioManager();
+  showMessage(`Saved scenario: ${name}.`);
+  renderScenarioComparison();
+}
+
+function loadScenario() {
+  const name = state.selectedScenarioName || $("#scenarioSelect")?.value;
+  const saved = getScenarioStore().scenarios[name];
+  if (!saved) { showMessage("Select a saved scenario to load."); return; }
+  Object.assign(state.revenueAssumptions, saved.data.revenueAssumptions || {});
+  Object.assign(state.personnelDrivers, saved.data.personnelDrivers || {});
+  state.fteReductions = { ...(saved.data.fteReductions || {}) };
+  state.buyoutCounts = { ...(saved.data.buyoutCounts || {}) };
+  state.buyoutCosts = { ...(saved.data.buyoutCosts || {}) };
+  state.operatingReductions = { ...(saved.data.operatingReductions || {}) };
+  state.keptProjects = { ...(saved.data.keptProjects || {}) };
+  state.lockedDepartments = { ...(saved.data.lockedDepartments || {}) };
+  state.proposedMillage = saved.data.proposedMillage || budgetData.millageAssumptions.adoptedMillage;
+  state.scenarioMeta = { name: saved.name, author: saved.author || "", notes: saved.notes || "" };
+  state.selectedScenarioName = name;
+  syncScenarioFields();
+  rerender();
+  showMessage(`Loaded scenario: ${name}.`);
+}
+
+function deleteScenario() {
+  const name = state.selectedScenarioName || $("#scenarioSelect")?.value;
+  const store = getScenarioStore();
+  if (!store.scenarios[name]) { showMessage("Select a saved scenario to delete."); return; }
+  delete store.scenarios[name];
+  state.selectedScenarioName = "";
+  setScenarioStore(store);
+  renderScenarioManager();
+  showMessage(`Deleted scenario: ${name}.`);
+  renderScenarioComparison();
+}
+
+function resetWorkingScenario() {
+  state.fteReductions = {};
+  state.buyoutCounts = {};
+  state.buyoutCosts = {};
+  state.operatingReductions = {};
+  state.keptProjects = {};
+  state.lockedDepartments = {};
+  state.proposedMillage = budgetData.millageAssumptions.adoptedMillage;
+  state.scenarioMeta = { name: "", author: "", notes: "" };
+  state.selectedScenarioName = "";
+  syncScenarioFields();
+  rerender();
+  showMessage("Working scenario reset.");
+}
+
+function syncScenarioFields() {
+  $("#scenarioName").value = state.scenarioMeta.name || "";
+  $("#scenarioAuthor").value = state.scenarioMeta.author || "";
+  $("#scenarioNotes").value = state.scenarioMeta.notes || "";
+  const select = $("#scenarioSelect");
+  if (select) select.value = state.selectedScenarioName || "";
+}
+
+function renderScenarioComparison() {
+  const box = $("#scenarioComparison");
+  if (!box) return;
+  const saved = getScenarioStore().scenarios[state.selectedScenarioName];
+  if (!saved?.data?.savedTotals) { box.innerHTML = '<div class="comparison-item"><span>Comparison</span><strong>No saved scenario selected</strong></div>'; return; }
+  const current = scenarioTotals();
+  const previous = saved.data.savedTotals;
+  const rows = [["Shortfall", current.remainingShortfall - previous.remainingShortfall], ["Personnel", current.personnelReductions - previous.personnelReductions], ["Operating", current.operatingReductions - previous.operatingReductions], ["Capital", current.capitalReductions - previous.capitalReductions], ["Total", current.totalReductions - previous.totalReductions]];
+  box.innerHTML = rows.map(([label, value]) => `<div class="comparison-item"><span>${label} vs Saved</span><strong>${money(value)}</strong></div>`).join("");
+}
+
+function reductionRowsForPdf() {
+  const impacts = scenarioTotals().departmentImpacts.filter((impact) => !excluded(impact.department) && (impact.fteReduction || impact.buyoutCount || impact.operatingReductionAmount || impact.personnelReduction));
+  const capitalRows = budgetData.capitalProjects.filter((project) => !state.keptProjects[project.id]).map((project) => `<tr><td>${departmentName(project.departmentId)}</td><td>${project.name}</td><td>${money(project.cost)}</td></tr>`).join("") || '<tr><td colspan="3">No capital or equipment projects removed.</td></tr>';
+  const personnelRows = impacts.filter((impact) => impact.fteReduction || impact.buyoutCount).map((impact) => `<tr><td>${impact.department.name}</td><td>${number(impact.fteReduction)}</td><td>${number(impact.buyoutCount)}</td><td>${money(impact.personnelReduction)}</td><td>${money(impact.buyoutOneTimeCost)}</td></tr>`).join("") || '<tr><td colspan="5">No personnel reductions selected.</td></tr>';
+  const operatingRows = impacts.filter((impact) => impact.operatingReductionAmount).map((impact) => `<tr><td>${impact.department.name}</td><td>${percent(impact.operatingReduction)}</td><td>${money(impact.operatingReductionAmount)}</td></tr>`).join("") || '<tr><td colspan="3">No operating reductions selected.</td></tr>';
+  const impactRows = scenarioTotals().departmentImpacts.filter((impact) => !excluded(impact.department)).sort(sortDepartments).map((impact) => `<tr><td>${impact.department.name}</td><td>${number(impact.fteReduction)}</td><td>${constitutional(impact.department) ? "Protected" : percent(impact.operatingReduction)}</td><td>${money(impact.personnelReduction)}</td><td>${money(impact.operatingReductionAmount)}</td><td>${money(impact.totalReduction)}</td><td>${impact.locked || constitutional(impact.department) ? "Locked/Protected" : "Adjustable"}</td></tr>`).join("");
+  return { personnelRows, operatingRows, capitalRows, impactRows };
+}
+
+function exportPdf() {
+  const totals = scenarioTotals();
+  const scenario = scenarioYear();
+  const rows = reductionRowsForPdf();
+  const report = window.open("", "_blank");
+  if (!report) return;
+  report.document.write(`<!doctype html><html><head><title>Walton County Scenario Report</title><style>@page{size:landscape;margin:.45in;@bottom-center{content:"Page " counter(page)}}:root{--green:#006231;--gold:#d1be78;--ink:#1f2a24;--muted:#5f6f66;--line:#d8ded9}body{font-family:Arial,Helvetica,sans-serif;color:var(--ink);margin:0}.report-header{display:flex;justify-content:space-between;gap:24px;align-items:center;border-bottom:4px solid var(--green);padding-bottom:14px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:14px}.seal{width:62px;height:62px;border:4px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--green);font-weight:900}.eyebrow{color:var(--green);font-weight:800;text-transform:uppercase;font-size:11px;letter-spacing:.04em;margin:0 0 4px}h1,h2,h3{margin:0;color:var(--green)}h1{font-size:28px}h2{font-size:18px;margin:22px 0 10px}.meta,.kpis,.assumptions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fbfcfc}.card span{display:block;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase}.card strong{display:block;margin-top:5px;font-size:18px;color:var(--green)}table{width:100%;border-collapse:collapse;margin:8px 0 16px;font-size:11px;page-break-inside:auto}th{background:var(--green);color:white;text-align:left;padding:7px}td{border-bottom:1px solid var(--line);padding:7px;vertical-align:top}.page-break{break-before:page}.footer{border-top:2px solid var(--gold);padding-top:10px;margin-top:18px;color:var(--muted);font-size:11px}</style></head><body><header class="report-header"><div class="brand"><div class="seal">WC</div><div><p class="eyebrow">Walton County Budget Simulation</p><h1>Scenario Report</h1></div></div><div><strong>Generated:</strong> ${new Date().toLocaleString()}<br><strong>Mode:</strong> ${isStaffMode ? "Staff" : "Public"}</div></header><section class="meta"><div class="card"><span>Scenario Name</span><strong>${state.scenarioMeta.name || "Working Scenario"}</strong></div><div class="card"><span>Author</span><strong>${state.scenarioMeta.author || "Not specified"}</strong></div><div class="card"><span>Notes</span><p>${state.scenarioMeta.notes || "None provided"}</p></div><div class="card"><span>Millage</span><strong>${millage(state.proposedMillage)}</strong></div></section><h2>Fiscal Summary</h2><section class="kpis"><div class="card"><span>Projected Revenue</span><strong>${money(scenario.revenue)}</strong></div><div class="card"><span>Projected Supported Expense</span><strong>${money(scenario.projectedSupportedExpense)}</strong></div><div class="card"><span>Projected Revenue Shortfall</span><strong>${money(totals.revenueShortfall)}</strong></div><div class="card"><span>Selected Reductions</span><strong>${money(totals.totalReductions)}</strong></div><div class="card"><span>Remaining Revenue Shortfall</span><strong>${money(totals.remainingShortfall)}</strong></div>${isStaffMode && totals.surplus ? `<div class="card"><span>Modeled Surplus</span><strong>${money(totals.surplus)}</strong></div>` : ""}</section><h2>Assumptions</h2><section class="assumptions"><div class="card"><span>Revenue Growth Rate</span><strong>${percent(state.revenueAssumptions.futureRevenueGrowthRate * 100)}</strong></div><div class="card"><span>FY2028 Revenue Reduction</span><strong>${money(state.revenueAssumptions.fy2028RevenueReduction)}</strong></div><div class="card"><span>FY2029 Revenue Reduction</span><strong>${money(state.revenueAssumptions.fy2029RevenueReduction)}</strong></div><div class="card"><span>Supported Expense Inflation</span><strong>${percent(state.revenueAssumptions.futureExpenseInflationRate * 100)}</strong></div><div class="card"><span>Rollback Rate</span><strong>${rollbackRate().toFixed(4)}</strong></div><div class="card"><span>Personnel Factor Total</span><strong>${percent(driverTotal() * 100)}</strong></div></section><h2>Personnel Reductions and Buy-Outs</h2><table><thead><tr><th>Department</th><th>FTE Reduction</th><th>Buy-Out Count</th><th>Recurring Reduction</th><th>One-Time Buy-Out Cost</th></tr></thead><tbody>${rows.personnelRows}</tbody></table><h2>Operating Reductions</h2><table><thead><tr><th>Department</th><th>Reduction</th><th>Amount</th></tr></thead><tbody>${rows.operatingRows}</tbody></table><h2>Capital / Equipment</h2><table><thead><tr><th>Department</th><th>Project Removed</th><th>Cost</th></tr></thead><tbody>${rows.capitalRows}</tbody></table><h2 class="page-break">Department Impact Summary</h2><table><thead><tr><th>Department</th><th>FTE Reduction</th><th>Operating Reduction</th><th>Personnel Reduction</th><th>Operating Amount</th><th>Total Reduction</th><th>Status</th></tr></thead><tbody>${rows.impactRows}</tbody></table><footer class="footer">This report is a simulation for planning and public education purposes. It is not an adopted budget action.</footer></body></html>`);
+  report.document.close();
+  report.focus();
+  report.print();
+}
+
+function searchParcels() {
+  const query = (state.parcelQuery || "").toUpperCase();
+  $("#parcelSuggestions").innerHTML = query ? budgetData.sampleParcels.filter((parcel) => `${parcel.address}${parcel.city}${parcel.parcel}`.toUpperCase().includes(query)).map((parcel) => `<button class="suggestion-button" data-control="select-parcel" data-parcel="${parcel.parcel}"><strong>${parcel.address}</strong><span>${parcel.city}, FL ${parcel.zip} | ${parcel.parcel}</span></button>`).join("") : "";
+}
+
+function rerender() {
+  renderDrivers();
+  renderLocks();
+  renderPersonnel();
+  renderOperating();
+  renderCapital();
+  renderTopServices();
+  renderRankings();
+  renderDepartments();
+  renderAssumptions();
+  renderScenarioManager();
+  updateResults();
+}
+
+document.addEventListener("input", (event) => {
+  const control = event.target.dataset.control;
+  const id = event.target.dataset.department;
+  if (control === "fte") {
+    const department = budgetData.departments.find((item) => item.id === id);
+    state.fteReductions[id] = capPublicFte(department, Number(event.target.value || 0));
+    renderPersonnel(); updateResults();
+  }
+  if (control === "buyout-count") {
+    const department = budgetData.departments.find((item) => item.id === id);
+    state.buyoutCounts[id] = capPublicBuyout(department, Number(event.target.value || 0));
+    renderPersonnel(); updateResults();
+  }
+  if (control === "buyout-cost") { state.buyoutCosts[id] = parseMoney(event.target.value); updateResults(); }
+  if (control === "operating") {
+    const department = budgetData.departments.find((item) => item.id === id);
+    state.operatingReductions[id] = capPublicOperating(department, Number(event.target.value || 0));
+    renderOperating(); updateResults();
+  }
+  if (control === "revenue-assumption" && isStaffMode) {
+    const assumption = event.target.dataset.assumption;
+    const value = event.target.dataset.format === "currency" ? parseMoney(event.target.value) : Number(event.target.value || 0);
+    state.revenueAssumptions[assumption] = assumption.includes("Rate") ? value / 100 : value;
+    updateResults();
+  }
+  if (control === "personnel-driver" && isStaffMode) { state.personnelDrivers[event.target.dataset.driver] = Number(event.target.value || 0) / 100; rerender(); }
+  if (control === "ranking-search") { state.rankingSearch = event.target.value; renderRankings(); }
+  if (control === "scenario-meta") { state.scenarioMeta[event.target.dataset.field] = event.target.value; }
+  if (control === "millage" && isStaffMode) { state.proposedMillage = Number(event.target.value || 0); updateResults(); }
+  if (control === "revenue-target" && isStaffMode) { state.proposedMillage = parseMoney(event.target.value) / budgetData.millageAssumptions.taxableValueBase * 1000; updateResults(); }
+  if (control === "parcel-search") { state.parcelQuery = event.target.value; searchParcels(); }
+});
+
+document.addEventListener("change", (event) => {
+  const control = event.target.dataset.control;
+  if (control === "capital") {
+    const project = budgetData.capitalProjects.find((item) => item.id === event.target.dataset.project);
+    const removing = !event.target.checked;
+    if (!isStaffMode && removing && project.cost > availableShortfallExcluding("capital", project.id)) {
+      state.keptProjects[project.id] = true;
+      showMessage("Selected reductions cannot exceed the projected revenue shortfall.");
+    } else {
+      state.keptProjects[project.id] = event.target.checked;
+    }
+    renderCapital(); updateResults();
+  }
+  if (control === "department-lock") { state.lockedDepartments[event.target.dataset.department] = event.target.checked; rerender(); }
+  if (control === "department-year") { state.departmentFiscalYear = event.target.value; renderDepartments(); }
+  if (control === "overview-year") { state.overviewFiscalYear = event.target.value; renderTopServices(); }
+  if (control === "scenario-select") { state.selectedScenarioName = event.target.value; renderScenarioComparison(); }
+  if (control === "homestead") { state.useHomesteadExemption = event.target.checked; renderTax(); }
+});
+
+document.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-control]");
+  if (!button) return;
+  const control = button.dataset.control;
+  if (control === "toggle-tools") { $("#scenarioToolsDrawer").hidden = false; button.setAttribute("aria-expanded", "true"); }
+  if (control === "close-tools") { $("#scenarioToolsDrawer").hidden = true; $('[data-control="toggle-tools"]')?.setAttribute("aria-expanded", "false"); }
+  if (control === "ranking-tab") {
+    state.rankingTab = button.dataset.ranking;
+    $$('[data-control="ranking-tab"]').forEach((item) => item.classList.toggle("active", item === button));
+    renderRankings();
+  }
+  if (control === "toggle-top-services") { state.showAllTopServices = !state.showAllTopServices; renderTopServices(); }
+  if (control === "toggle-department-cards") { state.showAllDepartmentCards = !state.showAllDepartmentCards; renderDepartments(); }
+  if (control === "toggle-rankings") { state.showAllRankings = !state.showAllRankings; renderRankings(); }
+  if (control === "toggle-impact-table") { state.showImpactTable = !state.showImpactTable; renderImpact(); }
+  if (control === "export-rankings") csv("department-rankings.csv", ["Department", "Ad Valorem Support", "FTE", "Budget"], sortedRankingRows().map((row) => [row.name, money(row.support), number(row.fte), money(row.budget)]));
+  if (control === "export-impact") csv("scenario-impact.csv", ["Department", "FTE Reduced", "Operating Reduction", "Personnel Reduction", "Operating Reduction Amount", "Total Department Reduction"], scenarioTotals().departmentImpacts.filter((impact) => !excluded(impact.department)).sort(sortDepartments).map((impact) => [impact.department.name, number(impact.fteReduction), constitutional(impact.department) ? "Protected" : percent(impact.operatingReduction), money(impact.personnelReduction), money(impact.operatingReductionAmount), money(impact.totalReduction)]));
+  if (control === "export-pdf") exportPdf();
+  if (control === "save-scenario") saveScenario();
+  if (control === "load-scenario") loadScenario();
+  if (control === "delete-scenario") deleteScenario();
+  if (control === "reset-scenario") resetWorkingScenario();
+  if (control === "reset-millage" && isStaffMode) { state.proposedMillage = budgetData.millageAssumptions.adoptedMillage; updateResults(); }
+  if (control === "select-parcel") { state.selectedParcel = budgetData.sampleParcels.find((parcel) => parcel.parcel === button.dataset.parcel); $("#parcelSearch").value = state.selectedParcel.address; $("#parcelSuggestions").innerHTML = ""; renderTax(); }
+});
+
+function init() {
+  renderChrome();
+  syncScenarioFields();
+  renderDrivers();
+  renderLocks();
+  renderPersonnel();
+  renderOperating();
+  renderCapital();
+  renderTopServices();
+  renderRankings();
+  renderDepartments();
+  renderAssumptions();
+  renderScenarioManager();
+  renderCharts();
+  searchParcels();
+  updateResults();
+}
+
+init();
