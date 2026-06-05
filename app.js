@@ -105,10 +105,10 @@ function fiscalYears() {
   const expenseGrowth = Number(state.revenueAssumptions.futureExpenseInflationRate || 0);
   const fy2028Reduction = Number(state.revenueAssumptions.fy2028RevenueReduction || 0);
   const fy2029Reduction = Number(state.revenueAssumptions.fy2029RevenueReduction || 0);
-  const revenue = [baseRevenue + millageRevenueImpact(), baseRevenue - fy2028Reduction - fy2029Reduction + millageRevenueImpact()];
+  const revenue = [baseRevenue, baseRevenue - fy2028Reduction, baseRevenue - fy2028Reduction - fy2029Reduction];
   const expense = [baselineExpense, 154000000];
   for (let index = 2; index < 6; index += 1) {
-    revenue[index] = revenue[index - 1] * (1 + growth);
+    if (index > 2) revenue[index] = revenue[index - 1] * (1 + growth);
     expense[index] = expense[index - 1] * (1 + expenseGrowth);
   }
   const forecastYears = ["FY2027", "FY2028", "FY2029", "FY2030", "FY2031", "FY2032"].map((year, index) => ({
@@ -486,7 +486,7 @@ function shortfallComponents() {
 
   return forecastYears().filter((year) => year.year !== "FY2027").map((year) => {
     const directRevenueReduction = Number(directReductionByYear[year.year] || 0);
-    const expenseInflationPressure = year.revenueShortfall - directRevenueReduction;
+    const expenseInflationPressure = Math.max(year.revenueShortfall - directRevenueReduction, 0);
     return { ...year, directRevenueReduction, expenseInflationPressure };
   });
 }
