@@ -373,7 +373,7 @@ function renderDepartments() {
   }
 
   const controlsTarget = $("#departmentExplorerControls");
-  if (controlsTarget) {
+  if (controlsTarget && !controlsTarget.querySelector('[data-control="department-search"]')) {
     controlsTarget.innerHTML = `
       <label><span>Search Departments</span><input type="search" value="${state.departmentSearch.replace(/"/g, "&quot;")}" placeholder="Search department" data-control="department-search"></label>
       <button type="button" class="view-all-button compact-export-button" data-control="export-rankings">Export</button>
