@@ -101,7 +101,11 @@ function fiscalYears() {
   const expenseGrowth = Number(state.revenueAssumptions.futureExpenseInflationRate || 0);
   const fy2028Reduction = Number(state.revenueAssumptions.fy2028RevenueReduction || 0);
   const fy2029Reduction = Number(state.revenueAssumptions.fy2029RevenueReduction || 0);
-  const revenue = [baseRevenue, baseRevenue - fy2028Reduction, baseRevenue - fy2028Reduction - fy2029Reduction];
+  const fy2028Revenue = baseRevenue - fy2028Reduction;
+  const fy2029PropertyValueGrowthOffset = fy2028Reduction;
+  const fy2029Revenue = fy2028Revenue + fy2029PropertyValueGrowthOffset - fy2029Reduction;
+  const revenue = [baseRevenue, fy2028Revenue, fy2029Revenue];
+  // FY2029 assumes property value growth partially offsets the exemption-related revenue reduction before future-year growth begins.
   const expense = [baselineExpense, 164247268];
   for (let index = 2; index < 6; index += 1) {
     if (index > 2) revenue[index] = revenue[index - 1] * (1 + growth);
