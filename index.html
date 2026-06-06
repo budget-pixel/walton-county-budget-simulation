@@ -266,6 +266,36 @@
           <p id="scenarioMessage" class="small-status"></p>
           <div id="scenarioComparison" class="comparison-grid"></div>
           <hr>
+          <section class="staff-converter-panel" data-staff-only aria-label="Service area converter">
+            <div class="panel-header compact-header">
+              <div>
+                <p class="eyebrow">Service Area Data</p>
+                <h3>Proposal Summary Converter</h3>
+              </div>
+            </div>
+            <p class="small-status">Upload the budget publication workbook to create a reviewable draft from the Proposal Summary tab. This does not update app data automatically.</p>
+            <div class="service-converter-controls">
+              <label><span>Budget Publication Workbook</span><input type="file" accept=".xlsx,.xls,.xlsm" data-control="service-workbook"></label>
+              <button type="button" class="view-all-button" data-control="export-service-areas" disabled>Export JS</button>
+            </div>
+            <p id="serviceAreaImportStatus" class="small-status" aria-live="polite"></p>
+            <div class="table-scroll service-review-wrap" hidden>
+              <table class="service-review-table">
+                <thead>
+                  <tr>
+                    <th>Department</th>
+                    <th>Service Area</th>
+                    <th>Service / Program</th>
+                    <th>Description</th>
+                    <th>Source Excerpt</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="serviceAreaReviewTable"></tbody>
+              </table>
+            </div>
+          </section>
+          <hr>
           <div class="panel-header compact-header">
             <div>
               <p class="eyebrow">Budget Exercise Mode</p>
@@ -491,6 +521,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="data/budgetData.js"></script>
   <script src="data/historicalDepartmentFunding.js"></script>
+  <script src="data/serviceAreaMappings.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

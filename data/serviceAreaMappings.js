@@ -1,0 +1,51 @@
+const serviceAreaMappings = {
+  version: 1,
+  serviceAreas: [
+    { id: "public-safety", name: "Public Safety", description: "Emergency response, law enforcement, compliance, preparedness, and public protection services." },
+    { id: "infrastructure-services", name: "Infrastructure Services", description: "Facilities, roads, engineering, construction, maintenance, and capital infrastructure services." },
+    { id: "parks-and-recreation", name: "Parks & Recreation", description: "Libraries, recreation, golf, community programs, and resident leisure services." },
+    { id: "community-development", name: "Community Development", description: "Planning, permitting, code compliance, growth management, and development review services." },
+    { id: "administrative-support", name: "Administrative Support", description: "County administration, budgeting, procurement, legal, human resources, and internal support services." },
+    { id: "environmental-and-beach-services", name: "Environmental & Beach Services", description: "Environmental stewardship, conservation, beach-related services, and natural resource protection." },
+    { id: "judicial-and-statutory-services", name: "Judicial & Statutory Services", description: "Courts, constitutional offices, statutory partners, and justice system support." },
+    { id: "other-county-services", name: "Other County Services", description: "County services that do not fit a primary resident-facing service area." }
+  ],
+  departmentMappings: {
+    "board-of-county-commissioners": "administrative-support",
+    "county-administration": "administrative-support",
+    "engineering-services": "infrastructure-services",
+    "building-construction-and-maintenance": "infrastructure-services",
+    "geographic-info-systems": "administrative-support",
+    "human-resources": "administrative-support",
+    "office-of-the-county-attorney": "administrative-support",
+    "office-of-management-and-budget": "administrative-support",
+    "planning": "community-development",
+    "procurement": "administrative-support",
+    "property-appraiser": "judicial-and-statutory-services",
+    "tax-collector": "judicial-and-statutory-services",
+    "supervisor-of-elections": "judicial-and-statutory-services",
+    "clerk-of-court": "judicial-and-statutory-services",
+    "medical-examiner": "judicial-and-statutory-services",
+    "south-walton-fire-district": "public-safety",
+    "sheriffs-office": "public-safety",
+    "code-compliance": "community-development",
+    "emergency-management": "public-safety",
+    "probation-services": "judicial-and-statutory-services",
+    "veteran-services": "other-county-services",
+    "eagle-springs-golf-and-recreation-center": "parks-and-recreation",
+    "eagle-springs-grill": "parks-and-recreation",
+    "libraries": "parks-and-recreation",
+    "recreation": "parks-and-recreation",
+    "state-attorney": "judicial-and-statutory-services",
+    "public-defender": "judicial-and-statutory-services",
+    "county-court": "judicial-and-statutory-services",
+    "circuit-court": "judicial-and-statutory-services",
+    "guardian-ad-litem": "judicial-and-statutory-services",
+    "human-services": "other-county-services",
+    "environmental-services": "environmental-and-beach-services",
+    "extension-office": "other-county-services",
+    "soil-conservation": "environmental-and-beach-services"
+  }
+};
+
+window.serviceAreaMappings = serviceAreaMappings;

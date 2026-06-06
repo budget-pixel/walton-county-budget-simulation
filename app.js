@@ -34,7 +34,8 @@ const state = {
   showAllRankings: false,
   showImpactTable: false,
   proposedMillage: budgetData.millageAssumptions.adoptedMillage,
-  selectedScenarioName: ""
+  selectedScenarioName: "",
+  serviceAreaDraft: []
 };
 
 let trendChart;
@@ -1025,6 +1026,228 @@ function rerender() {
   updateResults();
 }
 
+const serviceAreaConfig = window.serviceAreaMappings || { serviceAreas: [], departmentMappings: {} };
+const serviceAreaNameById = () => Object.fromEntries((serviceAreaConfig.serviceAreas || []).map((area) => [area.id, area.name]));
+const serviceAreaIdByName = () => Object.fromEntries((serviceAreaConfig.serviceAreas || []).map((area) => [area.name, area.id]));
+
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[char]));
+}
+
+function slug(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "") || "service";
+}
+
+function setServiceAreaStatus(message, isError = false) {
+  const status = $("#serviceAreaImportStatus");
+  if (!status) return;
+  status.textContent = message;
+  status.classList.toggle("negative-value", isError);
+}
+
+function loadSheetJs() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (window.sheetJsLoading) return window.sheetJsLoading;
+  window.sheetJsLoading = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+    script.onload = () => resolve(window.XLSX);
+    script.onerror = () => reject(new Error("SheetJS could not be loaded."));
+    document.head.appendChild(script);
+  });
+  return window.sheetJsLoading;
+}
+
+function normalizeWorkbookText(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function proposalRowsToTextRows(sheet) {
+  return window.XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", blankrows: false })
+    .map((row) => row.map(normalizeWorkbookText).filter(Boolean).join(" | "))
+    .filter(Boolean);
+}
+
+function departmentForText(text) {
+  const lower = text.toLowerCase();
+  return budgetData.departments
+    .slice()
+    .sort((a, b) => b.name.length - a.name.length)
+    .find((department) => lower.includes(department.name.toLowerCase()));
+}
+
+function splitProposalDepartmentBlocks(textRows) {
+  const blocks = [];
+  let current = null;
+  textRows.forEach((text) => {
+    const department = departmentForText(text);
+    if (department && (!current || current.department.id !== department.id)) {
+      current = { department, lines: [text] };
+      blocks.push(current);
+      return;
+    }
+    if (current) current.lines.push(text);
+  });
+  return blocks;
+}
+
+function textAfterKeyword(lines, keywords) {
+  const match = lines.find((line) => keywords.some((keyword) => line.toLowerCase().includes(keyword)));
+  if (!match) return "";
+  const pieces = match.split(/\||:|-/).map((part) => part.trim()).filter(Boolean);
+  return pieces.length > 1 ? pieces.slice(1).join(" ") : match;
+}
+
+function firstUsefulLine(lines, departmentName) {
+  return lines.find((line) => {
+    const lower = line.toLowerCase();
+    return line.length > 32 && !lower.includes(departmentName.toLowerCase()) && !lower.includes("proposal summary");
+  }) || lines[0] || "";
+}
+
+function suggestedProgramName(department, lines) {
+  const serviceText = textAfterKeyword(lines, ["service", "program", "function"]);
+  if (serviceText) return serviceText.split(/[.;|]/)[0].trim().slice(0, 90) || department.name;
+  return department.name;
+}
+
+function confidenceForDraft(description, services, lineCount) {
+  const score = [description, services].filter(Boolean).length + (lineCount > 4 ? 1 : 0);
+  if (score >= 3) return "Needs light review";
+  if (score >= 2) return "Needs review";
+  return "Low confidence";
+}
+
+function draftFromBlock(block) {
+  const names = serviceAreaNameById();
+  const areaId = serviceAreaConfig.departmentMappings?.[block.department.id] || "other-county-services";
+  const description = textAfterKeyword(block.lines, ["description", "purpose", "mission"]) || firstUsefulLine(block.lines, block.department.name);
+  const services = textAfterKeyword(block.lines, ["service", "program", "function"]);
+  const sourceExcerpt = block.lines.slice(0, 4).join(" ").slice(0, 360);
+  return {
+    id: `${block.department.id}-${slug(suggestedProgramName(block.department, block.lines))}`,
+    departmentId: block.department.id,
+    departmentName: block.department.name,
+    serviceAreaId: areaId,
+    serviceArea: names[areaId] || "Other County Services",
+    programName: suggestedProgramName(block.department, block.lines),
+    description,
+    mission: textAfterKeyword(block.lines, ["mission", "purpose"]),
+    services,
+    budgetHighlights: textAfterKeyword(block.lines, ["budget highlight", "budget"]),
+    capitalProjects: textAfterKeyword(block.lines, ["capital"]),
+    performanceMeasures: textAfterKeyword(block.lines, ["performance", "measure"]),
+    reviewNotes: textAfterKeyword(block.lines, ["review", "note"]),
+    sourceExcerpt,
+    status: confidenceForDraft(description, services, block.lines.length)
+  };
+}
+
+function renderServiceAreaReview() {
+  const table = $("#serviceAreaReviewTable");
+  const wrap = table?.closest(".service-review-wrap");
+  const exportButton = $('[data-control="export-service-areas"]');
+  if (!table || !wrap || !exportButton) return;
+  wrap.hidden = !state.serviceAreaDraft.length;
+  exportButton.disabled = !state.serviceAreaDraft.length;
+  table.innerHTML = state.serviceAreaDraft.map((row, index) => `
+    <tr>
+      <td><strong>${escapeHtml(row.departmentName)}</strong></td>
+      <td><input type="text" value="${escapeHtml(row.serviceArea)}" data-control="service-area-edit" data-index="${index}" data-field="serviceArea"></td>
+      <td><input type="text" value="${escapeHtml(row.programName)}" data-control="service-area-edit" data-index="${index}" data-field="programName"></td>
+      <td><textarea rows="3" data-control="service-area-edit" data-index="${index}" data-field="description">${escapeHtml(row.description)}</textarea></td>
+      <td><small>${escapeHtml(row.sourceExcerpt)}</small></td>
+      <td><select data-control="service-area-edit" data-index="${index}" data-field="status">
+        ${["Ready", "Needs light review", "Needs review", "Low confidence"].map((status) => `<option value="${status}" ${row.status === status ? "selected" : ""}>${status}</option>`).join("")}
+      </select></td>
+    </tr>
+  `).join("");
+}
+
+async function importServiceWorkbook(file) {
+  if (!file) return;
+  if (!isStaffMode) return;
+  setServiceAreaStatus("Reading workbook...");
+  try {
+    await loadSheetJs();
+    const buffer = await file.arrayBuffer();
+    const workbook = window.XLSX.read(buffer, { type: "array" });
+    const sheetName = workbook.SheetNames.find((name) => name.trim().toLowerCase() === "proposal summary");
+    if (!sheetName) {
+      state.serviceAreaDraft = [];
+      renderServiceAreaReview();
+      setServiceAreaStatus("Proposal Summary tab was not found in this workbook.", true);
+      return;
+    }
+    const textRows = proposalRowsToTextRows(workbook.Sheets[sheetName]);
+    const blocks = splitProposalDepartmentBlocks(textRows);
+    state.serviceAreaDraft = blocks.map(draftFromBlock);
+    renderServiceAreaReview();
+    setServiceAreaStatus(state.serviceAreaDraft.length ? `Created ${state.serviceAreaDraft.length} draft service/program rows for review.` : "No department narrative blocks were detected on Proposal Summary.", !state.serviceAreaDraft.length);
+  } catch (error) {
+    state.serviceAreaDraft = [];
+    renderServiceAreaReview();
+    setServiceAreaStatus(error.message || "Workbook import failed.", true);
+  }
+}
+
+function updateServiceAreaDraft(index, field, value) {
+  const row = state.serviceAreaDraft[Number(index)];
+  if (!row) return;
+  row[field] = value;
+  if (field === "serviceArea") {
+    row.serviceAreaId = serviceAreaIdByName()[value] || slug(value);
+  }
+  if (field === "programName") {
+    row.id = `${row.departmentId}-${slug(value)}`;
+  }
+}
+
+function exportServiceAreaDraft() {
+  if (!state.serviceAreaDraft.length) {
+    setServiceAreaStatus("Import and review a workbook before exporting.", true);
+    return;
+  }
+  const serviceAreas = state.serviceAreaDraft.map((row) => ({
+    id: row.id,
+    departmentId: row.departmentId,
+    departmentName: row.departmentName,
+    serviceAreaId: row.serviceAreaId,
+    serviceArea: row.serviceArea,
+    programName: row.programName,
+    description: row.description,
+    mission: row.mission,
+    services: row.services,
+    budgetHighlights: row.budgetHighlights,
+    capitalProjects: row.capitalProjects,
+    performanceMeasures: row.performanceMeasures,
+    reviewNotes: row.reviewNotes,
+    sourceExcerpt: row.sourceExcerpt,
+    status: row.status
+  }));
+  const departmentMappings = serviceAreas.reduce((mapping, row) => {
+    mapping[row.departmentId] = row.serviceAreaId;
+    return mapping;
+  }, {});
+  const payload = {
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    serviceAreas,
+    departmentMappings
+  };
+  const content = `window.departmentServiceAreas = ${JSON.stringify(payload, null, 2)};\n`;
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([content], { type: "text/javascript" }));
+  link.download = "departmentServiceAreas.generated.js";
+  link.click();
+  URL.revokeObjectURL(link.href);
+  setServiceAreaStatus(`Exported ${serviceAreas.length} reviewed service/program rows.`);
+}
+
 document.addEventListener("input", (event) => {
   const control = event.target.dataset.control;
   const id = event.target.dataset.department;
@@ -1078,6 +1301,7 @@ document.addEventListener("input", (event) => {
   if (control === "ranking-search") { state.rankingSearch = event.target.value; renderRankings(); }
   if (control === "department-search") { state.departmentSearch = event.target.value; renderDepartments(); }
   if (control === "scenario-meta") { state.scenarioMeta[event.target.dataset.field] = event.target.value; }
+  if (control === "service-area-edit") { updateServiceAreaDraft(event.target.dataset.index, event.target.dataset.field, event.target.value); }
   if (control === "millage" && isStaffMode) {
     const cleanedMillage = String(event.target.value || "").replace(/[^0-9.]/g, "");
     const parsedMillage = Number(cleanedMillage);
@@ -1110,6 +1334,8 @@ document.addEventListener("change", (event) => {
   if (control === "department-year") { state.departmentFiscalYear = event.target.value; renderDepartments(); }
   if (control === "overview-year") { state.overviewFiscalYear = event.target.value; renderTopServices(); }
   if (control === "scenario-select") { state.selectedScenarioName = event.target.value; renderScenarioComparison(); }
+  if (control === "service-workbook") { importServiceWorkbook(event.target.files?.[0]); }
+  if (control === "service-area-edit") { updateServiceAreaDraft(event.target.dataset.index, event.target.dataset.field, event.target.value); }
 });
 
 document.addEventListener("click", (event) => {
@@ -1146,6 +1372,7 @@ document.addEventListener("click", (event) => {
   if (control === "export-rankings") csv("department-rankings.csv", ["Department", "Ad Valorem Support", "FTE", "Budget"], sortedRankingRows().map((row) => [row.name, money(row.support), number(row.fte), money(row.budget)]));
   if (control === "export-impact") csv("scenario-impact.csv", ["Department", "FTE Reduced", "Operating Reduction", "Personnel Reduction", "Operating Reduction Amount", "Total Department Reduction"], scenarioTotals().departmentImpacts.filter((impact) => !excluded(impact.department)).sort(sortDepartments).map((impact) => [impact.department.name, number(impact.fteReduction), constitutional(impact.department) ? "" : percent(impact.operatingReduction), money(impact.personnelReduction), money(impact.operatingReductionAmount), money(impact.totalReduction)]));
   if (control === "export-pdf") exportPdf();
+  if (control === "export-service-areas") exportServiceAreaDraft();
   if (control === "save-scenario") saveScenario();
   if (control === "load-scenario") loadScenario();
   if (control === "delete-scenario") deleteScenario();
