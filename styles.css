@@ -942,8 +942,9 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
 }
 
 .department-detail-layout {
+  --department-detail-width: min(360px, calc((100vw - 32px) * 0.34));
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  grid-template-columns: minmax(0, 1fr) var(--department-detail-width);
   gap: 18px;
   align-items: start;
 }
@@ -978,6 +979,7 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   display: grid;
   gap: 14px;
   align-self: start;
+  width: auto;
   max-height: none;
   overflow: visible;
   margin-top: 0;
@@ -986,6 +988,7 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
 }
 .department-side-header { display: grid; gap: 6px; }
 .department-side-header h3 { font-size: 1.35rem; }
@@ -999,14 +1002,25 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   font-weight: 800;
   text-transform: uppercase;
 }
-.department-side-grid { grid-template-columns: 1fr; }
-.property-tax-embed {
-  display: block;
-  width: 100%;
-  min-height: 760px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-small);
-  background: #ffffff;
+.department-side-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.department-side-grid .detail-item {
+  padding: 10px 12px;
+}
+
+.department-side-grid .detail-item span {
+  font-size: 0.72rem;
+  line-height: 1.15;
+}
+
+.department-side-grid .detail-item strong {
+  font-size: 1rem;
+  line-height: 1.2;
+
 }
 
 .property-tax-context {
@@ -1030,7 +1044,10 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
 }
 
 @media (max-width: 900px) {
-  .department-detail-layout { grid-template-columns: 1fr; }
+  .department-detail-layout {
+    --department-detail-width: auto;
+    grid-template-columns: 1fr;
+  }
   .department-table-panel { position: static; }
   .property-tax-embed { min-height: 840px; }
 }

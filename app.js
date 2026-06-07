@@ -1,11 +1,136 @@
+function normalizeBootstrapDepartmentId(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/'/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function bootstrapArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function bootstrapExpenseDepartmentId(detail) {
+  return normalizeBootstrapDepartmentId(detail?.departmentId || detail?.id || detail?.department || detail?.proposal || detail?.name);
+}
+
+function bootstrapExpenseDepartmentName(detail) {
+  return String(detail?.department || detail?.proposal || detail?.name || detail?.departmentId || detail?.id || "Department").trim();
+}
+
+function bootstrapExpenseItems(detail) {
+  if (Array.isArray(detail?.items)) return detail.items;
+  if (Array.isArray(detail?.categories)) return detail.categories.flatMap((category) => Array.isArray(category.items) ? category.items.map((item) => ({ ...item, category: item.category || category.category })) : []);
+  return [];
+}
+
+function bootstrapExpenseAmount(detail) {
+  const explicitTotal = Number(detail?.total || detail?.totalBudget || detail?.amount || 0);
+  if (explicitTotal) return explicitTotal;
+  return bootstrapExpenseItems(detail).reduce((total, item) => total + Number(item.amount || 0), 0);
+}
+
+function bootstrapBudgetTypeForExpense(item) {
+  const type = String(item?.budgetType || item?.type || "").toLowerCase();
+  const category = String(item?.category || "").toLowerCase();
+  const code = String(item?.accountCode || "").trim();
+  if (type.includes("personnel") || category.includes("personnel") || category.includes("benefit") || code.startsWith("51") || code.startsWith("52")) return "personnel";
+  if (type.includes("capital") || category.includes("building") || category.includes("infrastructure") || category.includes("vehicle") || category.includes("equipment") || code.startsWith("56")) return "capital";
+  return "operating";
+}
+
+function bootstrapDepartmentMetaMap(globalName, idField, valueField) {
+  return new Map(bootstrapArray(window[globalName]).map((record) => [
+    normalizeBootstrapDepartmentId(record.departmentId || record.id || record.department || record.departments || record.name),
+    Number(record[valueField] ?? record[idField] ?? 0) || 0
+  ]));
+}
+
+function buildBudgetDataFallback() {
+  const expenseDetails = bootstrapArray(window.wcDepartmentExpenses || window.departmentExpenses || window.wcExpenseDetail);
+  const fteMap = bootstrapDepartmentMetaMap("wcDepartmentFte", "fte", "fteCount");
+  const adValoremMap = bootstrapDepartmentMetaMap("wcDepartmentAdValoremSupport", "adValorem", "adValoremSupport");
+
+  const departments = expenseDetails.map((detail) => {
+    const id = bootstrapExpenseDepartmentId(detail);
+    const items = bootstrapExpenseItems(detail);
+    const personnelBudget = items.reduce((total, item) => total + (bootstrapBudgetTypeForExpense(item) === "personnel" ? Number(item.amount || 0) : 0), 0);
+    const capitalBudget = items.reduce((total, item) => total + (bootstrapBudgetTypeForExpense(item) === "capital" ? Number(item.amount || 0) : 0), 0);
+    const totalBudget = bootstrapExpenseAmount(detail);
+    const operatingBudget = Math.max(totalBudget - personnelBudget - capitalBudget, 0);
+    const fteCount = fteMap.get(id) || 0;
+    return {
+      id,
+      name: bootstrapExpenseDepartmentName(detail),
+      personnelBudget,
+      operatingBudget,
+      capitalBudget,
+      totalBudget,
+      fteCount,
+      averageFteCost: fteCount > 0 ? Math.round(personnelBudget / fteCount) : 0,
+      adValoremSupport: adValoremMap.get(id) || 0,
+      nonFteAdjustable: false,
+      excludedFromActiveSimulation: false
+    };
+  }).filter((department) => department.id);
+
+  const adValoremSupportedExpenseBaseline = departments.reduce((total, department) => total + Number(department.adValoremSupport || 0), 0) || departments.reduce((total, department) => total + Number(department.totalBudget || 0), 0);
+
+  return {
+    departments,
+    capitalProjects: [],
+    constitutionalOfficeIds: [],
+    excludedScenarioDepartmentIds: [],
+    budgetBaselineTotals: {
+      personnelBudgetTotal: departments.reduce((total, department) => total + Number(department.personnelBudget || 0), 0),
+      operatingBudgetTotal: departments.reduce((total, department) => total + Number(department.operatingBudget || 0), 0),
+      capitalBudgetTotal: departments.reduce((total, department) => total + Number(department.capitalBudget || 0), 0),
+      totalBudgetBaseline: departments.reduce((total, department) => total + Number(department.totalBudget || 0), 0),
+      adValoremSupportedExpenseBaseline
+    },
+    revenueForecast: {
+      baseRevenue: adValoremSupportedExpenseBaseline,
+      defaultAssumptions: {
+        fy2028RevenueReduction: 5700000
+      }
+    },
+    millageAssumptions: {
+      adoptedMillage: 3.519,
+      taxableValueBase: 46454430236,
+      rollbackRate: 3.3531
+    },
+    scenarioYear: "FY2028",
+    personnelCostDrivers: {
+      baseSalary: 19957791.98,
+      cola: 598733.76,
+      ficaMedicare: 1568650.24,
+      retirement: 3203324.21,
+      insurance: 4721059.02,
+      other: 64725
+    },
+    personnelCostFactors: [
+      { id: "baseSalary", label: "Base Wage / Salaries", amount: 19957791.98, percentOfTotal: 66.1, note: "Base wage and salary cost is shown as a share of total personnel cost." },
+      { id: "cola", label: "Wage Adjustment / COLA-type adjustment", amount: 598733.76, percentOfTotal: 1.98, note: "Wage adjustment cost is shown as a share of total personnel cost." },
+      { id: "ficaMedicare", label: "Taxes / FICA-Medicare-type costs", amount: 1568650.24, percentOfTotal: 5.2, note: "Payroll tax costs are shown as a share of total personnel cost." },
+      { id: "retirement", label: "Retirement", amount: 3203324.21, percentOfTotal: 10.61, note: "Employer retirement contribution costs are shown as a share of total personnel cost." },
+      { id: "insurance", label: "Insurance", amount: 4721059.02, percentOfTotal: 15.64, note: "Employer health insurance and related benefit costs are shown as a share of total personnel cost." },
+      { id: "other", label: "Other", amount: 64725, percentOfTotal: 0.21, note: "Other smaller personnel-related costs." }
+    ]
+  };
+}
+
+var budgetData = window.budgetData || buildBudgetDataFallback();
+
 const currencyFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 console.info('app.js loaded');
 const currencyInputFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 const percentFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 const historicalActualRevenues = [["FY2022", 89972682], ["FY2023", 110875024], ["FY2024", 131679989], ["FY2025", 149437335], ["FY2026", 152900634]];
-const historicalFundingData = window.historicalDepartmentFunding || [];
-const expenseDetailData = window.wcExpenseDetail || [];
+const historicalFundingData = [];
+const expenseDetailData = window.wcDepartmentExpenses || window.departmentExpenses || window.wcExpenseDetail || [];
 const isStaffMode = new URLSearchParams(window.location.search).get("mode") === "staff";
 const scenarioStoreKey = "waltonBudgetScenarios";
 
@@ -79,6 +204,9 @@ function historicalSupport(year) {
 }
 
 function fy2027Support(department) {
+  if (Number.isFinite(Number(department?.adValoremSupport)) && Number(department.adValoremSupport) > 0) {
+    return Number(department.adValoremSupport);
+  }
   const total = departments().reduce((sum, item) => sum + item.totalBudget, 0) || 1;
   return department.totalBudget / total * budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline;
 }
@@ -543,6 +671,7 @@ let serviceAuditLogged = false;
 function serviceDataSource() {
   const candidates = [
     { name: "window.departmentServices", value: window.departmentServices },
+    { name: "window.wcDepartmentServices", value: window.wcDepartmentServices },
     { name: "window.departmentServiceAreas", value: window.departmentServiceAreas }
   ];
   const source = candidates.find((candidate) => candidate.value && (candidate.value.departments || Array.isArray(candidate.value.serviceAreas)));
@@ -623,9 +752,7 @@ function serviceFieldList(title, items) {
 }
 
 function departmentServiceAreaName(departmentId, rows = getDepartmentServices(departmentId)) {
-  const mappedAreaId = window.serviceAreaMappings?.departmentMappings?.[departmentId];
-  const mappedArea = window.serviceAreaMappings?.serviceAreas?.find((area) => area.id === mappedAreaId)?.name;
-  return rows.find((row) => row.serviceArea)?.serviceArea || mappedArea || "Department Services";
+  return rows.find((row) => row.serviceArea)?.serviceArea || "Department Services";
 }
 
 function renderDepartmentServices(departmentId) {
