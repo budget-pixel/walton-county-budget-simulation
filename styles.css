@@ -946,7 +946,13 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   align-items: start;
 }
 
-.department-table-panel { padding: 0; overflow: hidden; }
+.department-table-panel {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  padding: 0;
+  overflow: hidden;
+}
 .department-detail-table { margin: 0; }
 .department-detail-table th,
 .department-detail-table td { white-space: nowrap; }
@@ -966,8 +972,6 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
 .table-link-button:focus { color: var(--color-primary); text-decoration: underline; outline: none; }
 .selected-row td { background: var(--color-primary-soft); }
 .department-side-detail {
-  position: sticky;
-  top: 96px;
   display: grid;
   gap: 14px;
   align-self: start;
@@ -1022,7 +1026,7 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
 
 @media (max-width: 900px) {
   .department-detail-layout { grid-template-columns: 1fr; }
-  .department-side-detail { position: static; }
+  .department-table-panel { position: static; }
   .property-tax-embed { min-height: 840px; }
 }
 
@@ -1059,7 +1063,7 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
 }
 
 .department-list-scroll {
-  max-height: 520px;
+  max-height: calc(100vh - 220px);
   overflow-y: auto;
   overflow-x: auto;
 }
@@ -1242,6 +1246,20 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   color: var(--color-text);
 }
 
+.expense-show-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -2px;
+}
+
+.department-expense-section .small-toggle-button {
+  min-height: 28px;
+  padding: 5px 9px;
+  border-radius: var(--radius-small);
+  font-size: 0.74rem;
+  line-height: 1;
+}
+
 .expense-bars {
   display: grid;
   gap: 10px;
@@ -1336,6 +1354,12 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   margin: 0;
   color: var(--color-text);
   line-height: 1.5;
+}
+
+.department-side-description {
+  margin-top: -4px;
+  padding-bottom: 2px;
+  color: var(--color-text-muted);
 }
 
 .department-service-counts {

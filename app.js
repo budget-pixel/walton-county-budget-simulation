@@ -624,11 +624,9 @@ function renderDepartmentServices(departmentId) {
       ? `<section class="department-service-section department-service-fallback" aria-label="Department service and program information"><p>Service information is currently being developed for this department.</p></section>`
       : "";
   }
-  const description = getDepartmentDescription(departmentId);
   const programs = getDepartmentServicePrograms(departmentId);
   return `
     <section class="department-service-section" aria-label="Department service and program information">
-      ${description ? `<div class="department-service-block"><h4>Description</h4><p class="department-service-description">${escapeHtml(description)}</p></div>` : ""}
       ${serviceFieldList("Services & Programs", programs)}
     </section>
   `;
@@ -892,7 +890,7 @@ function renderExpenseDetail(department) {
       <div class="department-expense-heading">
         <p class="eyebrow">Expense Detail</p>
         <h4>Where the money goes</h4>
-        <p class="department-expense-total"><span>${escapeHtml(detail.department || department.name)}</span><strong>${compactMoney(total)}</strong></p>
+        <p class="department-expense-total"><span>Total expense detail</span><strong>${compactMoney(total)}</strong></p>
       </div>
       <div class="expense-bars">
         ${visibleCategories.map((category) => {
@@ -1025,11 +1023,13 @@ function renderDepartments() {
   }
 
   const record = historicalFundingData.find((item) => item.department === selectedDepartment.name)?.history.find((item) => item.fiscalYear === state.departmentFiscalYear);
+  const description = getDepartmentDescription(selectedDepartment.id);
   panel.innerHTML = `
     <div class="department-side-header">
       <h3>${selectedDepartment.name}</h3>
       ${constitutional(selectedDepartment) ? '<span class="department-badge">Constitutional Office</span>' : ''}
     </div>
+    ${description ? `<p class="department-service-description department-side-description">${escapeHtml(description)}</p>` : ""}
     <div class="department-primary-metric"><span>${budgetYear ? "FY2027 Ad Valorem Support" : "Ad Valorem Support"}</span><strong>${money(budgetYear ? departmentSupport(selectedDepartment) : record?.adValoremSupport || 0)}</strong></div>
     <div class="detail-grid department-side-grid">${
       budgetYear
