@@ -1,6 +1,6 @@
 window.departmentFte = {
   "version": 1,
-  "generatedAt": "2026-06-07T21:17:59.711Z",
+  "generatedAt": "2026-06-07T21:27:28.124Z",
   "departments": {
     "sheriff-s-office": {
       "department": "Sheriff's Office",
@@ -112,3 +112,4 @@ window.departmentFte = {
     }
   }
 };
+

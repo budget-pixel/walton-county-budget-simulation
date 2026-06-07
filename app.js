@@ -1,15 +1,49 @@
 function normalizeBootstrapDepartmentId(value) {
-  return String(value || "")
+  const normalized = String(value || "")
     .trim()
     .toLowerCase()
     .replace(/&/g, "and")
     .replace(/'/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+
+  const aliases = {
+    "sheriff-s-office": "sheriffs-office",
+    "sheriff-office": "sheriffs-office",
+    "sheriffs-department": "sheriffs-office",
+    "geographic-info-system": "geographic-info-systems",
+    "office-of-management-budget": "office-of-management-and-budget",
+    "probation": "probation-services",
+    "environmental-resources": "environmental-services",
+    "building-construction-maintenance": "building-construction-and-maintenance",
+    "purchasing": "procurement"
+  };
+
+  return aliases[normalized] || normalized;
 }
 
 function bootstrapArray(value) {
-  return Array.isArray(value) ? value : [];
+  if (Array.isArray(value)) return value;
+  if (!value || typeof value !== "object") return [];
+
+  const possibleArrays = [
+    value.departments,
+    value.records,
+    value.rows,
+    value.items,
+    value.data
+  ];
+
+  const nestedArray = possibleArrays.find(Array.isArray);
+  if (nestedArray) return nestedArray;
+
+  if (value.departments && typeof value.departments === "object") {
+    return Object.entries(value.departments).map(([departmentId, record]) => ({ departmentId, ...(record || {}) }));
+  }
+
+  return Object.entries(value)
+    .filter(([, item]) => item && typeof item === "object")
+    .map(([departmentId, item]) => ({ departmentId, ...item }));
 }
 
 function bootstrapExpenseDepartmentId(detail) {
@@ -41,17 +75,51 @@ function bootstrapBudgetTypeForExpense(item) {
   return "operating";
 }
 
-function bootstrapDepartmentMetaMap(globalName, idField, valueField) {
-  return new Map(bootstrapArray(window[globalName]).map((record) => [
-    normalizeBootstrapDepartmentId(record.departmentId || record.id || record.department || record.departments || record.name),
-    Number(record[valueField] ?? record[idField] ?? 0) || 0
-  ]));
+function bootstrapDepartmentMetaMap(globalNames, valueFields) {
+  const names = Array.isArray(globalNames) ? globalNames : [globalNames];
+  const fields = Array.isArray(valueFields) ? valueFields : [valueFields];
+  const map = new Map();
+
+  names.forEach((globalName) => {
+    bootstrapArray(window[globalName]).forEach((record) => {
+      const id = normalizeBootstrapDepartmentId(
+        record.departmentId ||
+        record.id ||
+        record.department ||
+        record.departments ||
+        record.Department ||
+        record.Departments ||
+        record.departmentName ||
+        record["Department Name"] ||
+        record.Dept ||
+        record.dept ||
+        record.name
+      );
+
+      if (!id) return;
+
+      const rawValue = fields
+        .map((field) => record[field])
+        .find((value) => value !== undefined && value !== null && value !== "");
+
+      const numericValue = Number(String(rawValue ?? 0).replace(/[^0-9.-]/g, "")) || 0;
+      map.set(id, numericValue);
+    });
+  });
+
+  return map;
 }
 
 function buildBudgetDataFallback() {
   const expenseDetails = bootstrapArray(window.wcDepartmentExpenses || window.departmentExpenses || window.wcExpenseDetail);
-  const fteMap = bootstrapDepartmentMetaMap("wcDepartmentFte", "fte", "fteCount");
-  const adValoremMap = bootstrapDepartmentMetaMap("wcDepartmentAdValoremSupport", "adValorem", "adValoremSupport");
+  const fteMap = bootstrapDepartmentMetaMap(
+    ["wcDepartmentFte", "departmentFte", "wcDepartmentFTE", "wcDepartmentFtes", "departmentFtes", "wcDepartmentFTEs"],
+    ["fteCount", "FTE", "fte", "Fte", "fteTotal", "FTE Count", "FTECount", "fte_count", "FTEs", "ftes"]
+  );
+  const adValoremMap = bootstrapDepartmentMetaMap(
+    ["wcDepartmentAdValoremSupport", "departmentAdValoremSupport", "wcAdValoremSupport"],
+    ["adValoremSupport", "Ad Valorem Support", "adValorem", "Ad Valorem", "propertyTaxSupport", "Property Tax Support", "support"]
+  );
 
   const departments = expenseDetails.map((detail) => {
     const id = bootstrapExpenseDepartmentId(detail);
@@ -1061,6 +1129,75 @@ function renderExpenseDetail(department) {
   `;
 }
 
+function diagnosticDepartmentRowsFromGlobal(globalNames) {
+  const names = Array.isArray(globalNames) ? globalNames : [globalNames];
+  return names.flatMap((globalName) => bootstrapArray(window[globalName]).map((record) => {
+    const id = normalizeBootstrapDepartmentId(
+      record.departmentId ||
+      record.id ||
+      record.department ||
+      record.departments ||
+      record.Department ||
+      record.Departments ||
+      record.departmentName ||
+      record["Department Name"] ||
+      record.Dept ||
+      record.dept ||
+      record.name
+    );
+    const name = String(record.department || record.Department || record.departmentName || record["Department Name"] || record.name || record.departments || record.Departments || id || "Department").trim();
+    return id ? { id, name } : null;
+  }).filter(Boolean));
+}
+
+function expectedDiagnosticDepartments() {
+  const map = new Map();
+  const addDepartment = (department) => {
+    if (!department?.id) return;
+    const existing = map.get(department.id) || {};
+    map.set(department.id, {
+      ...existing,
+      ...department,
+      name: department.name || existing.name || department.id
+    });
+  };
+
+  (budgetData.departments || []).forEach(addDepartment);
+
+  diagnosticDepartmentRowsFromGlobal(["wcDepartmentFte", "departmentFte", "wcDepartmentFTE", "wcDepartmentFtes", "departmentFtes", "wcDepartmentFTEs"]).forEach((row) => {
+    addDepartment({ id: row.id, name: row.name });
+  });
+
+  diagnosticDepartmentRowsFromGlobal(["wcDepartmentAdValoremSupport", "departmentAdValoremSupport", "wcAdValoremSupport"]).forEach((row) => {
+    addDepartment({ id: row.id, name: row.name });
+  });
+
+  normalizedServiceRows().forEach((row) => {
+    addDepartment({ id: normalizeBootstrapDepartmentId(row.departmentId || row.departmentName), name: row.departmentName || row.departmentId });
+  });
+
+  return [...map.values()].sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+}
+
+
+function departmentExemptFromFteDiagnostic(department) {
+  const id = normalizeBootstrapDepartmentId(department?.id || department?.departmentId || department?.name);
+  const name = String(department?.name || department?.department || "").toLowerCase();
+  return id === "capital-projects" ||
+    id === "statutory-and-other-agency-funding" ||
+    id === "statutory-other-agency-funding" ||
+    name.includes("capital projects") ||
+    name.includes("statutory") && name.includes("agency funding");
+}
+
+function departmentExemptFromServiceDiagnostic(department) {
+  const id = normalizeBootstrapDepartmentId(department?.id || department?.departmentId || department?.name);
+  const name = String(department?.name || department?.department || "").toLowerCase();
+  return id === "statutory-and-other-agency-funding" ||
+    id === "statutory-other-agency-funding" ||
+    name.includes("statutory") && name.includes("agency funding");
+}
+
 function serviceCoverageAudit() {
   const { name, data } = serviceDataSource();
   const excludedDepartmentIds = new Set([
@@ -1078,15 +1215,30 @@ function serviceCoverageAudit() {
     "human-services",
     "sheriff-s-office"
   ]);
-  const allDepartments = (budgetData.departments || []).filter((department) => !excludedDepartmentIds.has(department.id));
+  const budgetDepartmentMap = new Map((budgetData.departments || []).map((department) => [department.id, department]));
+  const allDepartments = expectedDiagnosticDepartments().filter((department) => !excludedDepartmentIds.has(department.id));
   const serviceRows = normalizedServiceRows();
   const departmentIds = new Set(allDepartments.map((department) => department.id));
   const serviceDepartmentIds = new Set(serviceRows.map((row) => row.departmentId).filter(Boolean));
   const withServiceData = allDepartments.filter((department) => serviceDepartmentIds.has(department.id));
-  const missingServiceData = allDepartments.filter((department) => !serviceDepartmentIds.has(department.id));
+  const missingServiceData = allDepartments.filter((department) => !departmentExemptFromServiceDiagnostic(department) && !serviceDepartmentIds.has(department.id));
   const unmatchedServiceRecords = serviceRows.filter((row) => row.departmentId && !departmentIds.has(row.departmentId));
   const coveragePercentage = allDepartments.length ? Math.round(withServiceData.length / allDepartments.length * 1000) / 10 : 0;
-  return { sourceName: name, departments: allDepartments, withServiceData, missingServiceData, unmatchedServiceRecords, coveragePercentage };
+  const departmentsWithoutBudgets = allDepartments.filter((department) => Number(budgetDepartmentMap.get(department.id)?.totalBudget || 0) <= 0);
+  const departmentsWithoutRevenueSupport = allDepartments.filter((department) => Number(budgetDepartmentMap.get(department.id)?.adValoremSupport || departmentSupport(budgetDepartmentMap.get(department.id) || department) || 0) <= 0);
+  const departmentsWithoutFte = allDepartments.filter((department) => !departmentExemptFromFteDiagnostic(department) && Number(budgetDepartmentMap.get(department.id)?.fteCount || department.fteCount || 0) <= 0);
+
+  return {
+    sourceName: name,
+    departments: allDepartments,
+    withServiceData,
+    missingServiceData,
+    unmatchedServiceRecords,
+    coveragePercentage,
+    departmentsWithoutBudgets,
+    departmentsWithoutRevenueSupport,
+    departmentsWithoutFte
+  };
 }
 
 function serviceAreaForDepartment(departmentId) {
@@ -1105,7 +1257,19 @@ function logServiceDataAudit() {
   console.info("Departments missing service data", audit.missingServiceData.map((department) => department.name));
   console.info("Service records not matched to departments", audit.unmatchedServiceRecords.map((row) => row.departmentName || row.departmentId));
   console.info("Coverage percentage", `${audit.coveragePercentage}%`);
-  console.table([{ departments: audit.departments.length, departmentsWithServiceData: audit.withServiceData.length, missingDepartments: audit.missingServiceData.length, unmatchedServiceRecords: audit.unmatchedServiceRecords.length, coverage: `${audit.coveragePercentage}%` }]);
+  console.info("Departments without budgets", audit.departmentsWithoutBudgets.map((department) => department.name));
+  console.info("Departments without ad valorem support", audit.departmentsWithoutRevenueSupport.map((department) => department.name));
+  console.info("Departments without FTE", audit.departmentsWithoutFte.map((department) => department.name));
+  console.table([{
+    departments: audit.departments.length,
+    departmentsWithServiceData: audit.withServiceData.length,
+    missingServiceData: audit.missingServiceData.length,
+    departmentsWithoutBudgets: audit.departmentsWithoutBudgets.length,
+    departmentsWithoutAdValoremSupport: audit.departmentsWithoutRevenueSupport.length,
+    departmentsWithoutFte: audit.departmentsWithoutFte.length,
+    unmatchedServiceRecords: audit.unmatchedServiceRecords.length,
+    coverage: `${audit.coveragePercentage}%`
+  }]);
   console.groupEnd();
   console.table(serviceAreaCategories.map((category) => ({
     serviceArea: category,
@@ -1124,12 +1288,20 @@ function renderServiceDiagnostics() {
       <div><span>Departments</span><strong>${audit.departments.length}</strong></div>
       <div><span>Departments with Service Data</span><strong>${audit.withServiceData.length}</strong></div>
       <div><span>Coverage</span><strong>${audit.coveragePercentage}%</strong></div>
+      <div><span>Missing Budgets</span><strong>${audit.departmentsWithoutBudgets.length}</strong></div>
+      <div><span>Missing Ad Valorem Support</span><strong>${audit.departmentsWithoutRevenueSupport.length}</strong></div>
+      <div><span>Missing FTE</span><strong>${audit.departmentsWithoutFte.length}</strong></div>
     `;
   }
   if (missing) {
-    missing.innerHTML = audit.missingServiceData.length
-      ? `<h4>Departments still missing service data</h4><ul>${audit.missingServiceData.map((department) => `<li>${escapeHtml(department.name)}</li>`).join("")}</ul>`
-      : `<p>All departments have service data.</p>`;
+    const diagnosticsSections = [
+      audit.missingServiceData.length ? `<section><h4>Departments still missing service data</h4><ul>${audit.missingServiceData.map((department) => `<li>${escapeHtml(department.name)}</li>`).join("")}</ul></section>` : "",
+      audit.departmentsWithoutBudgets.length ? `<section><h4>Departments without budgets</h4><ul>${audit.departmentsWithoutBudgets.map((department) => `<li>${escapeHtml(department.name)}</li>`).join("")}</ul></section>` : "",
+      audit.departmentsWithoutRevenueSupport.length ? `<section><h4>Departments without ad valorem support</h4><ul>${audit.departmentsWithoutRevenueSupport.map((department) => `<li>${escapeHtml(department.name)}</li>`).join("")}</ul></section>` : "",
+      audit.departmentsWithoutFte.length ? `<section><h4>Departments without FTE</h4><ul>${audit.departmentsWithoutFte.map((department) => `<li>${escapeHtml(department.name)}</li>`).join("")}</ul></section>` : ""
+    ].filter(Boolean).join("");
+
+    missing.innerHTML = diagnosticsSections || `<p>All departments have service data, budgets, ad valorem support, and FTE data.</p>`;
   }
 }
 

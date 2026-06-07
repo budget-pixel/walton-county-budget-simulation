@@ -1043,13 +1043,23 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   line-height: 1.5;
 }
 
+
+.property-tax-embed {
+  width: 100%;
+  min-height: 1100px;
+  border: 0;
+  border-radius: var(--radius-card);
+}
+
 @media (max-width: 900px) {
   .department-detail-layout {
     --department-detail-width: auto;
     grid-template-columns: 1fr;
   }
   .department-table-panel { position: static; }
-  .property-tax-embed { min-height: 840px; }
+  .property-tax-embed {
+    min-height: 840px;
+  }
 }
 
 
