@@ -270,25 +270,28 @@
             <div class="panel-header compact-header">
               <div>
                 <p class="eyebrow">Service Area Data</p>
-                <h3>Proposal Summary Converter</h3>
+                <h3>Reviewed CSV Converter</h3>
               </div>
             </div>
-            <p class="small-status">Upload the budget publication workbook to create a reviewable draft from the Proposal Summary tab. This does not update app data automatically.</p>
+            <p class="small-status">Upload the reviewed service/program CSV to preview and export app-ready department service data. Expected source: department_services_review.csv, though any CSV with the required columns is accepted.</p>
             <div class="service-converter-controls">
-              <label><span>Budget Publication Workbook</span><input type="file" accept=".xlsx,.xls,.xlsm" data-control="service-workbook"></label>
-              <button type="button" class="view-all-button" data-control="export-service-areas" disabled>Export JS</button>
+              <label><span>Reviewed Service CSV</span><input type="file" accept=".csv,text/csv" data-control="service-csv"></label>
+              <button type="button" class="view-all-button" data-control="export-service-areas" disabled>Download DepartmentServices.js</button>
             </div>
             <p id="serviceAreaImportStatus" class="small-status" aria-live="polite"></p>
+            <p id="serviceAreaSourceFile" class="small-status service-source-file"></p>
+            <div id="serviceAreaValidationWarnings" class="warning-list service-validation-warnings"></div>
             <div class="table-scroll service-review-wrap" hidden>
               <table class="service-review-table">
                 <thead>
                   <tr>
                     <th>Department</th>
                     <th>Service Area</th>
-                    <th>Service / Program</th>
                     <th>Description</th>
-                    <th>Source Excerpt</th>
-                    <th>Status</th>
+                    <th>Service Count</th>
+                    <th>Capital Project Count</th>
+                    <th>Performance Measure Count</th>
+                    <th>Notes</th>
                   </tr>
                 </thead>
                 <tbody id="serviceAreaReviewTable"></tbody>

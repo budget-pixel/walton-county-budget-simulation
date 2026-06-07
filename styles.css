@@ -1056,6 +1056,23 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   line-height: 1.35;
 }
 
+.service-source-file {
+  font-weight: 700;
+}
+
+.service-validation-warnings {
+  margin-top: 8px;
+}
+
+.service-validation-warnings ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.service-review-table .warning-row td:first-child {
+  border-left: 4px solid var(--color-warning);
+}
+
 @media (max-width: 740px) {
   .service-converter-controls {
     grid-template-columns: 1fr;

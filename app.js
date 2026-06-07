@@ -35,7 +35,9 @@ const state = {
   showImpactTable: false,
   proposedMillage: budgetData.millageAssumptions.adoptedMillage,
   selectedScenarioName: "",
-  serviceAreaDraft: []
+  serviceAreaDraft: [],
+  serviceAreaSourceFileName: "",
+  serviceAreaWarnings: []
 };
 
 let trendChart;
@@ -499,19 +501,52 @@ let serviceAuditLogged = false;
 
 function serviceDataSource() {
   const candidates = [
-    { name: "window.departmentServiceAreas", value: window.departmentServiceAreas },
-    { name: "window.departmentServices", value: window.departmentServices }
+    { name: "window.departmentServices", value: window.departmentServices },
+    { name: "window.departmentServiceAreas", value: window.departmentServiceAreas }
   ];
-  const source = candidates.find((candidate) => candidate.value && Array.isArray(candidate.value.serviceAreas));
+  const source = candidates.find((candidate) => candidate.value && (candidate.value.departments || Array.isArray(candidate.value.serviceAreas)));
   return {
     name: source?.name || "none",
-    data: source?.value || { serviceAreas: [], departmentMappings: {} }
+    data: source?.value || { departments: {}, serviceAreas: [], departmentMappings: {} }
   };
 }
 
-function getDepartmentServices(departmentId) {
+function normalizeDepartmentServiceRecord(id, record) {
+  if (!record) return null;
+  const department = budgetData.departments.find((item) => item.id === id || item.name === record.department);
+  return {
+    departmentId: id || department?.id || slug(record.department),
+    departmentName: record.department || department?.name || id,
+    serviceArea: record.serviceArea || "",
+    description: record.description || "",
+    services: record.services || [],
+    capitalProjects: record.capitalProjects || [],
+    performanceMeasures: record.performanceMeasures || [],
+    notes: record.notes || ""
+  };
+}
+
+function normalizedServiceRows() {
   const { data } = serviceDataSource();
-  return (data.serviceAreas || []).filter((row) => row && row.departmentId === departmentId);
+  if (data.departments && typeof data.departments === "object") {
+    return Object.entries(data.departments)
+      .map(([id, record]) => normalizeDepartmentServiceRecord(id, record))
+      .filter(Boolean);
+  }
+  return (data.serviceAreas || []).map((row) => ({
+    departmentId: row.departmentId,
+    departmentName: row.departmentName,
+    serviceArea: row.serviceArea,
+    description: row.description || row.mission || "",
+    services: splitServiceItems(row.programName || row.services),
+    capitalProjects: splitServiceItems(row.capitalProjects),
+    performanceMeasures: splitServiceItems(row.performanceMeasures),
+    notes: row.notes || row.reviewNotes || ""
+  }));
+}
+
+function getDepartmentServices(departmentId) {
+  return normalizedServiceRows().filter((row) => row && row.departmentId === departmentId);
 }
 
 function splitServiceItems(value) {
@@ -533,7 +568,7 @@ function getDepartmentDescription(departmentId) {
 
 function getDepartmentServicePrograms(departmentId) {
   const rows = getDepartmentServices(departmentId);
-  return uniqueItems(rows.flatMap((row) => splitServiceItems(row.programName || row.services)));
+  return uniqueItems(rows.flatMap((row) => splitServiceItems(row.services)));
 }
 
 function getDepartmentProjects(departmentId) {
@@ -595,7 +630,7 @@ function renderDepartmentServices(departmentId) {
 function serviceCoverageAudit() {
   const { name, data } = serviceDataSource();
   const allDepartments = budgetData.departments || [];
-  const serviceRows = data.serviceAreas || [];
+  const serviceRows = normalizedServiceRows();
   const departmentIds = new Set(allDepartments.map((department) => department.id));
   const serviceDepartmentIds = new Set(serviceRows.map((row) => row.departmentId).filter(Boolean));
   const withServiceData = allDepartments.filter((department) => serviceDepartmentIds.has(department.id));
@@ -1216,203 +1251,215 @@ function setServiceAreaStatus(message, isError = false) {
   status.classList.toggle("negative-value", isError);
 }
 
-function loadSheetJs() {
-  if (window.XLSX) return Promise.resolve(window.XLSX);
-  if (window.sheetJsLoading) return window.sheetJsLoading;
-  window.sheetJsLoading = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
-    script.onload = () => resolve(window.XLSX);
-    script.onerror = () => reject(new Error("SheetJS could not be loaded."));
-    document.head.appendChild(script);
-  });
-  return window.sheetJsLoading;
+const csvColumnAliases = {
+  department: ["department"],
+  serviceArea: ["servicearea", "service area"],
+  description: ["description"],
+  services: ["services", "services and programs", "service and program", "services programs", "services & programs"],
+  capitalProjects: ["capitalprojects", "capital projects"],
+  performanceMeasures: ["performancemeasures", "performance measures"],
+  notes: ["notes", "review notes"]
+};
+
+function normalizeCsvHeader(value) {
+  return String(value || "").trim().toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, " ").trim();
 }
 
-function normalizeWorkbookText(value) {
-  return String(value || "").replace(/\s+/g, " ").trim();
+function headerMatches(header, aliases) {
+  const normalizedHeader = normalizeCsvHeader(header);
+  return aliases.some((alias) => normalizeCsvHeader(alias) === normalizedHeader);
 }
 
-function proposalRowsToTextRows(sheet) {
-  return window.XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", blankrows: false })
-    .map((row) => row.map(normalizeWorkbookText).filter(Boolean).join(" | "))
+function csvFieldMap(headers) {
+  return Object.fromEntries(Object.entries(csvColumnAliases).map(([field, aliases]) => [
+    field,
+    headers.findIndex((header) => headerMatches(header, aliases))
+  ]));
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  const source = String(text || "").replace(/^\uFEFF/, "");
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index];
+    const next = source[index + 1];
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        field += '"';
+        index += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === "," && !inQuotes) {
+      row.push(field);
+      field = "";
+    } else if ((char === "\n" || char === "\r") && !inQuotes) {
+      if (char === "\r" && next === "\n") index += 1;
+      row.push(field);
+      if (row.some((value) => String(value).trim())) rows.push(row);
+      row = [];
+      field = "";
+    } else {
+      field += char;
+    }
+  }
+  row.push(field);
+  if (row.some((value) => String(value).trim())) rows.push(row);
+  return rows;
+}
+
+function splitCsvList(value) {
+  return String(value || "")
+    .split(/\n|;|\||\u2022|(?:^|\s)\d+[.)]\s+/)
+    .map((item) => item.trim())
     .filter(Boolean);
 }
 
-function departmentForText(text) {
-  const lower = text.toLowerCase();
-  return budgetData.departments
-    .slice()
-    .sort((a, b) => b.name.length - a.name.length)
-    .find((department) => lower.includes(department.name.toLowerCase()));
+function matchDepartmentByName(name) {
+  const normalized = normalizeCsvHeader(name);
+  return budgetData.departments.find((department) => normalizeCsvHeader(department.name) === normalized)
+    || budgetData.departments.find((department) => slug(department.name) === slug(name));
 }
 
-function splitProposalDepartmentBlocks(textRows) {
-  const blocks = [];
-  let current = null;
-  textRows.forEach((text) => {
-    const department = departmentForText(text);
-    if (department && (!current || current.department.id !== department.id)) {
-      current = { department, lines: [text] };
-      blocks.push(current);
-      return;
+function csvCell(row, index) {
+  return index >= 0 ? String(row[index] || "").trim() : "";
+}
+
+function buildServiceWarnings(rows) {
+  const warnings = [];
+  const seen = new Map();
+  const matchedIds = new Set();
+  rows.forEach((row, index) => {
+    const label = row.department || `Row ${index + 1}`;
+    if (!row.department) warnings.push(`Row ${index + 1}: missing department.`);
+    if (!row.serviceArea) warnings.push(`${label}: missing service area.`);
+    if (!row.description) warnings.push(`${label}: missing description.`);
+    if (!row.services.length) warnings.push(`${label}: no services/programs.`);
+    if (seen.has(row.departmentKey)) warnings.push(`${label}: duplicate department row.`);
+    seen.set(row.departmentKey, true);
+    if (row.matchedDepartment) {
+      matchedIds.add(row.departmentId);
+    } else if (row.department) {
+      warnings.push(`${row.department}: does not match budgetData.departments.`);
     }
-    if (current) current.lines.push(text);
   });
-  return blocks;
+  budgetData.departments.forEach((department) => {
+    if (!matchedIds.has(department.id)) warnings.push(`${department.name}: no CSV service data.`);
+  });
+  return warnings;
 }
 
-function textAfterKeyword(lines, keywords) {
-  const match = lines.find((line) => keywords.some((keyword) => line.toLowerCase().includes(keyword)));
-  if (!match) return "";
-  const pieces = match.split(/\||:|-/).map((part) => part.trim()).filter(Boolean);
-  return pieces.length > 1 ? pieces.slice(1).join(" ") : match;
-}
-
-function firstUsefulLine(lines, departmentName) {
-  return lines.find((line) => {
-    const lower = line.toLowerCase();
-    return line.length > 32 && !lower.includes(departmentName.toLowerCase()) && !lower.includes("proposal summary");
-  }) || lines[0] || "";
-}
-
-function suggestedProgramName(department, lines) {
-  const serviceText = textAfterKeyword(lines, ["service", "program", "function"]);
-  if (serviceText) return serviceText.split(/[.;|]/)[0].trim().slice(0, 90) || department.name;
-  return department.name;
-}
-
-function confidenceForDraft(description, services, lineCount) {
-  const score = [description, services].filter(Boolean).length + (lineCount > 4 ? 1 : 0);
-  if (score >= 3) return "Needs light review";
-  if (score >= 2) return "Needs review";
-  return "Low confidence";
-}
-
-function draftFromBlock(block) {
-  const names = serviceAreaNameById();
-  const areaId = serviceAreaConfig.departmentMappings?.[block.department.id] || "other-county-services";
-  const description = textAfterKeyword(block.lines, ["description", "purpose", "mission"]) || firstUsefulLine(block.lines, block.department.name);
-  const services = textAfterKeyword(block.lines, ["service", "program", "function"]);
-  const sourceExcerpt = block.lines.slice(0, 4).join(" ").slice(0, 360);
-  return {
-    id: `${block.department.id}-${slug(suggestedProgramName(block.department, block.lines))}`,
-    departmentId: block.department.id,
-    departmentName: block.department.name,
-    serviceAreaId: areaId,
-    serviceArea: names[areaId] || "Other County Services",
-    programName: suggestedProgramName(block.department, block.lines),
-    description,
-    mission: textAfterKeyword(block.lines, ["mission", "purpose"]),
-    services,
-    budgetHighlights: textAfterKeyword(block.lines, ["budget highlight", "budget"]),
-    capitalProjects: textAfterKeyword(block.lines, ["capital"]),
-    performanceMeasures: textAfterKeyword(block.lines, ["performance", "measure"]),
-    reviewNotes: textAfterKeyword(block.lines, ["review", "note"]),
-    sourceExcerpt,
-    status: confidenceForDraft(description, services, block.lines.length)
-  };
+function serviceDraftFromCsvRows(csvRows, fileName) {
+  if (csvRows.length < 2) throw new Error("CSV must include a header row and at least one data row.");
+  const headers = csvRows[0];
+  const fields = csvFieldMap(headers);
+  const missingColumns = Object.entries(fields).filter(([, index]) => index < 0).map(([field]) => field);
+  if (missingColumns.length) throw new Error(`CSV is missing required columns: ${missingColumns.join(", ")}.`);
+  const rows = csvRows.slice(1).map((row, index) => {
+    const department = csvCell(row, fields.department);
+    const matchedDepartment = matchDepartmentByName(department);
+    const departmentId = matchedDepartment?.id || slug(department || `csv-row-${index + 1}`);
+    return {
+      id: departmentId,
+      departmentId,
+      departmentKey: slug(department || departmentId),
+      matchedDepartment,
+      department: matchedDepartment?.name || department,
+      serviceArea: csvCell(row, fields.serviceArea),
+      description: csvCell(row, fields.description),
+      services: splitCsvList(csvCell(row, fields.services)),
+      capitalProjects: splitCsvList(csvCell(row, fields.capitalProjects)),
+      performanceMeasures: splitCsvList(csvCell(row, fields.performanceMeasures)),
+      notes: csvCell(row, fields.notes),
+      source: fileName
+    };
+  }).filter((row) => row.department || row.serviceArea || row.description || row.services.length || row.capitalProjects.length || row.performanceMeasures.length || row.notes);
+  return { rows, warnings: buildServiceWarnings(rows) };
 }
 
 function renderServiceAreaReview() {
   const table = $("#serviceAreaReviewTable");
   const wrap = table?.closest(".service-review-wrap");
   const exportButton = $('[data-control="export-service-areas"]');
+  const sourceFile = $("#serviceAreaSourceFile");
+  const warningBox = $("#serviceAreaValidationWarnings");
   if (!table || !wrap || !exportButton) return;
   wrap.hidden = !state.serviceAreaDraft.length;
   exportButton.disabled = !state.serviceAreaDraft.length;
-  table.innerHTML = state.serviceAreaDraft.map((row, index) => `
-    <tr>
-      <td><strong>${escapeHtml(row.departmentName)}</strong></td>
-      <td><input type="text" value="${escapeHtml(row.serviceArea)}" data-control="service-area-edit" data-index="${index}" data-field="serviceArea"></td>
-      <td><input type="text" value="${escapeHtml(row.programName)}" data-control="service-area-edit" data-index="${index}" data-field="programName"></td>
-      <td><textarea rows="3" data-control="service-area-edit" data-index="${index}" data-field="description">${escapeHtml(row.description)}</textarea></td>
-      <td><small>${escapeHtml(row.sourceExcerpt)}</small></td>
-      <td><select data-control="service-area-edit" data-index="${index}" data-field="status">
-        ${["Ready", "Needs light review", "Needs review", "Low confidence"].map((status) => `<option value="${status}" ${row.status === status ? "selected" : ""}>${status}</option>`).join("")}
-      </select></td>
+  if (sourceFile) sourceFile.textContent = state.serviceAreaSourceFileName ? `Previewing: ${state.serviceAreaSourceFileName}` : "";
+  if (warningBox) {
+    warningBox.innerHTML = state.serviceAreaWarnings.length
+      ? `<p>${state.serviceAreaWarnings.length} validation warning${state.serviceAreaWarnings.length === 1 ? "" : "s"}</p><ul>${state.serviceAreaWarnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")}</ul>`
+      : "";
+  }
+  table.innerHTML = state.serviceAreaDraft.map((row) => `
+    <tr class="${row.matchedDepartment ? "" : "warning-row"}">
+      <td><strong>${escapeHtml(row.department)}</strong>${row.matchedDepartment ? "" : "<small>Unmatched department</small>"}</td>
+      <td>${escapeHtml(row.serviceArea)}</td>
+      <td>${escapeHtml(row.description)}</td>
+      <td>${number(row.services.length)}</td>
+      <td>${number(row.capitalProjects.length)}</td>
+      <td>${number(row.performanceMeasures.length)}</td>
+      <td><small>${escapeHtml(row.notes)}</small></td>
     </tr>
   `).join("");
 }
 
-async function importServiceWorkbook(file) {
+async function importServiceCsv(file) {
   if (!file) return;
   if (!isStaffMode) return;
-  setServiceAreaStatus("Reading workbook...");
+  state.serviceAreaSourceFileName = file.name || "department_services_review.csv";
+  setServiceAreaStatus("Reading CSV...");
   try {
-    await loadSheetJs();
-    const buffer = await file.arrayBuffer();
-    const workbook = window.XLSX.read(buffer, { type: "array" });
-    const sheetName = workbook.SheetNames.find((name) => name.trim().toLowerCase() === "proposal summary");
-    if (!sheetName) {
-      state.serviceAreaDraft = [];
-      renderServiceAreaReview();
-      setServiceAreaStatus("Proposal Summary tab was not found in this workbook.", true);
-      return;
-    }
-    const textRows = proposalRowsToTextRows(workbook.Sheets[sheetName]);
-    const blocks = splitProposalDepartmentBlocks(textRows);
-    state.serviceAreaDraft = blocks.map(draftFromBlock);
+    const csvRows = parseCsv(await file.text());
+    const result = serviceDraftFromCsvRows(csvRows, state.serviceAreaSourceFileName);
+    state.serviceAreaDraft = result.rows;
+    state.serviceAreaWarnings = result.warnings;
     renderServiceAreaReview();
-    setServiceAreaStatus(state.serviceAreaDraft.length ? `Created ${state.serviceAreaDraft.length} draft service/program rows for review.` : "No department narrative blocks were detected on Proposal Summary.", !state.serviceAreaDraft.length);
+    setServiceAreaStatus(state.serviceAreaDraft.length ? `Loaded ${state.serviceAreaDraft.length} department service row${state.serviceAreaDraft.length === 1 ? "" : "s"} from CSV.` : "No service rows were detected in this CSV.", !state.serviceAreaDraft.length);
   } catch (error) {
     state.serviceAreaDraft = [];
+    state.serviceAreaWarnings = [];
     renderServiceAreaReview();
-    setServiceAreaStatus(error.message || "Workbook import failed.", true);
+    setServiceAreaStatus(error.message || "CSV import failed.", true);
   }
 }
 
-function updateServiceAreaDraft(index, field, value) {
-  const row = state.serviceAreaDraft[Number(index)];
-  if (!row) return;
-  row[field] = value;
-  if (field === "serviceArea") {
-    row.serviceAreaId = serviceAreaIdByName()[value] || slug(value);
-  }
-  if (field === "programName") {
-    row.id = `${row.departmentId}-${slug(value)}`;
-  }
-}
+function updateServiceAreaDraft() {}
 
 function exportServiceAreaDraft() {
   if (!state.serviceAreaDraft.length) {
-    setServiceAreaStatus("Import and review a workbook before exporting.", true);
+    setServiceAreaStatus("Import and review a CSV before exporting.", true);
     return;
   }
-  const serviceAreas = state.serviceAreaDraft.map((row) => ({
-    id: row.id,
-    departmentId: row.departmentId,
-    departmentName: row.departmentName,
-    serviceAreaId: row.serviceAreaId,
-    serviceArea: row.serviceArea,
-    programName: row.programName,
-    description: row.description,
-    mission: row.mission,
-    services: row.services,
-    budgetHighlights: row.budgetHighlights,
-    capitalProjects: row.capitalProjects,
-    performanceMeasures: row.performanceMeasures,
-    reviewNotes: row.reviewNotes,
-    sourceExcerpt: row.sourceExcerpt,
-    status: row.status
-  }));
-  const departmentMappings = serviceAreas.reduce((mapping, row) => {
-    mapping[row.departmentId] = row.serviceAreaId;
-    return mapping;
+  const departmentsPayload = state.serviceAreaDraft.reduce((payload, row) => {
+    payload[row.departmentId] = {
+      department: row.department,
+      serviceArea: row.serviceArea,
+      description: row.description,
+      services: row.services,
+      capitalProjects: row.capitalProjects,
+      performanceMeasures: row.performanceMeasures,
+      notes: row.notes
+    };
+    return payload;
   }, {});
   const payload = {
     version: 1,
     generatedAt: new Date().toISOString(),
-    serviceAreas,
-    departmentMappings
+    source: state.serviceAreaSourceFileName || "department_services_review.csv",
+    departments: departmentsPayload
   };
-  const content = `window.departmentServiceAreas = ${JSON.stringify(payload, null, 2)};\n`;
+  const content = `window.departmentServices = ${JSON.stringify(payload, null, 2)};\n`;
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([content], { type: "text/javascript" }));
-  link.download = "departmentServiceAreas.generated.js";
+  link.download = "DepartmentServices.js";
   link.click();
   URL.revokeObjectURL(link.href);
-  setServiceAreaStatus(`Exported ${serviceAreas.length} reviewed service/program rows.`);
+  setServiceAreaStatus(`Exported ${Object.keys(departmentsPayload).length} department service record${Object.keys(departmentsPayload).length === 1 ? "" : "s"}.`);
 }
 
 document.addEventListener("input", (event) => {
@@ -1468,7 +1515,6 @@ document.addEventListener("input", (event) => {
   if (control === "ranking-search") { state.rankingSearch = event.target.value; renderRankings(); }
   if (control === "department-search") { state.departmentSearch = event.target.value; renderDepartments(); }
   if (control === "scenario-meta") { state.scenarioMeta[event.target.dataset.field] = event.target.value; }
-  if (control === "service-area-edit") { updateServiceAreaDraft(event.target.dataset.index, event.target.dataset.field, event.target.value); }
   if (control === "millage" && isStaffMode) {
     const cleanedMillage = String(event.target.value || "").replace(/[^0-9.]/g, "");
     const parsedMillage = Number(cleanedMillage);
@@ -1501,8 +1547,7 @@ document.addEventListener("change", (event) => {
   if (control === "department-year") { state.departmentFiscalYear = event.target.value; renderDepartments(); }
   if (control === "overview-year") { state.overviewFiscalYear = event.target.value; renderTopServices(); }
   if (control === "scenario-select") { state.selectedScenarioName = event.target.value; renderScenarioComparison(); }
-  if (control === "service-workbook") { importServiceWorkbook(event.target.files?.[0]); }
-  if (control === "service-area-edit") { updateServiceAreaDraft(event.target.dataset.index, event.target.dataset.field, event.target.value); }
+  if (control === "service-csv") { importServiceCsv(event.target.files?.[0]); }
 });
 
 document.addEventListener("click", (event) => {
