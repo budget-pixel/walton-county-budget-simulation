@@ -105,12 +105,10 @@ function fiscalYears() {
   const fy2028Reduction = Number(state.revenueAssumptions.fy2028RevenueReduction || 0);
   const fy2029Reduction = Number(state.revenueAssumptions.fy2029RevenueReduction || 0);
   const fy2028Revenue = baseRevenue - fy2028Reduction;
-  const fy2029PropertyValueGrowthOffset = fy2028Reduction;
-  const fy2029Revenue = fy2028Revenue + fy2029PropertyValueGrowthOffset - fy2029Reduction;
+  const fy2029Revenue = fy2028Revenue * (1 + growth) - fy2029Reduction;
   const revenue = [baseRevenue, fy2028Revenue, fy2029Revenue];
-  // FY2029 assumes property value growth partially offsets the exemption-related revenue reduction before future-year growth begins.
-  const expense = [baselineExpense, 164247268];
-  for (let index = 2; index < 6; index += 1) {
+  const expense = [baselineExpense];
+  for (let index = 1; index < 6; index += 1) {
     if (index > 2) revenue[index] = revenue[index - 1] * (1 + growth);
     expense[index] = expense[index - 1] * (1 + expenseGrowth);
   }
@@ -1462,6 +1460,13 @@ function exportServiceAreaDraft() {
   setServiceAreaStatus(`Exported ${Object.keys(departmentsPayload).length} department service record${Object.keys(departmentsPayload).length === 1 ? "" : "s"}.`);
 }
 
+function updateRevenueAssumptionFromInput(input) {
+  const assumption = input.dataset.assumption;
+  const value = input.dataset.format === "currency" ? parseMoney(input.value) : Number(input.value || 0);
+  state.revenueAssumptions[assumption] = assumption.includes("Rate") ? value / 100 : value;
+  updateResults();
+}
+
 document.addEventListener("input", (event) => {
   const control = event.target.dataset.control;
   const id = event.target.dataset.department;
@@ -1507,10 +1512,7 @@ document.addEventListener("input", (event) => {
     updateResults();
   }
   if (control === "revenue-assumption" && isStaffMode) {
-    const assumption = event.target.dataset.assumption;
-    const value = event.target.dataset.format === "currency" ? parseMoney(event.target.value) : Number(event.target.value || 0);
-    state.revenueAssumptions[assumption] = assumption.includes("Rate") ? value / 100 : value;
-    updateResults();
+    updateRevenueAssumptionFromInput(event.target);
   }
   if (control === "ranking-search") { state.rankingSearch = event.target.value; renderRankings(); }
   if (control === "department-search") { state.departmentSearch = event.target.value; renderDepartments(); }
@@ -1548,6 +1550,7 @@ document.addEventListener("change", (event) => {
   if (control === "overview-year") { state.overviewFiscalYear = event.target.value; renderTopServices(); }
   if (control === "scenario-select") { state.selectedScenarioName = event.target.value; renderScenarioComparison(); }
   if (control === "service-csv") { importServiceCsv(event.target.files?.[0]); }
+  if (control === "revenue-assumption" && isStaffMode) { updateRevenueAssumptionFromInput(event.target); }
 });
 
 document.addEventListener("click", (event) => {
