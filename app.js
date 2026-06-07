@@ -231,7 +231,7 @@ function availableShortfallExcluding(type, id) {
 
 function sumRemovedForDepartment(departmentId) {
   if (!window.boccExpenses) return 0;
-  return window.boccExpenses.filter((item) => item.departmentId === departmentId && state.removedOperatingItems[item.id]).reduce((t, item) => t + (Number(state.operatingItemAmounts[item.id] ?? item.amount || 0) || 0), 0);
+  return window.boccExpenses.filter((item) => item.departmentId === departmentId && state.removedOperatingItems[item.id]).reduce((t, item) => t + (Number((state.operatingItemAmounts[item.id] ?? item.amount) || 0) || 0), 0);
 }
 
 function capPublicFte(department, requested) {
@@ -465,7 +465,7 @@ function renderOperating() {
     if (window.boccExpenses && department.id === "board-of-county-commissioners") {
       const items = window.boccExpenses.filter((item) => item.departmentId === department.id);
       itemizedMarkup = `<div class="itemized-list"><h4>Itemized Board Expenses</h4>` + items.map((item) => {
-        const amt = Number(state.operatingItemAmounts[item.id] ?? item.amount || 0) || 0;
+        const amt = Number((state.operatingItemAmounts[item.id] ?? item.amount) || 0) || 0;
         const removed = Boolean(state.removedOperatingItems[item.id]);
         return `<div class="item-row ${removed ? 'item-removed' : ''}"><div class="item-meta"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.category)}</small></div><div class="item-actions"><input data-control="item-amount" data-item="${item.id}" type="text" value="${moneyInput(amt)}" class="item-amount-input" ${isLocked ? 'disabled' : ''}><button class="remove-item-button" data-control="toggle-operating-item" data-item="${item.id}" ${isLocked ? 'disabled' : ''}>${removed ? 'Undo' : 'Remove'}</button></div></div>`;
       }).join("") + `</div>`;
