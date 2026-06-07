@@ -225,6 +225,19 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--color-pr
 .project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .project-card { display: grid; grid-template-columns: auto 1fr; gap: 12px; padding: 14px; border: 1px solid var(--color-border); border-radius: var(--radius-small); background: #fbfcfc; }
 .project-card p { margin-bottom: 0; color: var(--color-text-muted); font-size: 0.86rem; }
+.project-card small { display: block; margin-top: 4px; color: var(--color-text-muted); line-height: 1.35; }
+.expense-project-card { border-left: 4px solid var(--color-secondary); }
+.operating-line-detail { grid-column: 1 / -1; margin-top: 12px; }
+.operating-line-detail summary { width: fit-content; cursor: pointer; color: var(--color-primary); font-size: 0.88rem; font-weight: 800; }
+.operating-account-list { display: grid; gap: 10px; margin-top: 10px; }
+.operating-account-group { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-small); background: var(--color-surface); }
+.operating-account-group header { display: flex; justify-content: space-between; gap: 12px; color: var(--color-primary-dark); }
+.operating-line-item { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding-top: 8px; border-top: 1px solid var(--color-border); }
+.operating-line-item small { display: block; margin-top: 3px; color: var(--color-text-muted); line-height: 1.35; }
+.operating-line-item > span { color: var(--color-text); font-weight: 800; }
+.line-item-toggle { padding: 7px 10px; border: 1px solid var(--color-border); border-radius: var(--radius-small); background: var(--color-surface); color: var(--color-primary); font-weight: 800; cursor: pointer; }
+.line-item-removed { opacity: 0.62; }
+.line-item-removed strong { text-decoration: line-through; }
 
 .status-banner { margin-bottom: 14px; padding: 12px; border-radius: var(--radius-small); font-weight: 800; }
 .status-deficit { background: #f7efe0; color: var(--color-warning); }
