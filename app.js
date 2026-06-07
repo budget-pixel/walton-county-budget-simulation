@@ -1,4 +1,5 @@
 const currencyFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+console.info('app.js loaded');
 const currencyInputFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
 const percentFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
