@@ -328,6 +328,17 @@ function renderChrome() {
         background-clip: padding-box;
       }
 
+      /* --- Custom department search wide styles --- */
+      .department-search-wide {
+        min-width: 340px;
+        flex: 1 1 340px;
+      }
+
+      .department-search-wide input {
+        width: 100%;
+        min-width: 320px;
+      }
+
       /* --- Begin resulting-shortfall-forecast styles --- */
 
       .resulting-shortfall-forecast {
@@ -1005,7 +1016,7 @@ function renderDepartments() {
   const controlsTarget = $("#departmentExplorerControls");
   if (controlsTarget && !controlsTarget.querySelector('[data-control="department-search"]')) {
     controlsTarget.innerHTML = `
-      <label><span>Search Departments</span><input type="search" value="${state.departmentSearch.replace(/"/g, "&quot;")}" placeholder="Search department" data-control="department-search"></label>
+      <label class="department-search-wide"><span>Search Departments</span><input type="search" value="${state.departmentSearch.replace(/\"/g, "&quot;")}" placeholder="Search department" data-control="department-search"></label>
       <button type="button" class="view-all-button compact-export-button" data-control="export-rankings">Export</button>
     `;
   }

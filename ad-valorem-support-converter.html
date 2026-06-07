@@ -8,7 +8,7 @@
 </head>
 <body>
   <h1>Ad Valorem Support Converter</h1>
-  <p>Upload a CSV or Excel file mapping departments to ad valorem support amounts. Expects headers: <strong>department</strong> and <strong>support</strong>.</p>
+  <p>Upload a CSV or Excel file mapping departments to ad valorem support amounts. Expects headers: <strong>Departments</strong> and <strong>Ad Valorem Support</strong>.</p>
   <input id="fileInput" type="file" accept=".csv,text/csv,.xlsx,.xls,.xlsm">
   <button id="downloadButton" disabled>Download departmentAdValoremSupport.js</button>
   <p id="status">Waiting for a file.</p>
@@ -17,7 +17,10 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="converter-utils.js"></script>
   <script>
-    const requiredColumns = { department: ['department'], support: ['support', 'ad valorem', 'advalorem'] };
+    const requiredColumns = {
+      department: ['departments', 'department'],
+      support: ['ad valorem support', 'ad valorem', 'advalorem', 'support']
+    };
     const { mapFields, parseMoney, jsAssign } = window.converterUtils;
 
     async function rowsFromFile(file){ const buffer = await file.arrayBuffer(); return await window.converterUtils.rowsFromFile(buffer); }
