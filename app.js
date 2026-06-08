@@ -247,6 +247,7 @@ const state = {
   buyoutCounts: {},
   buyoutCosts: {},
   operatingReductions: {},
+  bulkOperatingReductionPercent: 0,
   removedOperatingItems: {},
   operatingDetailOpen: {},
   keptProjects: {},
@@ -287,8 +288,71 @@ const constitutional = (department) => budgetData.constitutionalOfficeIds.includ
 const excluded = (department) => budgetData.excludedScenarioDepartmentIds.includes(department.id);
 const locked = (id) => isStaffMode && Boolean(state.lockedDepartments[id]);
 const departments = () => budgetData.departments.filter((department) => !excluded(department));
+const departmentById = (id) => budgetData.departments.find((department) => department.id === id);
 
 const departmentName = (id) => budgetData.departments.find((department) => department.id === id)?.name || "Countywide";
+
+function boardOfCountyCommissioners(department) {
+  const id = normalizeBootstrapDepartmentId(department?.id || department?.departmentId || department?.name);
+  const name = String(department?.name || department?.department || "").toLowerCase();
+  return id === "board-of-county-commissioners" || name === "board of county commissioners";
+}
+
+function departmentExcludedFromReductionControls(department) {
+  const id = normalizeBootstrapDepartmentId(department?.id || department?.departmentId || department?.name);
+  const name = String(department?.name || department?.department || "").toLowerCase();
+  const excludedDepartmentIds = new Set([
+    "capital-projects",
+    "circuit-court",
+    "clerk-of-court",
+    "clerk-and-comptroller",
+    "clerk-of-courts-and-county-comptroller",
+    "county-court",
+    "court-technology",
+    "guardian-ad-litem",
+    "medical-examiner",
+    "property-appraiser",
+    "property-appraise",
+    "public-defender",
+    "sheriffs-office",
+    "sheriff-s-office",
+    "south-walton-fire-district",
+    "south-walton-fire-and-state-control",
+    "state-attorney",
+    "statutory-and-other-agency-funding",
+    "statutory-other-agency-funding",
+    "supervisor-of-elections",
+    "tax-collector"
+  ]);
+
+  return (
+    excludedDepartmentIds.has(id) ||
+    name.includes("capital projects") ||
+    name.includes("circuit court") ||
+    name.includes("clerk of court") ||
+    name.includes("clerk of courts") ||
+    name.includes("clerk and comptroller") ||
+    (name.includes("clerk") && name.includes("comptroller")) ||
+    name.includes("county court") ||
+    name.includes("court technology") ||
+    name.includes("guardian ad litem") ||
+    name.includes("medical examiner") ||
+    name.includes("property appraiser") ||
+    name.includes("property appraise") ||
+    name.includes("public defender") ||
+    name.includes("sheriff") ||
+    name.includes("south walton fire") ||
+    name.includes("state attorney") ||
+    (name.includes("statutory") && name.includes("agency funding")) ||
+    name.includes("supervisor of elections") ||
+    name.includes("supervisor of election") ||
+    name.includes("tax collector")
+  );
+}
+
+const reductionEligibleDepartment = (department) => department && !excluded(department) && !constitutional(department) && !departmentExcludedFromReductionControls(department);
+const operatingVisibleDepartment = (department) => reductionEligibleDepartment(department) || boardOfCountyCommissioners(department);
+const operatingEditableDepartment = (department) => reductionEligibleDepartment(department) && !boardOfCountyCommissioners(department);
 
 function hideExpenseDetailForDepartment(department) {
   const id = normalizeBootstrapDepartmentId(
@@ -471,15 +535,17 @@ function scenarioTotals(raw = false) {
   let operatingReductions = 0;
   let buyoutOneTimeCosts = 0;
   const departmentImpacts = budgetData.departments.map((department) => {
-    const isLocked = locked(department.id) || excluded(department);
+    const isConstitutional = constitutional(department);
+    const canReduceDepartment = reductionEligibleDepartment(department);
+    const isLocked = locked(department.id) || excluded(department) || isConstitutional;
     const averageCost = fteCost(department);
-    const fteReduction = !isLocked && department.fteCount > 0 && !department.nonFteAdjustable && department.name !== "Board of County Commissioners" ? Number(state.fteReductions[department.id] || 0) : 0;
-    const buyoutCount = isLocked || department.name === "Board of County Commissioners" ? 0 : Math.min(Number(state.buyoutCounts[department.id] || 0), Math.max(department.fteCount - fteReduction, 0));
+    const fteReduction = canReduceDepartment && !isLocked && department.fteCount > 0 && !department.nonFteAdjustable && department.name !== "Board of County Commissioners" ? Number(state.fteReductions[department.id] || 0) : 0;
+    const buyoutCount = !canReduceDepartment || isLocked || department.name === "Board of County Commissioners" ? 0 : Math.min(Number(state.buyoutCounts[department.id] || 0), Math.max(department.fteCount - fteReduction, 0));
     const buyoutCost = isLocked ? 0 : Number(state.buyoutCosts[department.id] || 0);
-    const operatingPercent = isLocked || constitutional(department) ? 0 : Number(state.operatingReductions[department.id] || 0);
+    const operatingPercent = isLocked || !operatingEditableDepartment(department) ? 0 : Number(state.operatingReductions[department.id] || 0);
     const personnelReduction = (fteReduction + buyoutCount) * averageCost;
     const oneTimeBuyoutCost = buyoutCount * buyoutCost;
-    const removedOperatingAmount = isLocked ? 0 : removedOperatingAmountForDepartment(department);
+    const removedOperatingAmount = isLocked || !operatingEditableDepartment(department) ? 0 : removedOperatingAmountForDepartment(department);
     const effectiveOperatingBudget = Math.max(department.operatingBudget - removedOperatingAmount, 0);
     const operatingReductionAmount = Math.round(effectiveOperatingBudget * operatingPercent / 100);
     personnelReductions += personnelReduction;
@@ -500,7 +566,11 @@ function scenarioTotals(raw = false) {
       totalReduction: personnelReduction + operatingReductionAmount + removedOperatingAmount
     };
   });
-  const capitalReductions = budgetData.capitalProjects.reduce((total, project) => locked(project.departmentId) || state.keptProjects[project.id] ? total : total + project.cost, 0) + expenseCapitalReductionAmount();
+  const capitalReductions = budgetData.capitalProjects.reduce((total, project) => {
+    const department = departmentById(project.departmentId);
+    if (!reductionEligibleDepartment(department) || locked(project.departmentId) || state.keptProjects[project.id]) return total;
+    return total + project.cost;
+  }, 0) + expenseCapitalReductionAmount();
   const actualTotalReductions = personnelReductions + operatingReductions + capitalReductions;
   const displayTotalReductions = !isStaffMode && !raw ? Math.min(actualTotalReductions, revenueShortfall) : actualTotalReductions;
   return {
@@ -519,28 +589,28 @@ function scenarioTotals(raw = false) {
 
 function currentReductionValue(type, id) {
   if (type === "fte") {
-    const department = budgetData.departments.find((item) => item.id === id);
-    return department ? Number(state.fteReductions[id] || 0) * fteCost(department) : 0;
+    const department = departmentById(id);
+    return reductionEligibleDepartment(department) ? Number(state.fteReductions[id] || 0) * fteCost(department) : 0;
   }
   if (type === "buyout") {
-    const department = budgetData.departments.find((item) => item.id === id);
-    return department ? Number(state.buyoutCounts[id] || 0) * fteCost(department) : 0;
+    const department = departmentById(id);
+    return reductionEligibleDepartment(department) ? Number(state.buyoutCounts[id] || 0) * fteCost(department) : 0;
   }
   if (type === "operating") {
-    const department = budgetData.departments.find((item) => item.id === id);
-    if (!department) return 0;
+    const department = departmentById(id);
+    if (!operatingEditableDepartment(department)) return 0;
     const removed = removedOperatingAmountForDepartment(department);
     return Math.round(Math.max(department.operatingBudget - removed, 0) * Number(state.operatingReductions[id] || 0) / 100) + removed;
   }
   if (type === "operating-item") {
     const item = expenseItemByKey(id);
-    return item && state.removedOperatingItems[id] ? Number(item.amount || 0) : 0;
+    return item && operatingEditableDepartment(departmentById(item.departmentId)) && state.removedOperatingItems[id] ? Number(item.amount || 0) : 0;
   }
   if (type === "capital") {
     const project = budgetData.capitalProjects.find((item) => item.id === id);
     const expenseProject = expenseItemByKey(id);
-    if (project) return !state.keptProjects[id] ? project.cost : 0;
-    return expenseProject && !state.keptExpenseCapitalItems[id] ? Number(expenseProject.amount || 0) : 0;
+    if (project) return reductionEligibleDepartment(departmentById(project.departmentId)) && !state.keptProjects[id] ? project.cost : 0;
+    return expenseProject && reductionEligibleDepartment(departmentById(expenseProject.departmentId)) && !state.keptExpenseCapitalItems[id] ? Number(expenseProject.amount || 0) : 0;
   }
   return 0;
 }
@@ -551,6 +621,7 @@ function availableShortfallExcluding(type, id) {
 }
 
 function capPublicFte(department, requested) {
+  if (!reductionEligibleDepartment(department)) return 0;
   if (isStaffMode) return Math.min(Math.max(requested, 0), department.fteCount);
   const cost = fteCost(department);
   const maxByShortfall = cost > 0 ? Math.floor((availableShortfallExcluding("fte", department.id) / cost) * 2) / 2 : 0;
@@ -560,6 +631,7 @@ function capPublicFte(department, requested) {
 }
 
 function capPublicBuyout(department, requested) {
+  if (!reductionEligibleDepartment(department)) return 0;
   const maxPositions = Math.max(department.fteCount - Number(state.fteReductions[department.id] || 0), 0);
   if (isStaffMode) return Math.min(Math.max(requested, 0), maxPositions);
   const cost = fteCost(department);
@@ -570,6 +642,7 @@ function capPublicBuyout(department, requested) {
 }
 
 function capPublicOperating(department, requested) {
+  if (!operatingEditableDepartment(department)) return 0;
   if (isStaffMode) return Math.min(Math.max(requested, 0), 100);
   const maxPercent = department.operatingBudget > 0 ? Math.floor(availableShortfallExcluding("operating", department.id) / department.operatingBudget * 100) : 0;
   const capped = Math.min(Math.max(requested, 0), 100, maxPercent);
@@ -792,7 +865,7 @@ function renderPersonnel() {
   if (costFactors) {
     costFactors.innerHTML = `<div class="personnel-factor-compact-header"><h4>Personnel Cost Factors</h4><p>Percentage of total personnel cost.</p></div><div class="personnel-driver-grid personnel-driver-grid-compact">${personnelDriverCardsMarkup()}</div>`;
   }
-  $("#personnelControls").innerHTML = departments().filter((department) => department.fteCount > 0 && !department.nonFteAdjustable && department.name !== "Board of County Commissioners").sort(sortDepartments).map((department) => {
+  $("#personnelControls").innerHTML = departments().filter((department) => reductionEligibleDepartment(department) && department.fteCount > 0 && !department.nonFteAdjustable && department.name !== "Board of County Commissioners").sort(sortDepartments).map((department) => {
     const isLocked = locked(department.id);
     const averageCost = fteCost(department);
     state.buyoutCosts[department.id] ??= Math.round(averageCost * 0.35);
@@ -804,21 +877,34 @@ function renderPersonnel() {
 }
 
 function renderOperating() {
-  const protectedDepartments = departments().filter((department) => department.operatingBudget > 0 && constitutional(department));
-  const adjustableDepartments = departments().filter((department) => department.operatingBudget > 0 && !constitutional(department)).sort(sortDepartments);
-  $("#operatingControls").innerHTML = `<section class="protected-operating-card"><div class="protected-operating-header"><div><h4>Constitutional Office Operating Budgets</h4></div><strong>${money(protectedDepartments.reduce((total, department) => total + department.operatingBudget, 0))}</strong></div><div class="protected-operating-list">${protectedDepartments.map((department) => `<div><span>${department.name}</span><strong>${money(department.operatingBudget)}</strong></div>`).join("")}</div></section>` + adjustableDepartments.map((department) => {
-    const isLocked = locked(department.id);
+  const operatingDepartments = departments().filter((department) => operatingVisibleDepartment(department) && department.operatingBudget > 0).sort(sortDepartments);
+  const bulkControl = `
+    <div class="slider-row bulk-operating-control">
+      <div>
+        <label>Bulk Operating Reduction</label>
+        <div class="slider-meta">Apply one percentage to every unlocked adjustable department.</div>
+      </div>
+      <label class="percent-entry">
+        <input type="number" min="0" max="100" step="1" value="${state.bulkOperatingReductionPercent || 0}" data-control="bulk-operating-percent">
+        <span>%</span>
+      </label>
+      <button type="button" class="view-all-button" data-control="apply-bulk-operating">Apply to All Departments</button>
+    </div>
+  `;
+  $("#operatingControls").innerHTML = bulkControl + operatingDepartments.map((department) => {
+    const readOnly = !operatingEditableDepartment(department);
+    const isLocked = locked(department.id) || readOnly;
     if (isLocked) state.operatingReductions[department.id] = 0;
-    const reductionPercent = Number(state.operatingReductions[department.id] || 0);
-    const removedOperatingAmount = removedOperatingAmountForDepartment(department);
+    const reductionPercent = readOnly ? 0 : Number(state.operatingReductions[department.id] || 0);
+    const removedOperatingAmount = readOnly ? 0 : removedOperatingAmountForDepartment(department);
     const newOperatingBudget = Math.max(department.operatingBudget - removedOperatingAmount, 0) * (1 - reductionPercent / 100);
     const programsMarkup = serviceFieldList("Services & Programs", getDepartmentServicePrograms(department.id));
-    return `<div class="slider-row ${isLocked ? "locked-row" : ""}"><div><label>${department.name}</label><div class="slider-meta">Operating budget: ${money(department.operatingBudget)}${removedOperatingAmount ? ` | Line items removed: ${money(removedOperatingAmount)}` : ""}${isLocked ? " | Locked" : ""}</div><div class="slider-meta slider-meta-secondary">New operating budget: <span class="new-operating-budget-value">${money(newOperatingBudget)}</span></div></div><input class="operating-slider" type="range" min="0" max="100" value="${reductionPercent}" data-control="operating" data-department="${department.id}" ${isLocked ? "disabled" : ""}><label class="percent-entry"><input type="number" min="0" max="100" step="1" value="${reductionPercent}" data-control="operating-percent" data-department="${department.id}" ${isLocked ? "disabled" : ""}><span>%</span></label>${programsMarkup}${renderOperatingLineItems(department, isLocked)}</div>`;
+    return `<div class="slider-row ${isLocked ? "locked-row" : ""}"><div><label>${department.name}</label><div class="slider-meta">Operating budget: ${money(department.operatingBudget)}${removedOperatingAmount ? ` | Line items removed: ${money(removedOperatingAmount)}` : ""}${readOnly ? " | Read-only" : isLocked ? " | Locked" : ""}</div><div class="slider-meta slider-meta-secondary">New operating budget: <span class="new-operating-budget-value">${money(newOperatingBudget)}</span></div></div><input class="operating-slider" type="range" min="0" max="100" value="${reductionPercent}" data-control="operating" data-department="${department.id}" ${isLocked ? "disabled" : ""}><label class="percent-entry"><input type="number" min="0" max="100" step="1" value="${reductionPercent}" data-control="operating-percent" data-department="${department.id}" ${isLocked ? "disabled" : ""}><span>%</span></label>${programsMarkup}${renderOperatingLineItems(department, isLocked)}</div>`;
   }).join("");
 }
 
 function renderCapital() {
-  $("#capitalControls").innerHTML = budgetData.capitalProjects.map((project) => {
+  $("#capitalControls").innerHTML = budgetData.capitalProjects.filter((project) => reductionEligibleDepartment(departmentById(project.departmentId))).map((project) => {
     state.keptProjects[project.id] ??= true;
     const isLocked = locked(project.departmentId);
     if (isLocked) state.keptProjects[project.id] = true;
@@ -1149,11 +1235,12 @@ function isCapitalExpenseItem(item) {
 }
 
 function operatingExpenseItemsForDepartment(department) {
+  if (!operatingVisibleDepartment(department)) return [];
   return expenseItemsForDepartment(department).filter((item) => !isPersonnelExpenseItem(item) && !isCapitalExpenseItem(item));
 }
 
 function expenseCapitalItems() {
-  return departments().flatMap((department) => expenseItemsForDepartment(department).filter(isCapitalExpenseItem));
+  return departments().filter(reductionEligibleDepartment).flatMap((department) => expenseItemsForDepartment(department).filter(isCapitalExpenseItem));
 }
 
 function expenseItemByKey(key) {
@@ -1170,7 +1257,7 @@ function removedOperatingAmountForDepartment(department) {
 
 function expenseCapitalReductionAmount() {
   return expenseCapitalItems().reduce((total, item) => {
-    if (locked(item.departmentId) || state.keptExpenseCapitalItems[item.expenseKey] !== false) return total;
+    if (!reductionEligibleDepartment(departmentById(item.departmentId)) || locked(item.departmentId) || state.keptExpenseCapitalItems[item.expenseKey] !== false) return total;
     return total + Number(item.amount || 0);
   }, 0);
 }
@@ -1814,6 +1901,7 @@ function scenarioSnapshot() {
     buyoutCounts: state.buyoutCounts,
     buyoutCosts: state.buyoutCosts,
     operatingReductions: state.operatingReductions,
+    bulkOperatingReductionPercent: state.bulkOperatingReductionPercent,
     removedOperatingItems: state.removedOperatingItems,
     keptProjects: state.keptProjects,
     keptExpenseCapitalItems: state.keptExpenseCapitalItems,
@@ -1867,6 +1955,7 @@ function loadScenario() {
   state.buyoutCounts = { ...(saved.data.buyoutCounts || {}) };
   state.buyoutCosts = { ...(saved.data.buyoutCosts || {}) };
   state.operatingReductions = { ...(saved.data.operatingReductions || {}) };
+  state.bulkOperatingReductionPercent = Number(saved.data.bulkOperatingReductionPercent || 0);
   state.removedOperatingItems = { ...(saved.data.removedOperatingItems || {}) };
   state.keptProjects = { ...(saved.data.keptProjects || {}) };
   state.keptExpenseCapitalItems = { ...(saved.data.keptExpenseCapitalItems || {}) };
@@ -1896,7 +1985,10 @@ function resetWorkingScenario() {
   state.buyoutCounts = {};
   state.buyoutCosts = {};
   state.operatingReductions = {};
+  state.bulkOperatingReductionPercent = 0;
+  state.removedOperatingItems = {};
   state.keptProjects = {};
+  state.keptExpenseCapitalItems = {};
   state.lockedDepartments = {};
   state.proposedMillage = budgetData.millageAssumptions.adoptedMillage;
   state.scenarioMeta = { name: "", author: "", notes: "" };
@@ -1966,7 +2058,7 @@ function renderResultingShortfallForecast(totals) {
 
 function reductionRowsForPdf() {
   const impacts = scenarioTotals().departmentImpacts.filter((impact) => !excluded(impact.department) && (impact.fteReduction || impact.buyoutCount || impact.operatingReductionAmount || impact.personnelReduction));
-  const capitalRows = budgetData.capitalProjects.filter((project) => !state.keptProjects[project.id]).map((project) => `<tr><td>${departmentName(project.departmentId)}</td><td>${project.name}</td><td>${money(project.cost)}</td></tr>`).join("") || '<tr><td colspan="3">No capital or equipment projects removed.</td></tr>';
+  const capitalRows = budgetData.capitalProjects.filter((project) => reductionEligibleDepartment(departmentById(project.departmentId)) && !state.keptProjects[project.id]).map((project) => `<tr><td>${departmentName(project.departmentId)}</td><td>${project.name}</td><td>${money(project.cost)}</td></tr>`).join("") || '<tr><td colspan="3">No capital or equipment projects removed.</td></tr>';
   const personnelRows = impacts.filter((impact) => impact.fteReduction || impact.buyoutCount).map((impact) => `<tr><td>${impact.department.name}</td><td>${number(impact.fteReduction)}</td><td>${number(impact.buyoutCount)}</td><td>${money(impact.personnelReduction)}</td><td>${money(impact.buyoutOneTimeCost)}</td></tr>`).join("") || '<tr><td colspan="5">No personnel reductions selected.</td></tr>';
   const operatingRows = impacts.filter((impact) => impact.operatingReductionAmount || impact.removedOperatingAmount).map((impact) => `<tr><td>${impact.department.name}</td><td>${percent(impact.operatingReduction)}</td><td>${money((impact.operatingReductionAmount || 0) + (impact.removedOperatingAmount || 0))}${impact.removedOperatingAmount ? ` <small>(includes ${money(impact.removedOperatingAmount)} removed items)</small>` : ''}</td></tr>`).join("") || '<tr><td colspan="3">No operating reductions selected.</td></tr>';
   const impactRows = scenarioTotals().departmentImpacts.filter((impact) => !excluded(impact.department)).sort(sortDepartments).map((impact) => `<tr><td>${impact.department.name}</td><td>${number(impact.fteReduction)}</td><td>${constitutional(impact.department) ? "" : percent(impact.operatingReduction)}</td><td>${money(impact.personnelReduction)}</td><td>${money((impact.operatingReductionAmount || 0) + (impact.removedOperatingAmount || 0))}</td><td>${money(impact.totalReduction)}</td><td>${impact.locked || constitutional(impact.department) ? "Locked" : "Adjustable"}</td></tr>`).join("");
@@ -2324,18 +2416,22 @@ document.addEventListener("input", (event) => {
   const control = event.target.dataset.control;
   const id = event.target.dataset.department;
   if (control === "fte") {
-    const department = budgetData.departments.find((item) => item.id === id);
+    const department = departmentById(id);
     state.fteReductions[id] = capPublicFte(department, Number(event.target.value || 0));
     updateResults();
   }
   if (control === "buyout-count") {
-    const department = budgetData.departments.find((item) => item.id === id);
+    const department = departmentById(id);
     state.buyoutCounts[id] = capPublicBuyout(department, Number(event.target.value || 0));
     updateResults();
   }
-  if (control === "buyout-cost") { state.buyoutCosts[id] = parseMoney(event.target.value); updateResults(); }
+  if (control === "buyout-cost") {
+    if (!reductionEligibleDepartment(departmentById(id))) return;
+    state.buyoutCosts[id] = parseMoney(event.target.value);
+    updateResults();
+  }
   if (control === "operating") {
-    const department = budgetData.departments.find((item) => item.id === id);
+    const department = departmentById(id);
     const cappedValue = capPublicOperating(department, Number(event.target.value || 0));
     state.operatingReductions[id] = cappedValue;
     if (Number(event.target.value || 0) !== cappedValue) event.target.value = cappedValue;
@@ -2350,7 +2446,7 @@ document.addEventListener("input", (event) => {
     updateResults();
   }
   if (control === "operating-percent") {
-    const department = budgetData.departments.find((item) => item.id === id);
+    const department = departmentById(id);
     const cappedValue = capPublicOperating(department, Number(event.target.value || 0));
     state.operatingReductions[id] = cappedValue;
     if (Number(event.target.value || 0) !== cappedValue) event.target.value = cappedValue;
@@ -2363,6 +2459,11 @@ document.addEventListener("input", (event) => {
     if (newBudget) newBudget.textContent = money(Math.max(department.operatingBudget - removedOperatingAmountForDepartment(department), 0) * (1 - cappedValue / 100));
 
     updateResults();
+  }
+  if (control === "bulk-operating-percent") {
+    const value = Math.min(Math.max(Number(event.target.value || 0), 0), 100);
+    state.bulkOperatingReductionPercent = value;
+    if (Number(event.target.value || 0) !== value) event.target.value = value;
   }
   if (control === "revenue-assumption" && isStaffMode) {
     updateRevenueAssumptionFromInput(event.target);
@@ -2389,6 +2490,7 @@ document.addEventListener("change", (event) => {
   const control = event.target.dataset.control;
   if (control === "capital") {
     const project = budgetData.capitalProjects.find((item) => item.id === event.target.dataset.project);
+    if (!project || !reductionEligibleDepartment(departmentById(project.departmentId))) return;
     const removing = !event.target.checked;
     if (!isStaffMode && removing && project.cost > availableShortfallExcluding("capital", project.id)) {
       state.keptProjects[project.id] = true;
@@ -2401,7 +2503,7 @@ document.addEventListener("change", (event) => {
   if (control === "expense-capital") {
     const item = expenseItemByKey(event.target.dataset.item);
     const removing = !event.target.checked;
-    if (!item) return;
+    if (!item || !reductionEligibleDepartment(departmentById(item.departmentId))) return;
     if (!isStaffMode && removing && Number(item.amount || 0) > availableShortfallExcluding("capital", item.expenseKey)) {
       state.keptExpenseCapitalItems[item.expenseKey] = true;
       event.target.checked = true;
@@ -2443,6 +2545,7 @@ document.addEventListener("click", (event) => {
   if (control === "clear-operating") {
     state.operatingReductions = {};
     state.removedOperatingItems = {};
+    state.bulkOperatingReductionPercent = 0;
     renderOperating();
     updateResults();
   }
@@ -2479,9 +2582,20 @@ document.addEventListener("click", (event) => {
   if (control === "delete-scenario") deleteScenario();
   if (control === "reset-scenario") resetWorkingScenario();
   if (control === "reset-millage" && isStaffMode) { state.proposedMillage = budgetData.millageAssumptions.adoptedMillage; updateResults(); }
+  if (control === "apply-bulk-operating") {
+    const value = Math.min(Math.max(Number(state.bulkOperatingReductionPercent || 0), 0), 100);
+    state.bulkOperatingReductionPercent = value;
+    departments()
+      .filter((department) => operatingEditableDepartment(department) && department.operatingBudget > 0 && !locked(department.id))
+      .forEach((department) => {
+        state.operatingReductions[department.id] = value;
+      });
+    renderOperating();
+    updateResults();
+  }
   if (control === "toggle-operating-item") {
     const item = expenseItemByKey(button.dataset.item);
-    if (!item) return;
+    if (!item || !operatingEditableDepartment(departmentById(item.departmentId))) return;
     const openDetail = button.closest(".operating-line-detail");
     if (openDetail?.dataset.department) state.operatingDetailOpen[openDetail.dataset.department] = openDetail.open;
     const removing = !state.removedOperatingItems[item.expenseKey];

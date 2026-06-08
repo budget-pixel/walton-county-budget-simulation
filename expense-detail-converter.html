@@ -84,11 +84,11 @@
     const codeToCategory = Object.fromEntries(Object.entries(categoryMap).flatMap(([category, codes]) => codes.map((code) => [code, category])));
     const requiredColumns = {
       proposal: ["proposal"],
-      projectName: ["project name name", "project name", "name"],
       type: ["type"],
       accountCode: ["account code", "accountcode"],
       accountName: ["account name", "accountname"],
       description: ["description"],
+      itemization: ["period 1 itemizations", "period 1 itemization", "itemizations", "itemization"],
       amount: ["period 1 proposed", "2027 proposed budget", "proposed budget", "amount"]
     };
     const categoryForCode = (code) => codeToCategory[String(code || "").trim()] || "Uncategorized";
@@ -163,12 +163,31 @@
 
       const fields = mapFields(rows[0], requiredColumns);
       const missing = Object.entries(fields)
-        .filter(([, column]) => column < 0)
+        .filter(([field, column]) => field !== "itemization" && column < 0)
         .map(([field]) => field);
 
       if (missing.length) throw new Error(`Missing required columns: ${missing.join(", ")}.`);
 
       const departments = new Map();
+
+      const rowsWithItemizations = new Set();
+      rows.slice(1).forEach((row) => {
+        const rawProposal = String(row[fields.proposal] || "").trim();
+        if (!rawProposal) return;
+        if (shouldExcludeDepartment(rawProposal)) return;
+
+        const proposal = normalizeProposalForGrouping(rawProposal);
+        const accountCode = String(row[fields.accountCode] ?? "")
+          .replace(/\.0$/, "")
+          .replace(/[^0-9]/g, "")
+          .trim();
+        const itemizationAmount = fields.itemization >= 0 ? parseMoney(row[fields.itemization]) : 0;
+
+        if (proposal && accountCode && itemizationAmount) {
+          rowsWithItemizations.add(`${proposal}::${accountCode}`);
+        }
+      });
+
       const unmatchedCodes = new Set();
 
       rows.slice(1).forEach((row) => {
@@ -185,7 +204,14 @@
         // Ignore non-expense accounts that begin with 3.
         if (accountCode.startsWith("3")) return;
 
-        const amount = parseMoney(row[fields.amount]);
+        const proposedAmount = parseMoney(row[fields.amount]);
+        const itemizationAmount = fields.itemization >= 0 ? parseMoney(row[fields.itemization]) : 0;
+        const hasItemizedRowsForCode = rowsWithItemizations.has(`${proposal}::${accountCode}`);
+
+        // If an object-code line has itemizations, skip the blank total row and use only itemization rows.
+        if (hasItemizedRowsForCode && !itemizationAmount) return;
+
+        const amount = itemizationAmount || proposedAmount;
         if (!amount) return;
 
         const category = categoryForCode(accountCode);
@@ -193,15 +219,15 @@
 
         const item = {
           proposal,
-          projectName: String(row[fields.projectName] || "").trim(),
           type: String(row[fields.type] || "").trim(),
           accountCode,
           accountName: String(row[fields.accountName] || "").trim(),
           description: String(row[fields.description] || "").trim(),
+          itemization: itemizationAmount,
+          proposedAmount,
           amount,
           category
         };
-
         if (!departments.has(proposal)) {
           departments.set(proposal, {
             department: proposal,
