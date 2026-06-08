@@ -16,7 +16,8 @@ function normalizeBootstrapDepartmentId(value) {
     "probation": "probation-services",
     "environmental-resources": "environmental-services",
     "building-construction-maintenance": "building-construction-and-maintenance",
-    "purchasing": "procurement"
+    "purchasing": "procurement",
+    "walton-county-health-department": "health-department"
   };
 
   return aliases[normalized] || normalized;
@@ -44,6 +45,34 @@ function bootstrapArray(value) {
   return Object.entries(value)
     .filter(([, item]) => item && typeof item === "object")
     .map(([departmentId, item]) => ({ departmentId, ...item }));
+}
+
+function valueFromRecordFields(record, fieldNames) {
+  const fields = Array.isArray(fieldNames) ? fieldNames : [fieldNames];
+  const normalizedRecordEntries = Object.entries(record || {}).map(([key, value]) => [
+    String(key || "")
+      .trim()
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim(),
+    value
+  ]);
+
+  for (const field of fields) {
+    const normalizedField = String(field || "")
+      .trim()
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    const match = normalizedRecordEntries.find(([key, value]) => key === normalizedField && value !== undefined && value !== null && value !== "");
+    if (match) return match[1];
+  }
+
+  return undefined;
 }
 
 function bootstrapExpenseDepartmentId(detail) {
@@ -83,24 +112,24 @@ function bootstrapDepartmentMetaMap(globalNames, valueFields) {
   names.forEach((globalName) => {
     bootstrapArray(window[globalName]).forEach((record) => {
       const id = normalizeBootstrapDepartmentId(
-        record.departmentId ||
-        record.id ||
-        record.department ||
-        record.departments ||
-        record.Department ||
-        record.Departments ||
-        record.departmentName ||
-        record["Department Name"] ||
-        record.Dept ||
-        record.dept ||
-        record.name
+        valueFromRecordFields(record, [
+          "departmentId",
+          "id",
+          "department",
+          "departments",
+          "Department",
+          "Departments",
+          "departmentName",
+          "Department Name",
+          "Dept",
+          "dept",
+          "name"
+        ])
       );
 
       if (!id) return;
 
-      const rawValue = fields
-        .map((field) => record[field])
-        .find((value) => value !== undefined && value !== null && value !== "");
+      const rawValue = valueFromRecordFields(record, fields);
 
       const numericValue = Number(String(rawValue ?? 0).replace(/[^0-9.-]/g, "")) || 0;
       map.set(id, numericValue);
@@ -117,8 +146,8 @@ function buildBudgetDataFallback() {
     ["fteCount", "FTE", "fte", "Fte", "fteTotal", "FTE Count", "FTECount", "fte_count", "FTEs", "ftes"]
   );
   const adValoremMap = bootstrapDepartmentMetaMap(
-    ["wcDepartmentAdValoremSupport", "departmentAdValoremSupport", "wcAdValoremSupport"],
-    ["adValoremSupport", "Ad Valorem Support", "adValorem", "Ad Valorem", "propertyTaxSupport", "Property Tax Support", "support"]
+    ["wcDepartmentAdValoremSupport", "departmentAdValoremSupport", "departmentAdValorem", "wcDepartmentAdValorem", "wcAdValoremSupport", "adValoremSupport"],
+    ["adValoremSupport", "Ad Valorem Support", "Ad Valorem Support ", "adValorem", "Ad Valorem", "propertyTaxSupport", "Property Tax Support", "support"]
   );
 
   const departments = expenseDetails.map((detail) => {
@@ -276,7 +305,15 @@ function hideExpenseDetailForDepartment(department) {
     "clerk-of-court",
     "clerk-and-comptroller",
     "sheriffs-office",
-    "sheriff-s-office"
+    "sheriff-s-office",
+    "south-walton-fire-district",
+    "public-defender",
+    "circuit-court",
+    "county-court",
+    "medical-examiner",
+    "health-department",
+    "statutory-and-other-agency-funding",
+    "statutory-other-agency-funding"
   ]);
 
   return (
@@ -287,7 +324,55 @@ function hideExpenseDetailForDepartment(department) {
     name.includes("supervisor of elections") ||
     name.includes("clerk of court") ||
     name.includes("clerk and comptroller") ||
-    name.includes("sheriff")
+    name.includes("sheriff") ||
+    name.includes("south walton fire") ||
+    name.includes("public defender") ||
+    name.includes("circuit court") ||
+    name.includes("county court") ||
+    name.includes("medical examiner") ||
+    name.includes("health department") ||
+    (name.includes("statutory") && name.includes("agency funding"))
+  );
+}
+
+function useListMetricsForDepartment(department) {
+  const id = normalizeBootstrapDepartmentId(
+    department?.id || department?.departmentId || department?.name
+  );
+  const name = String(
+    department?.name || department?.department || ""
+  ).toLowerCase();
+
+  return (
+    constitutional(department) ||
+    id === "sheriffs-office" ||
+    id === "sheriff-s-office" ||
+    id === "property-appraiser" ||
+    id === "supervisor-of-elections" ||
+    id === "clerk-of-court" ||
+    id === "clerk-and-comptroller" ||
+    id === "tax-collector" ||
+    id === "south-walton-fire-district" ||
+    id === "public-defender" ||
+    id === "circuit-court" ||
+    id === "county-court" ||
+    id === "medical-examiner" ||
+    id === "health-department" ||
+    id === "statutory-and-other-agency-funding" ||
+    id === "statutory-other-agency-funding" ||
+    name.includes("sheriff") ||
+    name.includes("property appraiser") ||
+    name.includes("supervisor of elections") ||
+    name.includes("clerk of court") ||
+    name.includes("clerk and comptroller") ||
+    name.includes("tax collector") ||
+    name.includes("south walton fire") ||
+    name.includes("public defender") ||
+    name.includes("circuit court") ||
+    name.includes("county court") ||
+    name.includes("medical examiner") ||
+    name.includes("health department") ||
+    (name.includes("statutory") && name.includes("agency funding"))
   );
 }
 
@@ -530,6 +615,31 @@ function renderChrome() {
       .department-side-grid .detail-item strong {
         font-size: 1rem;
         line-height: 1.2;
+      }
+
+      .department-side-metric-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .department-side-metric-list .detail-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+      }
+
+      .department-side-metric-list .detail-item span {
+        font-size: 0.74rem;
+        line-height: 1.2;
+      }
+
+      .department-side-metric-list .detail-item strong {
+        margin-top: 0;
+        font-size: 0.98rem;
+        line-height: 1.2;
+        text-align: right;
       }
 
       #departmentTable thead,
@@ -1384,23 +1494,26 @@ function renderDepartments() {
     </div>
     ${description ? `<p class="department-service-description department-side-description">${escapeHtml(description)}</p>` : ""}
     <div class="department-primary-metric"><span>${budgetYear ? "FY2027 Ad Valorem Support" : "Ad Valorem Support"}</span><strong>${money(budgetYear ? departmentSupport(selectedDepartment) : record?.adValoremSupport || 0)}</strong></div>
-    <div class="detail-grid department-side-grid">${
+    ${
       budgetYear
-        ? detail("Personnel Budget", selectedDepartment.personnelBudget)
-          + detail("Operating Budget", selectedDepartment.operatingBudget)
-          + detail("Capital Budget", selectedDepartment.capitalBudget)
-          + detail("Total Budget", selectedDepartment.totalBudget)
-          + detail("FTE Count", selectedDepartment.fteCount, number)
-          + (!constitutional(selectedDepartment) && selectedDepartment.name !== "Board of County Commissioners"
+        ? `<div class="${useListMetricsForDepartment(selectedDepartment) ? "department-side-metric-list" : "detail-grid department-side-grid"}">
+            ${Number(selectedDepartment.personnelBudget || 0) > 0 ? detail("Personnel Budget", selectedDepartment.personnelBudget) : ""}
+            ${Number(selectedDepartment.operatingBudget || 0) > 0 ? detail("Operating Budget", selectedDepartment.operatingBudget) : ""}
+            ${Number(selectedDepartment.capitalBudget || 0) > 0 ? detail("Capital Budget", selectedDepartment.capitalBudget) : ""}
+            ${Number(selectedDepartment.totalBudget || 0) > 0 ? detail("Total Budget", selectedDepartment.totalBudget) : ""}
+            ${Number(selectedDepartment.fteCount || 0) > 0 ? detail("FTE Count", selectedDepartment.fteCount, number) : ""}
+            ${(!useListMetricsForDepartment(selectedDepartment) && selectedDepartment.name !== "Board of County Commissioners" && Number(selectedDepartment.fteCount || 0) > 0)
               ? detail("Average Personnel Cost", fteCost(selectedDepartment))
-              : "")
-        : record
+              : ""}
+          </div>`
+        : `<div class="detail-grid department-side-grid">${record
           ? detail("Gross Expense", record.grossExpense)
             + detail("Department Revenue", record.departmentRevenue)
             + detail("Net Expense", record.netExpense)
             + detail("Ad Valorem Support", record.adValoremSupport)
           : '<p class="historical-note">No historical record is available for this department and fiscal year.</p>'
-    }</div>
+        }</div>`
+    }
     ${hideExpenseDetailForDepartment(selectedDepartment) ? "" : renderExpenseDetail(selectedDepartment)}
     ${renderDepartmentServices(selectedDepartment.id)}
   `;
