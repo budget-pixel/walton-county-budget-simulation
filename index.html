@@ -236,6 +236,7 @@
             </div>
           </div>
           <div id="staffRevenueControls" class="scenario-meta-grid staff-revenue-controls"></div>
+          <div id="buyoutAssumptionSettings" class="panel-inline-section"></div>
           <hr>
           <div class="scenario-meta-grid">
             <label><span>Scenario Name</span><input id="scenarioName" type="text" data-control="scenario-meta" data-field="name" placeholder="FY2027 Planning Scenario"></label>
@@ -252,19 +253,31 @@
           <p id="scenarioMessage" class="small-status"></p>
           <div id="scenarioComparison" class="comparison-grid"></div>
           <hr>
-          <section class="staff-converter-panel" aria-label="Service area converter">
+          <section class="staff-converter-panel" aria-label="Data converters">
             <div class="panel-header compact-header">
               <div>
-                <p class="eyebrow">Service Data</p>
-                <h3>Use the Converters below to generate new data.js for the model</h3>
+                <p class="eyebrow">Data Converters</p>
+                <h3>Prepare App Data Files</h3>
               </div>
             </div>
-            <p class="small-status">Open a converter to prepare app-ready service or expense detail data.</p>
-            <div class="converter-button-row">
-              <button type="button" class="view-all-button" data-control="open-service-converter">Open Service Converter</button>
-              <button type="button" class="view-all-button" data-control="open-expense-converter">Open Expense Detail Converter</button>
-              <button type="button" class="view-all-button" data-control="open-fte-converter">Open FTE Converter</button>
-              <button type="button" class="view-all-button" data-control="open-ad-valorem-converter">Open Ad Valorem Support Converter</button>
+            <p class="small-status">Use these tools to convert budget exports into app-ready data files.</p>
+            <div class="converter-grid">
+              <button type="button" class="view-all-button converter-card-button" data-control="open-service-converter">
+                <span>Service Data</span>
+                <strong>Service Converter</strong>
+              </button>
+              <button type="button" class="view-all-button converter-card-button" data-control="open-expense-converter">
+                <span>Expense Detail</span>
+                <strong>Expense Detail Converter</strong>
+              </button>
+              <button type="button" class="view-all-button converter-card-button" data-control="open-fte-converter">
+                <span>Staffing</span>
+                <strong>FTE Converter</strong>
+              </button>
+              <button type="button" class="view-all-button converter-card-button" data-control="open-ad-valorem-converter">
+                <span>Property Tax Support</span>
+                <strong>Ad Valorem Support Converter</strong>
+              </button>
             </div>
           </section>
           <hr>
@@ -310,17 +323,14 @@
               </div>
             </div>
             <div id="personnelCostFactorsInline" class="personnel-driver-inline"></div>
-            <div id="buyoutAssumptionSettings" class="panel-inline-section"></div>
             <div class="table-scroll">
               <table>
                 <thead>
                   <tr>
                     <th>Department</th>
                     <th>Current FTE</th>
-                    <th>Average Cost Per FTE</th>
                     <th>FTE Reduction</th>
                     <th>Buy-Out Count</th>
-                    <th>One-Time Buy-Out Cost</th>
                     <th>Recurring Reduction</th>
                     <th>First-Year Net Impact</th>
                   </tr>
@@ -357,17 +367,16 @@
           </article>
 
           <article class="panel">
-            <div class="panel-header">
+            <div class="panel-header impact-toggle-card" data-control="toggle-impact-table" role="button" tabindex="0">
               <div>
                 <p class="eyebrow">Scenario Reductions</p>
                 <h3>Department Impact Table</h3>
               </div>
               <div class="button-row">
-                <button type="button" class="view-all-button" data-control="toggle-impact-table">View All</button>
-                <button type="button" class="view-all-button" data-control="export-impact">Export</button>
+                                <button type="button" class="view-all-button" data-control="export-impact">Export</button>
               </div>
             </div>
-            <div class="table-scroll collapsed-table" id="impactTableWrap">
+            <div class="table-scroll collapsed-table" id="impactTableWrap" hidden>
               <table>
                 <thead>
                   <tr>

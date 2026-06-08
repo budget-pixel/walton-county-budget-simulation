@@ -17,7 +17,10 @@ function normalizeBootstrapDepartmentId(value) {
     "environmental-resources": "environmental-services",
     "building-construction-maintenance": "building-construction-and-maintenance",
     "purchasing": "procurement",
-    "walton-county-health-department": "health-department"
+    "walton-county-health-deparment": "health-department",
+    "walton-county-health-department": "health-department",
+    "south-walton-fire-district": "south-walton-fire-and-state-control",
+    "south-walton-fire-state-control": "south-walton-fire-and-state-control"
   };
 
   return aliases[normalized] || normalized;
@@ -79,8 +82,19 @@ function bootstrapExpenseDepartmentId(detail) {
   return normalizeBootstrapDepartmentId(detail?.departmentId || detail?.id || detail?.department || detail?.proposal || detail?.name);
 }
 
+
 function bootstrapExpenseDepartmentName(detail) {
   return String(detail?.department || detail?.proposal || detail?.name || detail?.departmentId || detail?.id || "Department").trim();
+}
+
+// Exclude non-department total rows such as "Total Ad Valorem Rev"
+function bootstrapExcludedDepartmentRecord(detail) {
+  const id = normalizeBootstrapDepartmentId(detail?.departmentId || detail?.id || detail?.department || detail?.proposal || detail?.name);
+  const name = String(detail?.department || detail?.proposal || detail?.name || detail?.departmentId || detail?.id || "").toLowerCase();
+
+  return id === "total-ad-valorem-rev" ||
+    name.includes("total ad valorem rev") ||
+    name.includes("total ad valorem revenue");
 }
 
 function bootstrapExpenseItems(detail) {
@@ -150,7 +164,7 @@ function buildBudgetDataFallback() {
     ["adValoremSupport", "Ad Valorem Support", "Ad Valorem Support ", "adValorem", "Ad Valorem", "propertyTaxSupport", "Property Tax Support", "support"]
   );
 
-  const departments = expenseDetails.map((detail) => {
+  const departments = expenseDetails.filter((detail) => !bootstrapExcludedDepartmentRecord(detail)).map((detail) => {
     const id = bootstrapExpenseDepartmentId(detail);
     const items = bootstrapExpenseItems(detail);
     const personnelBudget = items.reduce((total, item) => total + (bootstrapBudgetTypeForExpense(item) === "personnel" ? Number(item.amount || 0) : 0), 0);
@@ -891,7 +905,7 @@ function renderStaffRevenueControls() {
   container.innerHTML = `
     <label><span>Revenue Growth</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureRevenueGrowthRate * 100}" data-control="revenue-assumption" data-assumption="futureRevenueGrowthRate"></label>
     <label><span>Baseline Revenue</span><input type="text" value="${wholeMoneyInput(state.revenueAssumptions.baselineRevenue)}" data-control="revenue-assumption" data-assumption="baselineRevenue" data-format="currency"></label>
-    <label><span>FY2029+ Annaul Service Cost Growth</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureExpenseInflationRate * 100}" data-control="revenue-assumption" data-assumption="futureExpenseInflationRate"></label>
+    <label><span>Annual Cost Growth</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureExpenseInflationRate * 100}" data-control="revenue-assumption" data-assumption="futureExpenseInflationRate"></label>
     <label><span>Baseline Expense</span><input type="text" value="${wholeMoneyInput(state.revenueAssumptions.baselineExpense)}" data-control="revenue-assumption" data-assumption="baselineExpense" data-format="currency"></label>
     <label><span>FY2028 Revenue Reduction</span><input type="text" value="${wholeMoneyInput(state.revenueAssumptions.fy2028RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2028RevenueReduction" data-format="currency"></label>
     <label><span>Rollback Rate</span><input type="number" step="0.0001" value="${Number(rollbackValue || 0).toFixed(4)}" data-control="revenue-assumption" data-assumption="rollbackRate" data-format="millage"></label>
@@ -951,7 +965,8 @@ function renderPersonnel() {
     if (isLocked) { state.fteReductions[department.id] = 0; state.buyoutCounts[department.id] = 0; }
     const recurring = (Number(state.fteReductions[department.id] || 0) + Number(state.buyoutCounts[department.id] || 0)) * averageCost;
     const oneTime = Number(state.buyoutCounts[department.id] || 0) * Number(state.buyoutCosts[department.id] || 0);
-    return `<tr class="${isLocked ? "locked-row" : ""}"><td><strong>${department.name}</strong>${isLocked ? "<small>Locked</small>" : ""}</td><td>${number(department.fteCount)}</td><td>${money(averageCost)}</td><td><input type="number" step="0.5" min="0" max="${department.fteCount}" value="${state.fteReductions[department.id] || 0}" data-control="fte" data-department="${department.id}" ${isLocked ? "disabled" : ""}></td><td><input type="number" step="1" min="0" max="${department.fteCount}" value="${state.buyoutCounts[department.id] || 0}" data-control="buyout-count" data-department="${department.id}" ${isLocked ? "disabled" : ""}></td><td><input type="text" value="${moneyInput(state.buyoutCosts[department.id])}" data-control="buyout-cost" data-department="${department.id}" ${isLocked ? "disabled" : ""}></td><td>${money(recurring)}</td><td>${money(recurring - oneTime)}</td></tr>`;
+    // Removed One-Time Buy-Out Cost column and its input cell
+    return `<tr class="${isLocked ? "locked-row" : ""}"><td><strong>${department.name}</strong>${isLocked ? "<small>Locked</small>" : ""}</td><td>${Number(department.fteCount || 0) > 0 ? number(department.fteCount) : ""}</td><td><input type="number" step="0.5" min="0" max="${department.fteCount}" value="${state.fteReductions[department.id] || 0}" data-control="fte" data-department="${department.id}" ${isLocked ? "disabled" : ""}></td><td><input type="number" step="1" min="0" max="${department.fteCount}" value="${state.buyoutCounts[department.id] || 0}" data-control="buyout-count" data-department="${department.id}" ${isLocked ? "disabled" : ""}></td><td>${money(recurring)}</td><td>${money(recurring - oneTime)}</td></tr>`;
   }).join("");
 }
 
@@ -1016,7 +1031,7 @@ function renderRankings() {
   const rankingCards = $("#rankingCards");
   if (rankingCards) rankingCards.innerHTML = "";
   const rankingTable = $("#rankingTable");
-  if (rankingTable) rankingTable.innerHTML = rows.map((row) => `<tr><td>${row.name}</td><td>${money(row.support)}</td><td>${number(row.fte)}</td><td>${money(row.budget)}</td></tr>`).join("");
+  if (rankingTable) rankingTable.innerHTML = rows.map((row) => `<tr><td>${row.name}</td><td>${money(row.support)}</td><td>${Number(row.fte || 0) > 0 ? number(row.fte) : ""}</td><td>${money(row.budget)}</td></tr>`).join("");
   const rankingTableWrap = $("#rankingTableWrap");
   if (rankingTableWrap) rankingTableWrap.hidden = true;
 }
@@ -1455,14 +1470,15 @@ function diagnosticDepartmentRowsFromGlobal(globalNames) {
       record.name
     );
     const name = String(record.department || record.Department || record.departmentName || record["Department Name"] || record.name || record.departments || record.Departments || id || "Department").trim();
-    return id ? { id, name } : null;
+    if (!id || id === "total-ad-valorem-rev" || name.toLowerCase().includes("total ad valorem")) return null;
+    return { id, name };
   }).filter(Boolean));
 }
 
 function expectedDiagnosticDepartments() {
   const map = new Map();
   const addDepartment = (department) => {
-    if (!department?.id) return;
+    if (!department?.id || department.id === "total-ad-valorem-rev" || String(department.name || "").toLowerCase().includes("total ad valorem")) return;
     const existing = map.get(department.id) || {};
     map.set(department.id, {
       ...existing,
@@ -1493,10 +1509,28 @@ function departmentExemptFromFteDiagnostic(department) {
   const id = normalizeBootstrapDepartmentId(department?.id || department?.departmentId || department?.name);
   const name = String(department?.name || department?.department || "").toLowerCase();
   return id === "capital-projects" ||
+    id === "circuit-court" ||
+    id === "county-court" ||
+    id === "medical-examiner" ||
+    id === "public-defender" ||
+    id === "south-walton-fire-and-state-control" ||
+    id === "south-walton-fire-district" ||
+    id === "state-attorney" ||
+    id === "total-ad-valorem-rev" ||
+    id === "walton-county-health-department" ||
+    id === "health-department" ||
     id === "statutory-and-other-agency-funding" ||
     id === "statutory-other-agency-funding" ||
-    name.includes("capital projects") ||
-    name.includes("statutory") && name.includes("agency funding");
+    name.includes("circuit court") ||
+    name.includes("county court") ||
+    name.includes("medical examiner") ||
+    name.includes("public defender") ||
+    name.includes("south walton fire") ||
+    name.includes("state attorney") ||
+    name.includes("total ad valorem") ||
+    name.includes("walton county health department") ||
+    name.includes("health department") ||
+    (name.includes("statutory") && name.includes("agency funding"));
 }
 
 function departmentExemptFromServiceDiagnostic(department) {
@@ -1516,22 +1550,34 @@ function departmentExemptFromServiceDiagnostic(department) {
     id === "state-attorney" ||
     id === "total-ad-valorem-rev" ||
     id === "veteran-services" ||
-    id === "walton-county-health-deparment" ||
     id === "walton-county-health-department" ||
     id === "health-department" ||
+    id === "circuit-court" ||
+    id === "county-court" ||
+    id === "medical-examiner" ||
+    id === "property-appraiser" ||
+    id === "public-defender" ||
+    id === "supervisor-of-elections" ||
+    id === "tax-collector" ||
     (name.includes("statutory") && name.includes("agency funding")) ||
     name.includes("clerk of courts") ||
     name.includes("clerk of court") ||
-    name.includes("clerk") && name.includes("comptroller") ||
+    (name.includes("clerk") && name.includes("comptroller")) ||
     name.includes("court technology") ||
     name.includes("sheriff") ||
     name.includes("south walton fire") ||
     name.includes("state attorney") ||
     name.includes("total ad valorem") ||
     name.includes("veteran services") ||
-    name.includes("walton county health deparment") ||
     name.includes("walton county health department") ||
-    name.includes("health department");
+    name.includes("health department") ||
+    name.includes("circuit court") ||
+    name.includes("county court") ||
+    name.includes("medical examiner") ||
+    name.includes("property appraiser") ||
+    name.includes("public defender") ||
+    name.includes("supervisor of elections") ||
+    name.includes("tax collector");
 }
 
 function serviceCoverageAudit() {
@@ -1558,7 +1604,6 @@ function serviceCoverageAudit() {
     "state-attorney-facility",
     "total-ad-valorem-rev",
     "veteran-services",
-    "walton-county-health-deparment",
     "walton-county-health-department",
     "health-department"
   ]);
@@ -1677,7 +1722,7 @@ function renderDepartments() {
       const support = budgetYear ? departmentSupport(department) : record?.adValoremSupport || 0;
       const budget = budgetYear ? department.totalBudget : record?.grossExpense || 0;
       const selected = department.id === state.selectedDepartmentId;
-      return `<tr class="${constitutional(department) ? "constitutional-row" : ""} ${selected ? "selected-row" : ""}"><td><button type="button" class="table-link-button" data-control="select-department" data-department="${department.id}">${department.name}</button></td><td>${money(support)}</td><td>${money(budget)}</td><td>${number(department.fteCount)}</td></tr>`;
+      return `<tr class="${constitutional(department) ? "constitutional-row" : ""} ${selected ? "selected-row" : ""}"><td><button type="button" class="table-link-button" data-control="select-department" data-department="${department.id}">${department.name}</button></td><td>${money(support)}</td><td>${money(budget)}</td><td>${Number(department.fteCount || 0) > 0 ? number(department.fteCount) : ""}</td></tr>`;
     }).join("") || '<tr><td colspan="4">No departments match the current search.</td></tr>';
   }
 
@@ -1973,8 +2018,7 @@ function renderImpact() {
 
   $("#impactTable").innerHTML = departmentRows + totalRow;
   $("#impactTableWrap").hidden = !state.showImpactTable;
-  $('[data-control="toggle-impact-table"]').textContent = state.showImpactTable ? "Show Less" : "View All";
-  $("#validationWarnings").innerHTML = isStaffMode ? `<p>${Object.values(state.lockedDepartments).filter(Boolean).length} departments locked. Staff mode can exceed the shortfall and will label any surplus as Modeled Surplus.</p>` : "";
+    $("#validationWarnings").innerHTML = isStaffMode ? `<p>${Object.values(state.lockedDepartments).filter(Boolean).length} departments locked. Staff mode can exceed the shortfall and will label any surplus as Modeled Surplus.</p>` : "";
 }
 
 function renderMillage() {
@@ -2633,9 +2677,6 @@ document.addEventListener("input", (event) => {
   const control = event.target.dataset.control;
   const id = event.target.dataset.department;
   if (control === "fte") {
-    const department = departmentById(id);
-    state.fteReductions[id] = capPublicFte(department, Number(event.target.value || 0));
-    render();
     return;
   }
   if (control === "buyout-count") {
@@ -2724,6 +2765,13 @@ document.addEventListener("input", (event) => {
 
 document.addEventListener("change", (event) => {
   const control = event.target.dataset.control;
+  if (control === "fte") {
+    const id = event.target.dataset.department;
+    const department = departmentById(id);
+    state.fteReductions[id] = capPublicFte(department, Number(event.target.value || 0));
+    render();
+    return;
+  }
   if (control === "capital") {
     const project = budgetData.capitalProjects.find((item) => item.id === event.target.dataset.project);
     if (!project || !reductionEligibleDepartment(departmentById(project.departmentId))) return;
@@ -2756,6 +2804,11 @@ document.addEventListener("change", (event) => {
   if (control === "service-csv") { importServiceCsv(event.target.files?.[0]); }
   if (control === "revenue-assumption" && isStaffMode) { updateRevenueAssumptionFromInput(event.target); }
 });
+
+function activateControlElement(controlElement) {
+  if (!controlElement) return;
+  controlElement.click();
+}
 
 document.addEventListener("click", (event) => {
   const button = event.target.closest("[data-control]");
@@ -2853,6 +2906,17 @@ document.addEventListener("click", (event) => {
     updateResults();
   }
   if (control === "select-department") { state.selectedDepartmentId = button.dataset.department; renderDepartments(); }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+
+  const impactToggleCard = event.target.closest?.(".impact-toggle-card");
+  if (!impactToggleCard) return;
+
+  event.preventDefault();
+  state.showImpactTable = !state.showImpactTable;
+  renderImpact();
 });
 
 document.addEventListener("toggle", (event) => {
