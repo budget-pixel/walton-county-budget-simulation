@@ -409,7 +409,7 @@ const operatingEditableDepartment = (department) => {
   ]);
 
   if (operatingOnlyDepartments.has(id)) {
-    return true;
+    return isStaffMode;
   }
 
   return reductionEligibleDepartment(department);
@@ -1163,7 +1163,7 @@ function renderPersonnel() {
         <td>${money(countyPersonnelReduction)}</td>
       </tr>
       <tr class="locked-row">
-        <td><strong>Board of County Commissioners</strong><small>County departments total</small></td>
+        <td><strong>Board of County Commissioners</strong></td>
         <td>${number(countyFteTotal)}</td>
         <td></td>
         <td></td>
@@ -1172,7 +1172,7 @@ function renderPersonnel() {
       </tr>
       ${publicOfficeRows.map((department) => `
         <tr class="locked-row">
-          <td><strong>${department.name}</strong><small>Listed separately</small></td>
+          <td><strong>${department.name}</strong></td>
           <td>${Number(department.fteCount || 0) > 0 ? number(department.fteCount) : ""}</td>
           <td></td>
           <td></td>
