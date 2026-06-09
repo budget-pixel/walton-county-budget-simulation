@@ -260,19 +260,18 @@
                 <h3>Prepare App Data Files</h3>
               </div>
             </div>
-            <p class="small-status">Use these tools to convert budget exports into app-ready data files.</p>
             <div class="converter-grid">
               <button type="button" class="view-all-button converter-card-button" data-control="open-service-converter">
-                <span>Service Data</span>
                 <strong>Service Converter</strong>
               </button>
               <button type="button" class="view-all-button converter-card-button" data-control="open-fte-converter">
-                <span>Staffing</span>
                 <strong>FTE Converter</strong>
               </button>
               <button type="button" class="view-all-button converter-card-button" data-control="open-ad-valorem-converter">
-                <span>Property Tax Support</span>
                 <strong>Ad Valorem Support Converter</strong>
+              </button>
+              <button type="button" class="view-all-button converter-card-button" data-control="open-expense-detail-converter">
+                <strong>Expense Detail Converter</strong>
               </button>
             </div>
           </section>
@@ -460,7 +459,7 @@
             <div class="metric-box"><span>Vs Current Millage <button class="info-button" type="button" aria-label="Revenue difference help" data-tip="Revenue difference shows how much more or less Property Tax revenue the proposed millage would generate compared with the selected reference point, such as current millage or the rollback revenue target.">i</button></span><strong id="millageRevenueImpact"></strong></div>
             <div class="metric-box"><span>Vs Rollback Revenue <button class="info-button" type="button" aria-label="Revenue difference help" data-tip="Revenue difference shows how much more or less Property Tax revenue the proposed millage would generate compared with the selected reference point, such as current millage or the rollback revenue target.">i</button></span><strong id="rollbackRevenueImpact"></strong></div>
             <div class="metric-box"><span>Resulting Shortfall</span><strong id="millageShortfallImpact"></strong></div>
-            <div class="metric-box"><span>2026 Annual Property Tax Savings per Taxable Value</span><div id="taxpayerImpactTiers" class="taxpayer-impact-tiers"></div><small><em>Annual reduction by taxable value tier.</em></small></div>
+            <div class="metric-box"><span>2026 Annual Property Tax Savings per Taxable Value</span><div id="taxpayerImpactTiers" class="taxpayer-impact-tiers"></div><small><em>Amounts will be populated when the proposed millage is entered.</em></small></div>
           </div>
         </article>
         <article class="panel property-tax-breakdown-panel">
