@@ -387,14 +387,33 @@ function departmentExcludedFromReductionControls(department) {
 }
 
 const reductionEligibleDepartment = (department) => department && !excluded(department) && !constitutional(department) && !departmentExcludedFromReductionControls(department);
-const operatingVisibleDepartment = (department) => operatingEditableDepartment(department) || boardOfCountyCommissioners(department);
+const operatingVisibleDepartment = (department) => {
+  const id = normalizeBootstrapDepartmentId(
+    department?.id || department?.departmentId || department?.name
+  );
+
+  const publicReadOnlyOperatingDepartments = new Set([
+    "sheriffs-office",
+    "sheriff-s-office",
+    "clerk-of-court",
+    "clerk-and-comptroller",
+    "clerk-of-courts-and-county-comptroller",
+    "property-appraiser",
+    "tax-collector",
+    "supervisor-of-elections"
+  ]);
+
+  return operatingEditableDepartment(department) ||
+    boardOfCountyCommissioners(department) ||
+    publicReadOnlyOperatingDepartments.has(id);
+};
 const operatingEditableDepartment = (department) => {
   const id = normalizeBootstrapDepartmentId(
     department?.id || department?.departmentId || department?.name
   );
 
   if (boardOfCountyCommissioners(department)) {
-    return isStaffMode;
+    return true;
   }
 
   const operatingOnlyDepartments = new Set([
@@ -409,7 +428,7 @@ const operatingEditableDepartment = (department) => {
   ]);
 
   if (operatingOnlyDepartments.has(id)) {
-    return isStaffMode;
+    return true;
   }
 
   return reductionEligibleDepartment(department);
@@ -1722,11 +1741,10 @@ function renderOperatingLineItems(department, isLocked) {
               return `
                 <div class="operating-line-item ${removed ? "line-item-removed" : ""}">
                   <div>
-                    <strong>${escapeHtml(projectLabel)}</strong>
-                    ${desc ? `<small>${escapeHtml(desc)}</small>` : ""}
+                    ${desc ? `<strong>${escapeHtml(desc)}</strong>` : `<strong>${escapeHtml(projectLabel)}</strong>`}
                   </div>
                   <span>${money(item.amount)}</span>
-                  <button type="button" class="line-item-toggle" data-control="toggle-operating-item" data-item="${item.expenseKey}" ${isLocked ? "disabled" : ""}>${removed ? "Keep" : "Remove"}</button>
+                  ${isStaffMode ? `<button type="button" class="line-item-toggle" data-control="toggle-operating-item" data-item="${item.expenseKey}" ${isLocked ? "disabled" : ""}>${removed ? "Keep" : "Remove"}</button>` : ""}
                 </div>
               `;
             }).join("")}
