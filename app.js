@@ -274,6 +274,7 @@ const state = {
   operatingDetailOpen: {},
   keptProjects: {},
   keptExpenseCapitalItems: {},
+  capitalRemovedAll: false,
   lockedDepartments: {
     "board-of-county-commissioners": true,
     "clerk-of-court": true,
@@ -1109,12 +1110,51 @@ function renderOperating() {
 }
 
 function renderCapital() {
-  $("#capitalControls").innerHTML = budgetData.capitalProjects.filter((project) => reductionEligibleDepartment(departmentById(project.departmentId))).map((project) => {
-    state.keptProjects[project.id] ??= true;
-    const isLocked = locked(project.departmentId);
-    if (isLocked) state.keptProjects[project.id] = true;
-    return `<div class="project-card ${isLocked ? "locked-row" : ""}"><input type="checkbox" ${state.keptProjects[project.id] ? "checked" : ""} data-control="capital" data-project="${project.id}" ${isLocked ? "disabled" : ""}><div><label>${project.name}</label><p>${departmentName(project.departmentId)} | ${money(project.cost)}${isLocked ? " | Locked" : ""}</p></div></div>`;
-  }).join("") + renderExpenseCapitalProjects();
+  const removeAllButton = `
+    <div class="capital-actions">
+      <button type="button" class="view-all-button" data-control="remove-all-capital">
+        ${state.capitalRemovedAll ? "Restore All" : "Remove All"}
+      </button>
+    </div>
+  `;
+
+  $("#capitalControls").innerHTML =
+    removeAllButton +
+    budgetData.capitalProjects
+      .filter((project) =>
+        reductionEligibleDepartment(departmentById(project.departmentId))
+      )
+      .map((project) => {
+        state.keptProjects[project.id] ??= true;
+
+        const isLocked = locked(project.departmentId);
+
+        if (isLocked) {
+          state.keptProjects[project.id] = true;
+        }
+
+        return `
+          <div class="project-card ${isLocked ? "locked-row" : ""}">
+            <input
+              type="checkbox"
+              ${state.keptProjects[project.id] ? "checked" : ""}
+              data-control="capital"
+              data-project="${project.id}"
+              ${isLocked ? "disabled" : ""}
+            >
+            <div>
+              <label>${project.name}</label>
+              <p>
+                ${departmentName(project.departmentId)} |
+                ${money(project.cost)}
+                ${isLocked ? " | Locked" : ""}
+              </p>
+            </div>
+          </div>
+        `;
+      })
+      .join("") +
+    renderExpenseCapitalProjects();
 }
 
 function rankingRows(fiscalYear = state.overviewFiscalYear) {
@@ -2229,7 +2269,7 @@ function renderMillage() {
   const rollback = rollbackRate();
   const estimatedRevenue = estimatedMillageRevenue();
   $("#currentMillage").textContent = budgetData.millageAssumptions.adoptedMillage.toFixed(3);
-  $("#rollbackRate").textContent = `${rollback.toFixed(4)} mills`;
+  $("#rollbackRate").textContent = rollback.toFixed(4);
   const proposedMillageInput = $("#proposedMillage");
   if (proposedMillageInput) {
     proposedMillageInput.type = "text";
@@ -2986,6 +3026,25 @@ document.addEventListener("input", (event) => {
 
 document.addEventListener("change", (event) => {
   const control = event.target.dataset.control;
+  if (control === "remove-all-capital") {
+    budgetData.capitalProjects.forEach((project) => {
+      const department = departmentById(project.departmentId);
+      if (reductionEligibleDepartment(department) && !locked(project.departmentId)) {
+        state.keptProjects[project.id] = false;
+      }
+    });
+
+    expenseCapitalItems().forEach((item) => {
+      const department = departmentById(item.departmentId);
+      if (reductionEligibleDepartment(department) && !locked(item.departmentId)) {
+        state.keptExpenseCapitalItems[item.expenseKey] = false;
+      }
+    });
+
+    renderCapital();
+    updateResults();
+    return;
+  }
   if (control === "fte") {
     const id = event.target.dataset.department;
     const department = departmentById(id);
@@ -3062,6 +3121,24 @@ document.addEventListener("click", (event) => {
   if (control === "clear-capital") {
     state.keptProjects = {};
     state.keptExpenseCapitalItems = {};
+    renderCapital();
+    updateResults();
+  }
+  if (control === "remove-all-capital") {
+    budgetData.capitalProjects.forEach((project) => {
+      const department = departmentById(project.departmentId);
+      if (reductionEligibleDepartment(department) && !locked(project.departmentId)) {
+        state.keptProjects[project.id] = false;
+      }
+    });
+
+    expenseCapitalItems().forEach((item) => {
+      const department = departmentById(item.departmentId);
+      if (reductionEligibleDepartment(department) && !locked(item.departmentId)) {
+        state.keptExpenseCapitalItems[item.expenseKey] = false;
+      }
+    });
+
     renderCapital();
     updateResults();
   }

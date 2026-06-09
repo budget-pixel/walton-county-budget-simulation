@@ -152,7 +152,21 @@ h3 { margin-bottom: 0; font-size: 1.08rem; }
 .results-panel .panel {
   padding-bottom: 28px;
 }
-.panel-header { margin-bottom: 16px; display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.panel-header {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.millage-impact-panel .panel-header > div:first-child {
+  flex: 1 1 auto;
+}
+
+.millage-impact-panel .millage-header-actions {
+  flex: 0 0 150px;
+}
 .chart-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 18px; }
 .chart-wrap { position: relative; min-height: 310px; }
 .forecast-note {
@@ -477,6 +491,10 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   background: #fbfcfc;
 }
 
+
+.driver-card strong,
+.metric-box strong { display: block; margin-top: 6px; color: var(--color-primary); font-size: 1.3rem; line-height: 1.15; overflow-wrap: anywhere; }
+
 .metric-box:has(#taxpayerImpactTiers) > span {
   display: block;
   color: var(--color-text-muted);
@@ -484,39 +502,37 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   font-weight: 800;
   text-transform: uppercase;
 }
-
-.driver-card strong,
-.metric-box strong { display: block; margin-top: 6px; color: var(--color-primary); font-size: 1.3rem; line-height: 1.15; overflow-wrap: anywhere; }
-
 .taxpayer-impact-tiers {
   display: grid;
-  gap: 6px;
+  gap: 0;
   margin-top: 10px;
 }
 
 .taxpayer-impact-tier {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  padding: 4px 0;
+  padding: 5px 0;
+  border-top: 1px solid rgba(31, 42, 46, 0.08);
 }
 
-.taxpayer-impact-tier:not(:last-child) {
-  border-bottom: 1px solid rgba(31, 42, 46, 0.08);
+.taxpayer-impact-tier:first-child {
+  border-top: 0;
 }
 
 .taxpayer-impact-tier span {
-  color: var(--color-text);
-  font-size: 0.9rem;
-  font-weight: 700;
+  color: var(--color-primary-dark);
+  font-size: 0.95rem;
+  font-weight: 800;
 }
 
 .taxpayer-impact-tier strong {
   margin-top: 0;
   color: var(--color-primary-dark);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 800;
+  text-align: right;
   white-space: nowrap;
 }
 .driver-card small,
@@ -524,47 +540,31 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
 .total-driver { background: var(--color-primary-soft); }
 
 .header-millage-box {
-  min-width: 150px !important;
-  width: auto !important;
-  min-height: 50px !important;
-  height: auto !important;
-  padding: 8px 14px !important;
-  border-radius: 999px !important;
-  border: 1px solid var(--color-success) !important;
-  background: var(--color-success) !important;
-  color: #ffffff !important;
-  display: inline-flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  text-align: center !important;
-  box-sizing: border-box !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  box-shadow: none;
 }
 .header-millage-box span {
   display: inline-flex;
-  gap: 0.25rem;
   align-items: center;
-  justify-content: center;
-  margin: 0 0 2px;
-  font-family: var(--font-base) !important;
-  font-size: 0.72rem !important;
-  font-weight: 700 !important;
-  color: rgba(255, 255, 255, 0.95) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.02em !important;
+  gap: 4px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 .header-millage-box strong {
-  font-family: var(--font-base) !important;
-  font-size: 1.3rem !important;
-  font-weight: 900 !important;
-  line-height: 1.05 !important;
-  color: #ffffff !important;
-}
-.header-millage-box .info-button {
-  margin: 0 !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  background: rgba(255, 255, 255, 0.12) !important;
-  color: #ffffff !important;
+  color: var(--color-primary-dark);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
 }
 .lock-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .lock-card { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-small); background: #ffffff; font-weight: 800; }
@@ -810,6 +810,7 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   background: #f7efe0;
   color: var(--color-warning);
 }
+
 .driver-card input,
 .editable-millage input {
   width: 100%;
@@ -818,6 +819,23 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   border: 1px solid var(--color-border);
   border-radius: var(--radius-small);
   font: inherit;
+}
+
+#proposedMillage {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: left;
+}
+
+#proposedMillage::placeholder {
+  color: var(--color-primary);
+  opacity: 0.7;
 }
 
 @media (max-width: 900px) {
