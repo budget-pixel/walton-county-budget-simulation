@@ -1277,6 +1277,9 @@ function capitalProjectItemsForDepartment(department) {
 }
 
 function renderDepartmentCapitalProjects(department) {
+  const id = normalizeBootstrapDepartmentId(department?.id || department?.departmentId || department?.name);
+  const name = String(department?.name || department?.department || "").toLowerCase();
+  if (id === "sheriffs-office" || id === "sheriff-s-office" || name.includes("sheriff")) return "";
   const projects = capitalProjectItemsForDepartment(department);
   if (!projects.length) return "";
   return `
