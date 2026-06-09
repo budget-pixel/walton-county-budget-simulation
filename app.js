@@ -1941,10 +1941,10 @@ function renderDepartments() {
           : '<p class="historical-note">No historical record is available for this department and fiscal year.</p>'
         }</div>`
     }
+    ${renderDepartmentServices(selectedDepartment.id)}
     ${hideExpenseDetailForDepartment(selectedDepartment) ? "" : renderExpenseDetail(selectedDepartment)}
     ${renderDepartmentCapitalProjects(selectedDepartment)}
     ${renderStatutoryAgencyFundingItems(selectedDepartment)}
-    ${renderDepartmentServices(selectedDepartment.id)}
   `;
 }
 
