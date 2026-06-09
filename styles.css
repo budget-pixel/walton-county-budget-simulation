@@ -1281,7 +1281,7 @@ body:not(.staff-mode) [data-staff-only] { display: none !important; }
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   margin-bottom: 24px;
-  padding: 28px max(16px, calc((100vw - 1180px) / 2));
+  padding: 28px max(4px, calc((100vw - 1440px) / 2 + 4px));
   background: var(--color-primary-dark);
   color: #ffffff;
 }
