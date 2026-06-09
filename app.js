@@ -209,7 +209,7 @@ function buildBudgetDataFallback() {
     },
     millageAssumptions: {
       adoptedMillage: 3.519,
-      taxableValueBase: 46454430236,
+      taxableValueBase: 48899400423,
       rollbackRate: 3.3531
     },
     scenarioYear: "FY2028",
@@ -248,10 +248,14 @@ const scenarioStoreKey = "waltonBudgetScenarios";
 const state = {
   revenueAssumptions: {
     ...budgetData.revenueForecast.defaultAssumptions,
+    taxableValueFy2027: budgetData.millageAssumptions.taxableValueBase,
+    taxableValueReductionFy2028: 1676947986,
+    taxableValueReductionFy2029: 1280152710,
+    proposedRate: budgetData.millageAssumptions.adoptedMillage,
     baselineRevenue: budgetData.revenueForecast.baseRevenue,
     baselineExpense: budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline,
-    futureRevenueGrowthRate: 0.01,
-    futureExpenseInflationRate: 0.01,
+    futureRevenueGrowthRate: 0,
+    futureExpenseInflationRate: 0,
     rollbackRate: 3.3531,
     fy2029RevenueReduction: 9478842
   },
@@ -518,11 +522,72 @@ function departmentSupport(department, fiscalYear = "FY2027 Budget") {
 }
 
 function currentMillageRevenue() {
-  return budgetData.millageAssumptions.taxableValueBase * budgetData.millageAssumptions.adoptedMillage / 1000;
+  return modeledFy2027TaxableValue() * budgetData.millageAssumptions.adoptedMillage / 1000;
 }
 
 function estimatedMillageRevenue(rate = state.proposedMillage) {
-  return budgetData.millageAssumptions.taxableValueBase * Number(rate || 0) / 1000;
+  return modeledFy2027TaxableValue() * Number(rate || 0) / 1000;
+}
+
+function revenueFromTaxableValue(taxableValue, rate = state.revenueAssumptions.proposedRate) {
+  return Number(taxableValue || 0) * Number(rate || 0) / 1000;
+}
+
+function modeledFy2027TaxableValue() {
+  return Math.max(
+    Number(state.revenueAssumptions.taxableValueFy2027 || 0) * 0.95,
+    0
+  );
+}
+
+function modeledFy2028TaxableValue() {
+  return Math.max(
+    modeledFy2027TaxableValue() -
+    Number(state.revenueAssumptions.taxableValueReductionFy2028 || 0),
+    0
+  );
+}
+
+function modeledFy2029TaxableValue() {
+  return Math.max(
+    modeledFy2027TaxableValue() -
+    Number(state.revenueAssumptions.taxableValueReductionFy2028 || 0) -
+    Number(state.revenueAssumptions.taxableValueReductionFy2029 || 0),
+    0
+  );
+}
+
+function modeledFy2027Revenue() {
+  return revenueFromTaxableValue(
+    modeledFy2027TaxableValue(),
+    state.revenueAssumptions.proposedRate
+  );
+}
+
+function modeledFy2028Revenue() {
+  return revenueFromTaxableValue(
+    modeledFy2028TaxableValue(),
+    state.revenueAssumptions.proposedRate
+  );
+}
+
+function modeledFy2029Revenue() {
+  return revenueFromTaxableValue(
+    modeledFy2029TaxableValue(),
+    state.revenueAssumptions.proposedRate
+  );
+}
+
+function adValoremSupportMismatchMessage() {
+  const adValoremSupportTotal = Number(
+    budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline || 0
+  );
+  const modeledRevenue = modeledFy2027Revenue();
+  const difference = Math.round(modeledRevenue - adValoremSupportTotal);
+
+  if (Math.abs(difference) < 1) return "";
+
+  return `Ad valorem support does not match baseline revenue for fiscal year 2027. Difference: ${signedMoney(difference)}.`;
 }
 
 function calculatedRollbackRate() {
@@ -544,14 +609,13 @@ function millageRevenueImpact() {
 }
 
 function fiscalYears() {
-  const baseRevenue = Number(state.revenueAssumptions.baselineRevenue || budgetData.revenueForecast.baseRevenue);
+  const baseRevenue = modeledFy2027Revenue();
+  state.revenueAssumptions.baselineRevenue = baseRevenue;
   const baselineExpense = Number(state.revenueAssumptions.baselineExpense || budgetData.budgetBaselineTotals.adValoremSupportedExpenseBaseline);
   const growth = Number(state.revenueAssumptions.futureRevenueGrowthRate || 0);
   const expenseGrowth = Number(state.revenueAssumptions.futureExpenseInflationRate || 0);
-  const fy2028Reduction = Number(state.revenueAssumptions.fy2028RevenueReduction || 0);
-  const fy2029Reduction = Number(state.revenueAssumptions.fy2029RevenueReduction || 0);
-  const fy2028Revenue = baseRevenue * (1 + growth) - fy2028Reduction;
-  const fy2029Revenue = fy2028Revenue * (1 + growth) - fy2029Reduction;
+  const fy2028Revenue = modeledFy2028Revenue();
+  const fy2029Revenue = modeledFy2029Revenue();
   const revenue = [baseRevenue, fy2028Revenue, fy2029Revenue];
   const expense = [baselineExpense];
   for (let index = 1; index < 6; index += 1) {
@@ -901,15 +965,56 @@ function renderDrivers() {
 function renderStaffRevenueControls() {
   const container = $("#staffRevenueControls");
   if (!container) return;
-  const rollbackValue = state.revenueAssumptions.rollbackRate === "" || state.revenueAssumptions.rollbackRate == null ? calculatedRollbackRate() : Number(state.revenueAssumptions.rollbackRate || 0);
+  const mismatchMessage = adValoremSupportMismatchMessage();
   container.innerHTML = `
-    <label><span>Revenue Growth</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureRevenueGrowthRate * 100}" data-control="revenue-assumption" data-assumption="futureRevenueGrowthRate"></label>
-    <label><span>Baseline Revenue</span><input type="text" value="${wholeMoneyInput(state.revenueAssumptions.baselineRevenue)}" data-control="revenue-assumption" data-assumption="baselineRevenue" data-format="currency"></label>
-    <label><span>Annual Cost Growth</span><input type="number" step="0.1" value="${state.revenueAssumptions.futureExpenseInflationRate * 100}" data-control="revenue-assumption" data-assumption="futureExpenseInflationRate"></label>
-    <label><span>Baseline Expense</span><input type="text" value="${wholeMoneyInput(state.revenueAssumptions.baselineExpense)}" data-control="revenue-assumption" data-assumption="baselineExpense" data-format="currency"></label>
-    <label><span>FY2028 Revenue Reduction</span><input type="text" value="${wholeMoneyInput(state.revenueAssumptions.fy2028RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2028RevenueReduction" data-format="currency"></label>
-    <label><span>Rollback Rate</span><input type="number" step="0.0001" value="${Number(rollbackValue || 0).toFixed(4)}" data-control="revenue-assumption" data-assumption="rollbackRate" data-format="millage"></label>
-    <label><span>FY2029 Revenue Reduction</span><input type="text" value="${wholeMoneyInput(state.revenueAssumptions.fy2029RevenueReduction)}" data-control="revenue-assumption" data-assumption="fy2029RevenueReduction" data-format="currency"></label>
+    <label>
+      <span>FY2027 Taxable Value</span>
+      <input type="text" value="${wholeMoneyInput(state.revenueAssumptions.taxableValueFy2027)}" data-control="revenue-assumption" data-assumption="taxableValueFy2027" data-format="currency">
+    </label>
+
+    <label>
+      <span>Proposed Rate</span>
+      <input type="number" step="0.0001" value="${Number(state.revenueAssumptions.proposedRate || 0).toFixed(4)}" data-control="revenue-assumption" data-assumption="proposedRate" data-format="millage">
+    </label>
+
+    <label>
+      <span>FY2028 Taxable Value Reduction</span>
+      <input type="text" value="${wholeMoneyInput(state.revenueAssumptions.taxableValueReductionFy2028)}" data-control="revenue-assumption" data-assumption="taxableValueReductionFy2028" data-format="currency">
+    </label>
+
+    <label>
+      <span>Rollback Rate</span>
+      <input
+        type="number"
+        step="0.0001"
+        value="${Number(rollbackRate() || 0).toFixed(4)}"
+        data-control="revenue-assumption"
+        data-assumption="rollbackRate"
+        data-format="millage"
+      >
+    </label>
+
+    <label>
+      <span>FY2029 Taxable Value Reduction</span>
+      <input type="text" value="${wholeMoneyInput(state.revenueAssumptions.taxableValueReductionFy2029)}" data-control="revenue-assumption" data-assumption="taxableValueReductionFy2029" data-format="currency">
+    </label>
+
+    <label>
+      <span>Baseline Expense</span>
+      <input type="text" value="${wholeMoneyInput(state.revenueAssumptions.baselineExpense)}" data-control="revenue-assumption" data-assumption="baselineExpense" data-format="currency">
+    </label>
+
+    <label>
+      <span>Revenue Growth</span>
+      <input type="number" step="0.1" value="${state.revenueAssumptions.futureRevenueGrowthRate * 100}" data-control="revenue-assumption" data-assumption="futureRevenueGrowthRate">
+    </label>
+
+    <label>
+      <span>Annual Cost Growth</span>
+      <input type="number" step="0.1" value="${state.revenueAssumptions.futureExpenseInflationRate * 100}" data-control="revenue-assumption" data-assumption="futureExpenseInflationRate">
+    </label>
+
+    ${mismatchMessage ? `<div class="staff-warning-message">${mismatchMessage}</div>` : ""}
   `;
 }
 
@@ -1147,6 +1252,7 @@ function departmentServiceAreaName(departmentId, rows = getDepartmentServices(de
 function renderDepartmentServices(departmentId) {
   const rows = getDepartmentServices(departmentId);
   const department = budgetData.departments.find((dept) => dept.id === departmentId);
+  if (department && normalizeExpenseDepartmentName(department.name) === "capital projects") return "";
   if (!rows.length) {
     const hideFallback = department && hideExpenseDetailForDepartment(department);
 
@@ -1158,6 +1264,37 @@ function renderDepartmentServices(departmentId) {
   return `
     <section class="department-service-section" aria-label="Department service and program information">
       ${serviceFieldList("Services & Programs", programs)}
+    </section>
+  `;
+}
+
+function capitalProjectItemsForDepartment(department) {
+  return expenseItemsForDepartment(department)
+    .filter(isCapitalExpenseItem)
+    .sort((a, b) => Number(b.amount || 0) - Number(a.amount || 0) || String(a.description || a.projectName || a.name || "").localeCompare(String(b.description || b.projectName || b.name || "")));
+}
+
+function renderDepartmentCapitalProjects(department) {
+  const projects = capitalProjectItemsForDepartment(department);
+  if (!projects.length) return "";
+  return `
+    <section class="department-capital-projects-section" aria-label="Capital projects">
+      <div class="department-service-heading">
+        <h4>Equipment &amp; Capital</h4>
+      </div>
+      <div class="department-capital-project-list">
+        ${projects.map((project) => {
+          const description = project.description || project.projectName || project.name || project.accountName || "Capital project";
+          return `
+            <div class="department-capital-project-item">
+              <div>
+                <strong>${escapeHtml(description)}</strong>
+              </div>
+              <span>${money(project.amount)}</span>
+            </div>
+          `;
+        }).join("")}
+      </div>
     </section>
   `;
 }
@@ -1428,9 +1565,7 @@ function renderExpenseDetail(department) {
   return `
     <section class="department-expense-section" aria-label="Where the money goes">
       <div class="department-expense-heading">
-        <p class="eyebrow">Expense Detail</p>
         <h4>Where the money goes</h4>
-        <p class="department-expense-total"><span>Total expense detail</span><strong>${compactMoney(total)}</strong></p>
       </div>
       <div class="expense-bars">
         ${visibleCategories.map((category) => {
@@ -1764,6 +1899,7 @@ function renderDepartments() {
         }</div>`
     }
     ${hideExpenseDetailForDepartment(selectedDepartment) ? "" : renderExpenseDetail(selectedDepartment)}
+    ${renderDepartmentCapitalProjects(selectedDepartment)}
     ${renderDepartmentServices(selectedDepartment.id)}
   `;
 }
@@ -1908,8 +2044,8 @@ function projectedSupportedExpenseForForecastDisplay(year) {
 
 function shortfallComponents() {
   const directReductionByYear = {
-    FY2028: Number(state.revenueAssumptions.fy2028RevenueReduction || 0),
-    FY2029: Number(state.revenueAssumptions.fy2029RevenueReduction || 0)
+    FY2028: revenueFromTaxableValue(state.revenueAssumptions.taxableValueReductionFy2028),
+    FY2029: revenueFromTaxableValue(state.revenueAssumptions.taxableValueReductionFy2029)
   };
 
   return forecastYearsForChart().filter((year) => year.year !== "FY2027").map((year) => {
@@ -2056,7 +2192,15 @@ function renderMillage() {
   millageShortfallImpactElement.textContent = "";
   millageShortfallImpactElement.classList.remove("negative-value");
   renderResultingShortfallForecast(totals);
-  $("#taxpayerImpact").textContent = money((budgetData.millageAssumptions.adoptedMillage - state.proposedMillage) * 250);
+  const taxpayerImpactTiersContainer = $("#taxpayerImpactTiers");
+  if (taxpayerImpactTiersContainer) {
+    const taxpayerImpactTiers = [100000, 200000, 300000, 400000, 500000];
+    const millageDifference = budgetData.millageAssumptions.adoptedMillage - Number(state.proposedMillage || 0);
+    taxpayerImpactTiersContainer.innerHTML = taxpayerImpactTiers.map((value) => {
+      const impact = millageDifference * value / 1000;
+      return `<div class="taxpayer-impact-tier"><span>${money(value)}</span><strong>${money(impact)}</strong></div>`;
+    }).join("");
+  }
 }
 
 function renderScenarioManager() {
@@ -2657,16 +2801,25 @@ function exportServiceAreaDraft() {
 
 function updateRevenueAssumptionFromInput(input) {
   const assumption = input.dataset.assumption;
-  const isCurrency = input.dataset.format === "currency";
-  const isMillage = input.dataset.format === "millage";
-  const value = isCurrency ? parseMoney(input.value) : Number(input.value || 0);
+  const format = input.dataset.format;
+  const isCurrency = format === "currency";
+  const isMillage = format === "millage";
+  let value;
+  if (isCurrency) {
+    value = parseMoney(input.value);
+  } else if (isMillage) {
+    value = Number(input.value || 0);
+  } else {
+    value = Number(input.value || 0) / 100;
+  }
+
   if (isMillage && !String(input.value || "").trim()) {
     state.revenueAssumptions[assumption] = "";
   } else {
-    state.revenueAssumptions[assumption] = ["futureRevenueGrowthRate", "futureExpenseInflationRate"].includes(assumption) ? value / 100 : value;
+    state.revenueAssumptions[assumption] = value;
   }
   if (isCurrency) input.value = String(input.value || "").trim() ? wholeMoneyInput(value) : "";
-  if (assumption === "baselineRevenue" && (state.revenueAssumptions.rollbackRate === "" || state.revenueAssumptions.rollbackRate == null)) {
+  if ((assumption === "taxableValueFy2027" || assumption === "proposedRate") && (state.revenueAssumptions.rollbackRate === "" || state.revenueAssumptions.rollbackRate == null)) {
     const rollbackInput = $('[data-assumption="rollbackRate"]');
     if (rollbackInput && document.activeElement !== rollbackInput) rollbackInput.value = calculatedRollbackRate().toFixed(4);
   }
