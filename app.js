@@ -1041,6 +1041,20 @@ function renderLocks() {
     .map((department) => `<label class="lock-card ${constitutional(department) ? "constitutional-card" : ""}"><input type="checkbox" ${state.lockedDepartments[department.id] ? "checked" : ""} data-control="department-lock" data-department="${department.id}"><span>${department.name}</span></label>`).join("");
 }
 
+function publicCountyStaffDepartments() {
+  return departments()
+    .filter((department) => reductionEligibleDepartment(department) && department.fteCount > 0 && !department.nonFteAdjustable && department.name !== "Board of County Commissioners")
+    .sort(sortDepartments);
+}
+
+function publicCountyStaffFteReduction() {
+  return publicCountyStaffDepartments().reduce((total, department) => total + Number(state.fteReductions[department.id] || 0), 0);
+}
+
+function publicCountyStaffPersonnelReduction() {
+  return publicCountyStaffDepartments().reduce((total, department) => total + Number(state.fteReductions[department.id] || 0) * fteCost(department), 0);
+}
+
 function renderPersonnel() {
   const costFactors = $("#personnelCostFactorsInline");
   if (costFactors) {
@@ -1068,6 +1082,44 @@ function renderPersonnel() {
         </div>
       </div>
     `;
+  }
+  if (!isStaffMode) {
+    const countyDepartments = publicCountyStaffDepartments();
+    const countyFteTotal = countyDepartments.reduce((total, department) => total + Number(department.fteCount || 0), 0);
+    const countyFteReduction = publicCountyStaffFteReduction();
+    const countyPersonnelReduction = publicCountyStaffPersonnelReduction();
+    const publicOfficeIds = [
+      "sheriffs-office",
+      "tax-collector",
+      "supervisor-of-elections",
+      "clerk-of-courts-and-county-comptroller",
+      "property-appraiser"
+    ];
+    const publicOfficeRows = publicOfficeIds
+      .map((id) => budgetData.departments.find((department) => normalizeBootstrapDepartmentId(department.id || department.name) === id))
+      .filter(Boolean);
+
+    $("#personnelControls").innerHTML = `
+      <tr>
+        <td><strong>Board of County Commissioners</strong><small>County departments total</small></td>
+        <td>${number(countyFteTotal)}</td>
+        <td><input type="number" step="0.5" min="0" max="${countyFteTotal}" value="${countyFteReduction}" data-control="public-county-fte"></td>
+        <td></td>
+        <td>${money(countyPersonnelReduction)}</td>
+        <td>${money(countyPersonnelReduction)}</td>
+      </tr>
+      ${publicOfficeRows.map((department) => `
+        <tr class="locked-row">
+          <td><strong>${department.name}</strong><small>Listed separately</small></td>
+          <td>${Number(department.fteCount || 0) > 0 ? number(department.fteCount) : ""}</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      `).join("")}
+    `;
+    return;
   }
   $("#personnelControls").innerHTML = departments().filter((department) => reductionEligibleDepartment(department) && department.fteCount > 0 && !department.nonFteAdjustable && department.name !== "Board of County Commissioners").sort(sortDepartments).map((department) => {
     const isLocked = locked(department.id);
