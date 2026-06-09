@@ -2406,7 +2406,7 @@ function renderMillage() {
     proposedMillageInput.type = "text";
     proposedMillageInput.inputMode = "decimal";
     proposedMillageInput.placeholder = "Enter millage";
-    proposedMillageInput.disabled = !isStaffMode;
+    proposedMillageInput.disabled = false;
     if (document.activeElement !== proposedMillageInput) {
       proposedMillageInput.value = Number(state.proposedMillage || 0).toFixed(4);
     }
@@ -3143,7 +3143,7 @@ document.addEventListener("input", (event) => {
   if (control === "ranking-search") { state.rankingSearch = event.target.value; renderRankings(); }
   if (control === "department-search") { state.departmentSearch = event.target.value; renderDepartments(); }
   if (control === "scenario-meta") { state.scenarioMeta[event.target.dataset.field] = event.target.value; }
-  if (control === "millage" && isStaffMode) {
+  if (control === "millage") {
     const cleanedMillage = String(event.target.value || "").replace(/[^0-9.]/g, "");
     const parsedMillage = Number(cleanedMillage);
     if (cleanedMillage === "") {
