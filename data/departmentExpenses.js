@@ -1,12 +1,93 @@
 window.wcDepartmentExpenses = [
   {
+    "department": "Ad Valorem Taxes Interfund Transfers",
+    "total": 122975792,
+    "categories": [
+      {
+        "category": "Grants, Aid & Transfers",
+        "amount": 122975792,
+        "percent": 100,
+        "items": [
+          {
+            "proposal": "Ad Valorem Taxes Interfund Transfers",
+            "type": "Expenses",
+            "accountCode": "591000",
+            "accountName": "Intergovernmental Transfers",
+            "description": "Transfer to the Fine & Forfeiture Fund for Public Safety (Property Taxes)",
+            "itemization": 98004256,
+            "proposedAmount": 0,
+            "amount": 98004256,
+            "category": "Grants, Aid & Transfers"
+          },
+          {
+            "proposal": "Ad Valorem Taxes Interfund Transfers",
+            "type": "Expenses",
+            "accountCode": "591000",
+            "accountName": "Intergovernmental Transfers",
+            "description": "Transfer to the Capital Projects Fund for Infrastructure (Property Taxes)",
+            "itemization": 22456536,
+            "proposedAmount": 0,
+            "amount": 22456536,
+            "category": "Grants, Aid & Transfers"
+          },
+          {
+            "proposal": "Ad Valorem Taxes Interfund Transfers",
+            "type": "Expenses",
+            "accountCode": "591000",
+            "accountName": "Intergovernmental Transfers",
+            "description": "Transfer to the Capital Projects Fund for Debt Payment (Property Taxes)",
+            "itemization": 2515000,
+            "proposedAmount": 0,
+            "amount": 2515000,
+            "category": "Grants, Aid & Transfers"
+          }
+        ]
+      }
+    ],
+    "items": [
+      {
+        "proposal": "Ad Valorem Taxes Interfund Transfers",
+        "type": "Expenses",
+        "accountCode": "591000",
+        "accountName": "Intergovernmental Transfers",
+        "description": "Transfer to the Fine & Forfeiture Fund for Public Safety (Property Taxes)",
+        "itemization": 98004256,
+        "proposedAmount": 0,
+        "amount": 98004256,
+        "category": "Grants, Aid & Transfers"
+      },
+      {
+        "proposal": "Ad Valorem Taxes Interfund Transfers",
+        "type": "Expenses",
+        "accountCode": "591000",
+        "accountName": "Intergovernmental Transfers",
+        "description": "Transfer to the Capital Projects Fund for Infrastructure (Property Taxes)",
+        "itemization": 22456536,
+        "proposedAmount": 0,
+        "amount": 22456536,
+        "category": "Grants, Aid & Transfers"
+      },
+      {
+        "proposal": "Ad Valorem Taxes Interfund Transfers",
+        "type": "Expenses",
+        "accountCode": "591000",
+        "accountName": "Intergovernmental Transfers",
+        "description": "Transfer to the Capital Projects Fund for Debt Payment (Property Taxes)",
+        "itemization": 2515000,
+        "proposedAmount": 0,
+        "amount": 2515000,
+        "category": "Grants, Aid & Transfers"
+      }
+    ]
+  },
+  {
     "department": "Board of County Commissioners",
-    "total": 12337398,
+    "total": 11793511,
     "categories": [
       {
         "category": "Facilities, Utilities & Maintenance",
         "amount": 3867000,
-        "percent": 31.3,
+        "percent": 32.8,
         "items": [
           {
             "proposal": "Board of County Commissioners",
@@ -90,7 +171,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Professional Services",
         "amount": 2710000,
-        "percent": 22,
+        "percent": 23,
         "items": [
           {
             "proposal": "Board of County Commissioners",
@@ -162,8 +243,8 @@ window.wcDepartmentExpenses = [
       },
       {
         "category": "Personnel & Benefits",
-        "amount": 2469898,
-        "percent": 20,
+        "amount": 2601011,
+        "percent": 22.1,
         "items": [
           {
             "proposal": "Board of County Commissioners",
@@ -183,8 +264,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "Commissioner aid salaries",
             "itemization": 0,
-            "proposedAmount": 476617,
-            "amount": 476617,
+            "proposedAmount": 453473,
+            "amount": 453473,
             "category": "Personnel & Benefits"
           },
           {
@@ -192,10 +273,10 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "512007",
             "accountName": "Sick Leave Incentive Pay",
-            "description": "",
+            "description": "PTO Buyout General Fund",
             "itemization": 0,
-            "proposedAmount": 19016,
-            "amount": 19016,
+            "proposedAmount": 250000,
+            "amount": 250000,
             "category": "Personnel & Benefits"
           },
           {
@@ -203,10 +284,10 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "513000",
             "accountName": "Other Salaries & Wages",
-            "description": "Summer Students @$16/hour = $110,000, additional funding for General Fund merit increases",
+            "description": "Summer Students Program",
             "itemization": 0,
-            "proposedAmount": 275000,
-            "amount": 275000,
+            "proposedAmount": 200000,
+            "amount": 200000,
             "category": "Personnel & Benefits"
           },
           {
@@ -216,8 +297,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 60789,
-            "amount": 60789,
+            "proposedAmount": 59018,
+            "amount": 59018,
             "category": "Personnel & Benefits"
           },
           {
@@ -237,9 +318,9 @@ window.wcDepartmentExpenses = [
             "accountCode": "523000",
             "accountName": "Life & Health Insurance",
             "description": "",
-            "itemization": -146904,
+            "itemization": -146834,
             "proposedAmount": 0,
-            "amount": -146904,
+            "amount": -146834,
             "category": "Personnel & Benefits"
           },
           {
@@ -271,8 +352,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 875,
-            "amount": 875,
+            "proposedAmount": 849,
+            "amount": 849,
             "category": "Personnel & Benefits"
           },
           {
@@ -290,8 +371,8 @@ window.wcDepartmentExpenses = [
       },
       {
         "category": "Buildings & Infrastructure",
-        "amount": 1805000,
-        "percent": 14.6,
+        "amount": 1605000,
+        "percent": 13.6,
         "items": [
           {
             "proposal": "Board of County Commissioners",
@@ -314,63 +395,67 @@ window.wcDepartmentExpenses = [
             "proposedAmount": 75000,
             "amount": 75000,
             "category": "Buildings & Infrastructure"
-          },
-          {
-            "proposal": "Board of County Commissioners",
-            "type": "Expenses",
-            "accountCode": "563000",
-            "accountName": "Infrastructure",
-            "description": "Boating Improvement Program Funding",
-            "itemization": 0,
-            "proposedAmount": 200000,
-            "amount": 200000,
-            "category": "Buildings & Infrastructure"
-          }
-        ]
-      },
-      {
-        "category": "Contingency & Other",
-        "amount": 690000,
-        "percent": 5.6,
-        "items": [
-          {
-            "proposal": "Board of County Commissioners",
-            "type": "Expenses",
-            "accountCode": "549000",
-            "accountName": "Other Current Charges",
-            "description": "State mandated newspaper notices/ads/publications, Tyler Tech eCheck Fee for online billing, Tax Collector and Clerk Escrow accounts for fees.",
-            "itemization": 0,
-            "proposedAmount": 190000,
-            "amount": 190000,
-            "category": "Contingency & Other"
-          },
-          {
-            "proposal": "Board of County Commissioners",
-            "type": "Expenses",
-            "accountCode": "599000",
-            "accountName": "Other Uses/Contingency",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 500000,
-            "amount": 500000,
-            "category": "Contingency & Other"
           }
         ]
       },
       {
         "category": "Supplies & Fuel",
-        "amount": 290500,
-        "percent": 2.4,
+        "amount": 315500,
+        "percent": 2.7,
         "items": [
           {
             "proposal": "Board of County Commissioners",
             "type": "Expenses",
             "accountCode": "552000",
             "accountName": "Operating Supplies",
-            "description": "Tech & AV upgrades to Boardrooms",
+            "description": "D1 Office funding",
             "itemization": 0,
-            "proposedAmount": 100000,
-            "amount": 100000,
+            "proposedAmount": 25000,
+            "amount": 25000,
+            "category": "Supplies & Fuel"
+          },
+          {
+            "proposal": "Board of County Commissioners",
+            "type": "Expenses",
+            "accountCode": "552000",
+            "accountName": "Operating Supplies",
+            "description": "D2 Office funding",
+            "itemization": 0,
+            "proposedAmount": 25000,
+            "amount": 25000,
+            "category": "Supplies & Fuel"
+          },
+          {
+            "proposal": "Board of County Commissioners",
+            "type": "Expenses",
+            "accountCode": "552000",
+            "accountName": "Operating Supplies",
+            "description": "D3 Office funding",
+            "itemization": 0,
+            "proposedAmount": 25000,
+            "amount": 25000,
+            "category": "Supplies & Fuel"
+          },
+          {
+            "proposal": "Board of County Commissioners",
+            "type": "Expenses",
+            "accountCode": "552000",
+            "accountName": "Operating Supplies",
+            "description": "D4 Office funding",
+            "itemization": 0,
+            "proposedAmount": 25000,
+            "amount": 25000,
+            "category": "Supplies & Fuel"
+          },
+          {
+            "proposal": "Board of County Commissioners",
+            "type": "Expenses",
+            "accountCode": "552000",
+            "accountName": "Operating Supplies",
+            "description": "D5 Office funding",
+            "itemization": 0,
+            "proposedAmount": 25000,
+            "amount": 25000,
             "category": "Supplies & Fuel"
           },
           {
@@ -422,7 +507,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 280000,
-        "percent": 2.3,
+        "percent": 2.4,
         "items": [
           {
             "proposal": "Board of County Commissioners",
@@ -445,6 +530,24 @@ window.wcDepartmentExpenses = [
             "proposedAmount": 120000,
             "amount": 120000,
             "category": "Communications & Technology"
+          }
+        ]
+      },
+      {
+        "category": "Contingency & Other",
+        "amount": 190000,
+        "percent": 1.6,
+        "items": [
+          {
+            "proposal": "Board of County Commissioners",
+            "type": "Expenses",
+            "accountCode": "549000",
+            "accountName": "Other Current Charges",
+            "description": "State mandated newspaper notices/ads/publications, Tyler Tech eCheck Fee for online billing, Tax Collector and Clerk Escrow accounts for fees.",
+            "itemization": 0,
+            "proposedAmount": 190000,
+            "amount": 190000,
+            "category": "Contingency & Other"
           }
         ]
       },
@@ -520,10 +623,54 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "552000",
         "accountName": "Operating Supplies",
-        "description": "Tech & AV upgrades to Boardrooms",
+        "description": "D1 Office funding",
         "itemization": 0,
-        "proposedAmount": 100000,
-        "amount": 100000,
+        "proposedAmount": 25000,
+        "amount": 25000,
+        "category": "Supplies & Fuel"
+      },
+      {
+        "proposal": "Board of County Commissioners",
+        "type": "Expenses",
+        "accountCode": "552000",
+        "accountName": "Operating Supplies",
+        "description": "D2 Office funding",
+        "itemization": 0,
+        "proposedAmount": 25000,
+        "amount": 25000,
+        "category": "Supplies & Fuel"
+      },
+      {
+        "proposal": "Board of County Commissioners",
+        "type": "Expenses",
+        "accountCode": "552000",
+        "accountName": "Operating Supplies",
+        "description": "D3 Office funding",
+        "itemization": 0,
+        "proposedAmount": 25000,
+        "amount": 25000,
+        "category": "Supplies & Fuel"
+      },
+      {
+        "proposal": "Board of County Commissioners",
+        "type": "Expenses",
+        "accountCode": "552000",
+        "accountName": "Operating Supplies",
+        "description": "D4 Office funding",
+        "itemization": 0,
+        "proposedAmount": 25000,
+        "amount": 25000,
+        "category": "Supplies & Fuel"
+      },
+      {
+        "proposal": "Board of County Commissioners",
+        "type": "Expenses",
+        "accountCode": "552000",
+        "accountName": "Operating Supplies",
+        "description": "D5 Office funding",
+        "itemization": 0,
+        "proposedAmount": 25000,
+        "amount": 25000,
         "category": "Supplies & Fuel"
       },
       {
@@ -555,8 +702,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "Commissioner aid salaries",
         "itemization": 0,
-        "proposedAmount": 476617,
-        "amount": 476617,
+        "proposedAmount": 453473,
+        "amount": 453473,
         "category": "Personnel & Benefits"
       },
       {
@@ -564,10 +711,10 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "512007",
         "accountName": "Sick Leave Incentive Pay",
-        "description": "",
+        "description": "PTO Buyout General Fund",
         "itemization": 0,
-        "proposedAmount": 19016,
-        "amount": 19016,
+        "proposedAmount": 250000,
+        "amount": 250000,
         "category": "Personnel & Benefits"
       },
       {
@@ -575,10 +722,10 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "513000",
         "accountName": "Other Salaries & Wages",
-        "description": "Summer Students @$16/hour = $110,000, additional funding for General Fund merit increases",
+        "description": "Summer Students Program",
         "itemization": 0,
-        "proposedAmount": 275000,
-        "amount": 275000,
+        "proposedAmount": 200000,
+        "amount": 200000,
         "category": "Personnel & Benefits"
       },
       {
@@ -588,8 +735,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 60789,
-        "amount": 60789,
+        "proposedAmount": 59018,
+        "amount": 59018,
         "category": "Personnel & Benefits"
       },
       {
@@ -609,9 +756,9 @@ window.wcDepartmentExpenses = [
         "accountCode": "523000",
         "accountName": "Life & Health Insurance",
         "description": "",
-        "itemization": -146904,
+        "itemization": -146834,
         "proposedAmount": 0,
-        "amount": -146904,
+        "amount": -146834,
         "category": "Personnel & Benefits"
       },
       {
@@ -643,8 +790,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 875,
-        "amount": 875,
+        "proposedAmount": 849,
+        "amount": 849,
         "category": "Personnel & Benefits"
       },
       {
@@ -932,39 +1079,17 @@ window.wcDepartmentExpenses = [
         "proposedAmount": 5000,
         "amount": 5000,
         "category": "Grants, Aid & Transfers"
-      },
-      {
-        "proposal": "Board of County Commissioners",
-        "type": "Expenses",
-        "accountCode": "563000",
-        "accountName": "Infrastructure",
-        "description": "Boating Improvement Program Funding",
-        "itemization": 0,
-        "proposedAmount": 200000,
-        "amount": 200000,
-        "category": "Buildings & Infrastructure"
-      },
-      {
-        "proposal": "Board of County Commissioners",
-        "type": "Expenses",
-        "accountCode": "599000",
-        "accountName": "Other Uses/Contingency",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 500000,
-        "amount": 500000,
-        "category": "Contingency & Other"
       }
     ]
   },
   {
     "department": "Building Construction and Maintenance",
-    "total": 10700000,
+    "total": 10575758,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 5442755,
-        "percent": 50.9,
+        "amount": 5318513,
+        "percent": 50.3,
         "items": [
           {
             "proposal": "Building Construction and Maintenance",
@@ -973,19 +1098,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 3402464,
-            "amount": 3402464,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Building Construction and Maintenance",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 15000,
-            "amount": 15000,
+            "proposedAmount": 3303593,
+            "amount": 3303593,
             "category": "Personnel & Benefits"
           },
           {
@@ -1028,8 +1142,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 259685,
-            "amount": 259685,
+            "proposedAmount": 252121,
+            "amount": 252121,
             "category": "Personnel & Benefits"
           },
           {
@@ -1050,8 +1164,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 934416,
-            "amount": 934416,
+            "proposedAmount": 934114,
+            "amount": 934114,
             "category": "Personnel & Benefits"
           },
           {
@@ -1061,8 +1175,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 86008,
-            "amount": 86008,
+            "proposedAmount": 83503,
+            "amount": 83503,
             "category": "Personnel & Benefits"
           }
         ]
@@ -1070,7 +1184,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Facilities, Utilities & Maintenance",
         "amount": 2227500,
-        "percent": 20.8,
+        "percent": 21.1,
         "items": [
           {
             "proposal": "Building Construction and Maintenance",
@@ -1121,7 +1235,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Buildings & Infrastructure",
         "amount": 1260000,
-        "percent": 11.8,
+        "percent": 11.9,
         "items": [
           {
             "proposal": "Building Construction and Maintenance",
@@ -1161,7 +1275,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 1149495,
-        "percent": 10.7,
+        "percent": 10.9,
         "items": [
           {
             "proposal": "Building Construction and Maintenance",
@@ -1307,7 +1421,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Professional Services",
         "amount": 250000,
-        "percent": 2.3,
+        "percent": 2.4,
         "items": [
           {
             "proposal": "Building Construction and Maintenance",
@@ -1325,7 +1439,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 47750,
-        "percent": 0.4,
+        "percent": 0.5,
         "items": [
           {
             "proposal": "Building Construction and Maintenance",
@@ -1418,19 +1532,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 3402464,
-        "amount": 3402464,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Building Construction and Maintenance",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 15000,
-        "amount": 15000,
+        "proposedAmount": 3303593,
+        "amount": 3303593,
         "category": "Personnel & Benefits"
       },
       {
@@ -1473,8 +1576,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 259685,
-        "amount": 259685,
+        "proposedAmount": 252121,
+        "amount": 252121,
         "category": "Personnel & Benefits"
       },
       {
@@ -1495,8 +1598,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 934416,
-        "amount": 934416,
+        "proposedAmount": 934114,
+        "amount": 934114,
         "category": "Personnel & Benefits"
       },
       {
@@ -1506,8 +1609,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 86008,
-        "amount": 86008,
+        "proposedAmount": 83503,
+        "amount": 83503,
         "category": "Personnel & Benefits"
       },
       {
@@ -1778,12 +1881,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Capital Projects",
-    "total": 23986536,
+    "total": 25735536,
     "categories": [
       {
         "category": "Buildings & Infrastructure",
-        "amount": 21471536,
-        "percent": 89.5,
+        "amount": 23220536,
+        "percent": 90.2,
         "items": [
           {
             "proposal": "Capital Projects",
@@ -1805,6 +1908,28 @@ window.wcDepartmentExpenses = [
             "itemization": 0,
             "proposedAmount": 3500000,
             "amount": 3500000,
+            "category": "Buildings & Infrastructure"
+          },
+          {
+            "proposal": "Capital Projects",
+            "type": "Expenses",
+            "accountCode": "563000",
+            "accountName": "Infrastructure",
+            "description": "Chat Holley & US 331 Intersection Improvements (Long Term Option)",
+            "itemization": 0,
+            "proposedAmount": 260000,
+            "amount": 260000,
+            "category": "Buildings & Infrastructure"
+          },
+          {
+            "proposal": "Capital Projects",
+            "type": "Expenses",
+            "accountCode": "563000",
+            "accountName": "Infrastructure",
+            "description": "CR 83 N (Blue Mountain Rd) Extension from US 98 to Chat Holley",
+            "itemization": 0,
+            "proposedAmount": 250000,
+            "amount": 250000,
             "category": "Buildings & Infrastructure"
           },
           {
@@ -1834,6 +1959,17 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "563000",
             "accountName": "Infrastructure",
+            "description": "Holiday Rd & CR 2378 (Scenic Gulf Drive) Intersection Improvements",
+            "itemization": 0,
+            "proposedAmount": 225000,
+            "amount": 225000,
+            "category": "Buildings & Infrastructure"
+          },
+          {
+            "proposal": "Capital Projects",
+            "type": "Expenses",
+            "accountCode": "563000",
+            "accountName": "Infrastructure",
             "description": "Holiday Shores Drainage & Pedestrian Improvements Phase II",
             "itemization": 0,
             "proposedAmount": 7000000,
@@ -1856,10 +1992,54 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "563000",
             "accountName": "Infrastructure",
+            "description": "South Orange Street Pedestrian Improvements",
+            "itemization": 0,
+            "proposedAmount": 200000,
+            "amount": 200000,
+            "category": "Buildings & Infrastructure"
+          },
+          {
+            "proposal": "Capital Projects",
+            "type": "Expenses",
+            "accountCode": "563000",
+            "accountName": "Infrastructure",
+            "description": "CR 30A Sidewalk from Ventana Blvd to Blue Gulf Dr",
+            "itemization": 0,
+            "proposedAmount": 174000,
+            "amount": 174000,
+            "category": "Buildings & Infrastructure"
+          },
+          {
+            "proposal": "Capital Projects",
+            "type": "Expenses",
+            "accountCode": "563000",
+            "accountName": "Infrastructure",
             "description": "Poinciana Blvd & Scenic Hwy 98 Intersection Signalization",
             "itemization": 0,
             "proposedAmount": 900000,
             "amount": 900000,
+            "category": "Buildings & Infrastructure"
+          },
+          {
+            "proposal": "Capital Projects",
+            "type": "Expenses",
+            "accountCode": "563000",
+            "accountName": "Infrastructure",
+            "description": "N Orange Street Pedestrian Improvements",
+            "itemization": 0,
+            "proposedAmount": 340000,
+            "amount": 340000,
+            "category": "Buildings & Infrastructure"
+          },
+          {
+            "proposal": "Capital Projects",
+            "type": "Expenses",
+            "accountCode": "563000",
+            "accountName": "Infrastructure",
+            "description": "E Bay Loop (CR 83A E) Northbound Right Turn Lane",
+            "itemization": 0,
+            "proposedAmount": 300000,
+            "amount": 300000,
             "category": "Buildings & Infrastructure"
           }
         ]
@@ -1867,7 +2047,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Debt Service",
         "amount": 2515000,
-        "percent": 10.5,
+        "percent": 9.8,
         "items": [
           {
             "proposal": "Capital Projects",
@@ -1922,6 +2102,28 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "563000",
         "accountName": "Infrastructure",
+        "description": "Chat Holley & US 331 Intersection Improvements (Long Term Option)",
+        "itemization": 0,
+        "proposedAmount": 260000,
+        "amount": 260000,
+        "category": "Buildings & Infrastructure"
+      },
+      {
+        "proposal": "Capital Projects",
+        "type": "Expenses",
+        "accountCode": "563000",
+        "accountName": "Infrastructure",
+        "description": "CR 83 N (Blue Mountain Rd) Extension from US 98 to Chat Holley",
+        "itemization": 0,
+        "proposedAmount": 250000,
+        "amount": 250000,
+        "category": "Buildings & Infrastructure"
+      },
+      {
+        "proposal": "Capital Projects",
+        "type": "Expenses",
+        "accountCode": "563000",
+        "accountName": "Infrastructure",
         "description": "Driftwood & US 98 Intersection Signalization",
         "itemization": 0,
         "proposedAmount": 1400000,
@@ -1937,6 +2139,17 @@ window.wcDepartmentExpenses = [
         "itemization": 0,
         "proposedAmount": 4571536,
         "amount": 4571536,
+        "category": "Buildings & Infrastructure"
+      },
+      {
+        "proposal": "Capital Projects",
+        "type": "Expenses",
+        "accountCode": "563000",
+        "accountName": "Infrastructure",
+        "description": "Holiday Rd & CR 2378 (Scenic Gulf Drive) Intersection Improvements",
+        "itemization": 0,
+        "proposedAmount": 225000,
+        "amount": 225000,
         "category": "Buildings & Infrastructure"
       },
       {
@@ -1966,10 +2179,54 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "563000",
         "accountName": "Infrastructure",
+        "description": "South Orange Street Pedestrian Improvements",
+        "itemization": 0,
+        "proposedAmount": 200000,
+        "amount": 200000,
+        "category": "Buildings & Infrastructure"
+      },
+      {
+        "proposal": "Capital Projects",
+        "type": "Expenses",
+        "accountCode": "563000",
+        "accountName": "Infrastructure",
+        "description": "CR 30A Sidewalk from Ventana Blvd to Blue Gulf Dr",
+        "itemization": 0,
+        "proposedAmount": 174000,
+        "amount": 174000,
+        "category": "Buildings & Infrastructure"
+      },
+      {
+        "proposal": "Capital Projects",
+        "type": "Expenses",
+        "accountCode": "563000",
+        "accountName": "Infrastructure",
         "description": "Poinciana Blvd & Scenic Hwy 98 Intersection Signalization",
         "itemization": 0,
         "proposedAmount": 900000,
         "amount": 900000,
+        "category": "Buildings & Infrastructure"
+      },
+      {
+        "proposal": "Capital Projects",
+        "type": "Expenses",
+        "accountCode": "563000",
+        "accountName": "Infrastructure",
+        "description": "N Orange Street Pedestrian Improvements",
+        "itemization": 0,
+        "proposedAmount": 340000,
+        "amount": 340000,
+        "category": "Buildings & Infrastructure"
+      },
+      {
+        "proposal": "Capital Projects",
+        "type": "Expenses",
+        "accountCode": "563000",
+        "accountName": "Infrastructure",
+        "description": "E Bay Loop (CR 83A E) Northbound Right Turn Lane",
+        "itemization": 0,
+        "proposedAmount": 300000,
+        "amount": 300000,
         "category": "Buildings & Infrastructure"
       },
       {
@@ -2349,11 +2606,11 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Code Compliance",
-    "total": 4840000,
+    "total": 4836670,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 4140090,
+        "amount": 4136760,
         "percent": 85.5,
         "items": [
           {
@@ -2361,76 +2618,10 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "512000",
             "accountName": "Regular Salaries & Wages",
-            "description": "STR",
-            "itemization": 0,
-            "proposedAmount": 55096,
-            "amount": 55096,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Code Compliance",
-            "type": "Expenses",
-            "accountCode": "521000",
-            "accountName": "FICA Taxes & Medicare",
-            "description": "STR",
-            "itemization": 0,
-            "proposedAmount": 4139,
-            "amount": 4139,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Code Compliance",
-            "type": "Expenses",
-            "accountCode": "522000",
-            "accountName": "Retirement Contributions",
-            "description": "STR",
-            "itemization": 0,
-            "proposedAmount": 7369,
-            "amount": 7369,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Code Compliance",
-            "type": "Expenses",
-            "accountCode": "523000",
-            "accountName": "Life & Health Insurance",
-            "description": "STR",
-            "itemization": 0,
-            "proposedAmount": 13344,
-            "amount": 13344,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Code Compliance",
-            "type": "Expenses",
-            "accountCode": "524000",
-            "accountName": "Workers' Compensation",
-            "description": "STR",
-            "itemization": 0,
-            "proposedAmount": 1120,
-            "amount": 1120,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Code Compliance",
-            "type": "Expenses",
-            "accountCode": "512000",
-            "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 2570456,
-            "amount": 2570456,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Code Compliance",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "*OMB entered",
-            "itemization": 0,
-            "proposedAmount": 7468,
-            "amount": 7468,
+            "proposedAmount": 2496666,
+            "amount": 2496666,
             "category": "Personnel & Benefits"
           },
           {
@@ -2440,8 +2631,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Other Salaries & Wages",
             "description": "Seasonal Beach Stewards",
             "itemization": 0,
-            "proposedAmount": 250000,
-            "amount": 250000,
+            "proposedAmount": 416000,
+            "amount": 416000,
             "category": "Personnel & Benefits"
           },
           {
@@ -2462,8 +2653,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 193810,
-            "amount": 193810,
+            "proposedAmount": 188165,
+            "amount": 188165,
             "category": "Personnel & Benefits"
           },
           {
@@ -2484,8 +2675,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 640689,
-            "amount": 640689,
+            "proposedAmount": 640464,
+            "amount": 640464,
             "category": "Personnel & Benefits"
           },
           {
@@ -2495,8 +2686,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 38929,
-            "amount": 38929,
+            "proposedAmount": 37795,
+            "amount": 37795,
             "category": "Personnel & Benefits"
           }
         ]
@@ -2606,7 +2797,7 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "564000",
             "accountName": "Machinery & Equipment",
-            "description": "4x4 Crew Cab Truck",
+            "description": "SUV",
             "itemization": 36000,
             "proposedAmount": 0,
             "amount": 36000,
@@ -2617,7 +2808,7 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "564000",
             "accountName": "Machinery & Equipment",
-            "description": "4x4 Crew Cab Truck",
+            "description": "SUV",
             "itemization": 36000,
             "proposedAmount": 0,
             "amount": 36000,
@@ -2635,9 +2826,9 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "531000",
             "accountName": "Professional Services",
-            "description": "*Requesting to cover a portion of the salary cost of Land Use Attorney FTE in Planning Dept. (If approved this cost will move to 512000)",
-            "itemization": 0,
-            "proposedAmount": 87600,
+            "description": "Legal Services",
+            "itemization": 87600,
+            "proposedAmount": 0,
             "amount": 87600,
             "category": "Professional Services"
           }
@@ -2777,76 +2968,10 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "512000",
         "accountName": "Regular Salaries & Wages",
-        "description": "STR",
-        "itemization": 0,
-        "proposedAmount": 55096,
-        "amount": 55096,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Code Compliance",
-        "type": "Expenses",
-        "accountCode": "521000",
-        "accountName": "FICA Taxes & Medicare",
-        "description": "STR",
-        "itemization": 0,
-        "proposedAmount": 4139,
-        "amount": 4139,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Code Compliance",
-        "type": "Expenses",
-        "accountCode": "522000",
-        "accountName": "Retirement Contributions",
-        "description": "STR",
-        "itemization": 0,
-        "proposedAmount": 7369,
-        "amount": 7369,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Code Compliance",
-        "type": "Expenses",
-        "accountCode": "523000",
-        "accountName": "Life & Health Insurance",
-        "description": "STR",
-        "itemization": 0,
-        "proposedAmount": 13344,
-        "amount": 13344,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Code Compliance",
-        "type": "Expenses",
-        "accountCode": "524000",
-        "accountName": "Workers' Compensation",
-        "description": "STR",
-        "itemization": 0,
-        "proposedAmount": 1120,
-        "amount": 1120,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Code Compliance",
-        "type": "Expenses",
-        "accountCode": "512000",
-        "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 2570456,
-        "amount": 2570456,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Code Compliance",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "*OMB entered",
-        "itemization": 0,
-        "proposedAmount": 7468,
-        "amount": 7468,
+        "proposedAmount": 2496666,
+        "amount": 2496666,
         "category": "Personnel & Benefits"
       },
       {
@@ -2856,8 +2981,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Other Salaries & Wages",
         "description": "Seasonal Beach Stewards",
         "itemization": 0,
-        "proposedAmount": 250000,
-        "amount": 250000,
+        "proposedAmount": 416000,
+        "amount": 416000,
         "category": "Personnel & Benefits"
       },
       {
@@ -2878,8 +3003,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 193810,
-        "amount": 193810,
+        "proposedAmount": 188165,
+        "amount": 188165,
         "category": "Personnel & Benefits"
       },
       {
@@ -2900,8 +3025,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 640689,
-        "amount": 640689,
+        "proposedAmount": 640464,
+        "amount": 640464,
         "category": "Personnel & Benefits"
       },
       {
@@ -2911,8 +3036,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 38929,
-        "amount": 38929,
+        "proposedAmount": 37795,
+        "amount": 37795,
         "category": "Personnel & Benefits"
       },
       {
@@ -2920,9 +3045,9 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "531000",
         "accountName": "Professional Services",
-        "description": "*Requesting to cover a portion of the salary cost of Land Use Attorney FTE in Planning Dept. (If approved this cost will move to 512000)",
-        "itemization": 0,
-        "proposedAmount": 87600,
+        "description": "Legal Services",
+        "itemization": 87600,
+        "proposedAmount": 0,
         "amount": 87600,
         "category": "Professional Services"
       },
@@ -3118,7 +3243,7 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "564000",
         "accountName": "Machinery & Equipment",
-        "description": "4x4 Crew Cab Truck",
+        "description": "SUV",
         "itemization": 36000,
         "proposedAmount": 0,
         "amount": 36000,
@@ -3129,7 +3254,7 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "564000",
         "accountName": "Machinery & Equipment",
-        "description": "4x4 Crew Cab Truck",
+        "description": "SUV",
         "itemization": 36000,
         "proposedAmount": 0,
         "amount": 36000,
@@ -3139,12 +3264,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "County Administration",
-    "total": 2270000,
+    "total": 2215402,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 2071000,
-        "percent": 91.2,
+        "amount": 2016402,
+        "percent": 91,
         "items": [
           {
             "proposal": "County Administration",
@@ -3153,19 +3278,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 1429186,
-            "amount": 1429186,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "County Administration",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "*OMB entered",
-            "itemization": 0,
-            "proposedAmount": 9961,
-            "amount": 9961,
+            "proposedAmount": 1387560,
+            "amount": 1387560,
             "category": "Personnel & Benefits"
           },
           {
@@ -3186,8 +3300,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 106573,
-            "amount": 106573,
+            "proposedAmount": 103787,
+            "amount": 103787,
             "category": "Personnel & Benefits"
           },
           {
@@ -3208,8 +3322,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 250676,
-            "amount": 250676,
+            "proposedAmount": 250549,
+            "amount": 250549,
             "category": "Personnel & Benefits"
           },
           {
@@ -3219,8 +3333,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 3367,
-            "amount": 3367,
+            "proposedAmount": 3269,
+            "amount": 3269,
             "category": "Personnel & Benefits"
           }
         ]
@@ -3275,7 +3389,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 35000,
-        "percent": 1.5,
+        "percent": 1.6,
         "items": [
           {
             "proposal": "County Administration",
@@ -3419,19 +3533,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 1429186,
-        "amount": 1429186,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "County Administration",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "*OMB entered",
-        "itemization": 0,
-        "proposedAmount": 9961,
-        "amount": 9961,
+        "proposedAmount": 1387560,
+        "amount": 1387560,
         "category": "Personnel & Benefits"
       },
       {
@@ -3452,8 +3555,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 106573,
-        "amount": 106573,
+        "proposedAmount": 103787,
+        "amount": 103787,
         "category": "Personnel & Benefits"
       },
       {
@@ -3474,8 +3577,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 250676,
-        "amount": 250676,
+        "proposedAmount": 250549,
+        "amount": 250549,
         "category": "Personnel & Benefits"
       },
       {
@@ -3485,8 +3588,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 3367,
-        "amount": 3367,
+        "proposedAmount": 3269,
+        "amount": 3269,
         "category": "Personnel & Benefits"
       },
       {
@@ -3753,12 +3856,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Eagle Springs Golf and Recreation Center",
-    "total": 2212000,
+    "total": 1824803,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 1009500,
-        "percent": 45.6,
+        "amount": 922303,
+        "percent": 50.5,
         "items": [
           {
             "proposal": "Eagle Springs Golf and Recreation Center",
@@ -3767,19 +3870,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 593293,
-            "amount": 593293,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Eagle Springs Golf and Recreation Center",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 4095,
-            "amount": 4095,
+            "proposedAmount": 534602,
+            "amount": 534602,
             "category": "Personnel & Benefits"
           },
           {
@@ -3811,8 +3903,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 44890,
-            "amount": 44890,
+            "proposedAmount": 40400,
+            "amount": 40400,
             "category": "Personnel & Benefits"
           },
           {
@@ -3822,8 +3914,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Retirement Contributions",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 79930,
-            "amount": 79930,
+            "proposedAmount": 74093,
+            "amount": 74093,
             "category": "Personnel & Benefits"
           },
           {
@@ -3833,8 +3925,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 190123,
-            "amount": 190123,
+            "proposedAmount": 176765,
+            "amount": 176765,
             "category": "Personnel & Benefits"
           },
           {
@@ -3844,8 +3936,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 7169,
-            "amount": 7169,
+            "proposedAmount": 6443,
+            "amount": 6443,
             "category": "Personnel & Benefits"
           }
         ]
@@ -3853,7 +3945,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 428000,
-        "percent": 19.3,
+        "percent": 23.5,
         "items": [
           {
             "proposal": "Eagle Springs Golf and Recreation Center",
@@ -3924,38 +4016,9 @@ window.wcDepartmentExpenses = [
         ]
       },
       {
-        "category": "Buildings & Infrastructure",
-        "amount": 425000,
-        "percent": 19.2,
-        "items": [
-          {
-            "proposal": "Eagle Springs Golf and Recreation Center",
-            "type": "Expenses",
-            "accountCode": "563000",
-            "accountName": "Infrastructure",
-            "description": "Phase II",
-            "itemization": 300000,
-            "proposedAmount": 0,
-            "amount": 300000,
-            "category": "Buildings & Infrastructure"
-          },
-          {
-            "proposal": "Eagle Springs Golf and Recreation Center",
-            "type": "Expenses",
-            "accountCode": "563000",
-            "accountName": "Infrastructure",
-            "description": "Parking improvements, green improvements",
-            "itemization": 125000,
-            "proposedAmount": 0,
-            "amount": 125000,
-            "category": "Buildings & Infrastructure"
-          }
-        ]
-      },
-      {
         "category": "Facilities, Utilities & Maintenance",
         "amount": 210500,
-        "percent": 9.5,
+        "percent": 11.5,
         "items": [
           {
             "proposal": "Eagle Springs Golf and Recreation Center",
@@ -3993,9 +4056,27 @@ window.wcDepartmentExpenses = [
         ]
       },
       {
+        "category": "Buildings & Infrastructure",
+        "amount": 125000,
+        "percent": 6.9,
+        "items": [
+          {
+            "proposal": "Eagle Springs Golf and Recreation Center",
+            "type": "Expenses",
+            "accountCode": "563000",
+            "accountName": "Infrastructure",
+            "description": "Parking improvements, green improvements",
+            "itemization": 125000,
+            "proposedAmount": 0,
+            "amount": 125000,
+            "category": "Buildings & Infrastructure"
+          }
+        ]
+      },
+      {
         "category": "Vehicles & Equipment",
         "amount": 81000,
-        "percent": 3.7,
+        "percent": 4.4,
         "items": [
           {
             "proposal": "Eagle Springs Golf and Recreation Center",
@@ -4024,7 +4105,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 21000,
-        "percent": 0.9,
+        "percent": 1.2,
         "items": [
           {
             "proposal": "Eagle Springs Golf and Recreation Center",
@@ -4053,7 +4134,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Contingency & Other",
         "amount": 20000,
-        "percent": 0.9,
+        "percent": 1.1,
         "items": [
           {
             "proposal": "Eagle Springs Golf and Recreation Center",
@@ -4071,7 +4152,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Travel & Training",
         "amount": 14000,
-        "percent": 0.6,
+        "percent": 0.8,
         "items": [
           {
             "proposal": "Eagle Springs Golf and Recreation Center",
@@ -4100,7 +4181,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Professional Services",
         "amount": 3000,
-        "percent": 0.1,
+        "percent": 0.2,
         "items": [
           {
             "proposal": "Eagle Springs Golf and Recreation Center",
@@ -4142,34 +4223,12 @@ window.wcDepartmentExpenses = [
       {
         "proposal": "Eagle Springs Golf and Recreation Center",
         "type": "Expenses",
-        "accountCode": "563000",
-        "accountName": "Infrastructure",
-        "description": "Phase II",
-        "itemization": 300000,
-        "proposedAmount": 0,
-        "amount": 300000,
-        "category": "Buildings & Infrastructure"
-      },
-      {
-        "proposal": "Eagle Springs Golf and Recreation Center",
-        "type": "Expenses",
         "accountCode": "512000",
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 593293,
-        "amount": 593293,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Eagle Springs Golf and Recreation Center",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 4095,
-        "amount": 4095,
+        "proposedAmount": 534602,
+        "amount": 534602,
         "category": "Personnel & Benefits"
       },
       {
@@ -4201,8 +4260,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 44890,
-        "amount": 44890,
+        "proposedAmount": 40400,
+        "amount": 40400,
         "category": "Personnel & Benefits"
       },
       {
@@ -4212,8 +4271,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Retirement Contributions",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 79930,
-        "amount": 79930,
+        "proposedAmount": 74093,
+        "amount": 74093,
         "category": "Personnel & Benefits"
       },
       {
@@ -4223,8 +4282,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 190123,
-        "amount": 190123,
+        "proposedAmount": 176765,
+        "amount": 176765,
         "category": "Personnel & Benefits"
       },
       {
@@ -4234,8 +4293,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 7169,
-        "amount": 7169,
+        "proposedAmount": 6443,
+        "amount": 6443,
         "category": "Personnel & Benefits"
       },
       {
@@ -4418,12 +4477,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Eagle Springs Grill",
-    "total": 570000,
+    "total": 561801,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 385100,
-        "percent": 67.6,
+        "amount": 376901,
+        "percent": 67.1,
         "items": [
           {
             "proposal": "Eagle Springs Grill",
@@ -4432,8 +4491,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 265179,
-            "amount": 265179,
+            "proposedAmount": 257650,
+            "amount": 257650,
             "category": "Personnel & Benefits"
           },
           {
@@ -4454,8 +4513,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 19776,
-            "amount": 19776,
+            "proposedAmount": 19200,
+            "amount": 19200,
             "category": "Personnel & Benefits"
           },
           {
@@ -4476,8 +4535,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 60702,
-            "amount": 60702,
+            "proposedAmount": 60679,
+            "amount": 60679,
             "category": "Personnel & Benefits"
           },
           {
@@ -4487,8 +4546,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 2435,
-            "amount": 2435,
+            "proposedAmount": 2364,
+            "amount": 2364,
             "category": "Personnel & Benefits"
           }
         ]
@@ -4496,7 +4555,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 160300,
-        "percent": 28.1,
+        "percent": 28.5,
         "items": [
           {
             "proposal": "Eagle Springs Grill",
@@ -4658,8 +4717,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 265179,
-        "amount": 265179,
+        "proposedAmount": 257650,
+        "amount": 257650,
         "category": "Personnel & Benefits"
       },
       {
@@ -4680,8 +4739,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 19776,
-        "amount": 19776,
+        "proposedAmount": 19200,
+        "amount": 19200,
         "category": "Personnel & Benefits"
       },
       {
@@ -4702,8 +4761,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 60702,
-        "amount": 60702,
+        "proposedAmount": 60679,
+        "amount": 60679,
         "category": "Personnel & Benefits"
       },
       {
@@ -4713,8 +4772,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 2435,
-        "amount": 2435,
+        "proposedAmount": 2364,
+        "amount": 2364,
         "category": "Personnel & Benefits"
       },
       {
@@ -4798,12 +4857,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Emergency Management",
-    "total": 888000,
+    "total": 904656,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 679871,
-        "percent": 76.6,
+        "amount": 696527,
+        "percent": 77,
         "items": [
           {
             "proposal": "Emergency Management",
@@ -4812,19 +4871,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 454870,
-            "amount": 454870,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Emergency Management",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "*OMB entered",
-            "itemization": 0,
-            "proposedAmount": 2143,
-            "amount": 2143,
+            "proposedAmount": 468763,
+            "amount": 468763,
             "category": "Personnel & Benefits"
           },
           {
@@ -4834,8 +4882,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 34806,
-            "amount": 34806,
+            "proposedAmount": 35861,
+            "amount": 35861,
             "category": "Personnel & Benefits"
           },
           {
@@ -4845,8 +4893,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Retirement Contributions",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 97732,
-            "amount": 97732,
+            "proposedAmount": 101526,
+            "amount": 101526,
             "category": "Personnel & Benefits"
           },
           {
@@ -4856,8 +4904,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 89819,
-            "amount": 89819,
+            "proposedAmount": 89861,
+            "amount": 89861,
             "category": "Personnel & Benefits"
           },
           {
@@ -4867,8 +4915,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 501,
-            "amount": 501,
+            "proposedAmount": 516,
+            "amount": 516,
             "category": "Personnel & Benefits"
           }
         ]
@@ -4876,7 +4924,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 83000,
-        "percent": 9.3,
+        "percent": 9.2,
         "items": [
           {
             "proposal": "Emergency Management",
@@ -4985,17 +5033,28 @@ window.wcDepartmentExpenses = [
       {
         "category": "Vehicles & Equipment",
         "amount": 30000,
-        "percent": 3.4,
+        "percent": 3.3,
         "items": [
           {
             "proposal": "Emergency Management",
             "type": "Expenses",
             "accountCode": "564000",
             "accountName": "Machinery & Equipment",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 30000,
-            "amount": 30000,
+            "description": "UTV (BCC10404)",
+            "itemization": 20000,
+            "proposedAmount": 0,
+            "amount": 20000,
+            "category": "Vehicles & Equipment"
+          },
+          {
+            "proposal": "Emergency Management",
+            "type": "Expenses",
+            "accountCode": "564000",
+            "accountName": "Machinery & Equipment",
+            "description": "Harris XL 200",
+            "itemization": 10000,
+            "proposedAmount": 0,
+            "amount": 10000,
             "category": "Vehicles & Equipment"
           }
         ]
@@ -5003,7 +5062,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Facilities, Utilities & Maintenance",
         "amount": 28000,
-        "percent": 3.2,
+        "percent": 3.1,
         "items": [
           {
             "proposal": "Emergency Management",
@@ -5021,10 +5080,21 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "546000",
             "accountName": "Repair & Maintenance",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 23000,
-            "amount": 23000,
+            "description": "Heavy Rescue repairs",
+            "itemization": 15000,
+            "proposedAmount": 0,
+            "amount": 15000,
+            "category": "Facilities, Utilities & Maintenance"
+          },
+          {
+            "proposal": "Emergency Management",
+            "type": "Expenses",
+            "accountCode": "546000",
+            "accountName": "Repair & Maintenance",
+            "description": "Repair & Maintenance",
+            "itemization": 8000,
+            "proposedAmount": 0,
+            "amount": 8000,
             "category": "Facilities, Utilities & Maintenance"
           }
         ]
@@ -5038,19 +5108,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 454870,
-        "amount": 454870,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Emergency Management",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "*OMB entered",
-        "itemization": 0,
-        "proposedAmount": 2143,
-        "amount": 2143,
+        "proposedAmount": 468763,
+        "amount": 468763,
         "category": "Personnel & Benefits"
       },
       {
@@ -5060,8 +5119,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 34806,
-        "amount": 34806,
+        "proposedAmount": 35861,
+        "amount": 35861,
         "category": "Personnel & Benefits"
       },
       {
@@ -5071,8 +5130,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Retirement Contributions",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 97732,
-        "amount": 97732,
+        "proposedAmount": 101526,
+        "amount": 101526,
         "category": "Personnel & Benefits"
       },
       {
@@ -5082,8 +5141,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 89819,
-        "amount": 89819,
+        "proposedAmount": 89861,
+        "amount": 89861,
         "category": "Personnel & Benefits"
       },
       {
@@ -5093,8 +5152,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 501,
-        "amount": 501,
+        "proposedAmount": 516,
+        "amount": 516,
         "category": "Personnel & Benefits"
       },
       {
@@ -5146,10 +5205,21 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "546000",
         "accountName": "Repair & Maintenance",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 23000,
-        "amount": 23000,
+        "description": "Heavy Rescue repairs",
+        "itemization": 15000,
+        "proposedAmount": 0,
+        "amount": 15000,
+        "category": "Facilities, Utilities & Maintenance"
+      },
+      {
+        "proposal": "Emergency Management",
+        "type": "Expenses",
+        "accountCode": "546000",
+        "accountName": "Repair & Maintenance",
+        "description": "Repair & Maintenance",
+        "itemization": 8000,
+        "proposedAmount": 0,
+        "amount": 8000,
         "category": "Facilities, Utilities & Maintenance"
       },
       {
@@ -5212,22 +5282,33 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "564000",
         "accountName": "Machinery & Equipment",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 30000,
-        "amount": 30000,
+        "description": "UTV (BCC10404)",
+        "itemization": 20000,
+        "proposedAmount": 0,
+        "amount": 20000,
+        "category": "Vehicles & Equipment"
+      },
+      {
+        "proposal": "Emergency Management",
+        "type": "Expenses",
+        "accountCode": "564000",
+        "accountName": "Machinery & Equipment",
+        "description": "Harris XL 200",
+        "itemization": 10000,
+        "proposedAmount": 0,
+        "amount": 10000,
         "category": "Vehicles & Equipment"
       }
     ]
   },
   {
     "department": "Engineering Services",
-    "total": 2545000,
+    "total": 2213906,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 2249000,
-        "percent": 88.4,
+        "amount": 2035406,
+        "percent": 91.9,
         "items": [
           {
             "proposal": "Engineering Services",
@@ -5236,19 +5317,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 1628444,
-            "amount": 1628444,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Engineering Services",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 15214,
-            "amount": 15214,
+            "proposedAmount": 1471211,
+            "amount": 1471211,
             "category": "Personnel & Benefits"
           },
           {
@@ -5258,8 +5328,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 124576,
-            "amount": 124576,
+            "proposedAmount": 112556,
+            "amount": 112556,
             "category": "Personnel & Benefits"
           },
           {
@@ -5269,8 +5339,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Retirement Contributions",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 252715,
-            "amount": 252715,
+            "proposedAmount": 237325,
+            "amount": 237325,
             "category": "Personnel & Benefits"
           },
           {
@@ -5280,8 +5350,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 225872,
-            "amount": 225872,
+            "proposedAmount": 212319,
+            "amount": 212319,
             "category": "Personnel & Benefits"
           },
           {
@@ -5291,34 +5361,16 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 2179,
-            "amount": 2179,
+            "proposedAmount": 1995,
+            "amount": 1995,
             "category": "Personnel & Benefits"
-          }
-        ]
-      },
-      {
-        "category": "Professional Services",
-        "amount": 100000,
-        "percent": 3.9,
-        "items": [
-          {
-            "proposal": "Engineering Services",
-            "type": "Expenses",
-            "accountCode": "531000",
-            "accountName": "Professional Services",
-            "description": "Includes professional services for projects that are not covered under other departments.  Based upon the capital improvement projects for the next FY identified in the adopted Five Year Work Plan.",
-            "itemization": 0,
-            "proposedAmount": 100000,
-            "amount": 100000,
-            "category": "Professional Services"
           }
         ]
       },
       {
         "category": "Supplies & Fuel",
         "amount": 54500,
-        "percent": 2.1,
+        "percent": 2.5,
         "items": [
           {
             "proposal": "Engineering Services",
@@ -5358,7 +5410,7 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "552002",
             "accountName": "Fuel",
-            "description": "Includes fuel cost",
+            "description": "",
             "itemization": 0,
             "proposedAmount": 20000,
             "amount": 20000,
@@ -5367,9 +5419,56 @@ window.wcDepartmentExpenses = [
         ]
       },
       {
-        "category": "Facilities, Utilities & Maintenance",
+        "category": "Vehicles & Equipment",
         "amount": 45000,
-        "percent": 1.8,
+        "percent": 2,
+        "items": [
+          {
+            "proposal": "Engineering Services",
+            "type": "Expenses",
+            "accountCode": "564000",
+            "accountName": "Machinery & Equipment",
+            "description": "4x4 Crew Cab Truck",
+            "itemization": 45000,
+            "proposedAmount": 0,
+            "amount": 45000,
+            "category": "Vehicles & Equipment"
+          }
+        ]
+      },
+      {
+        "category": "Communications & Technology",
+        "amount": 34000,
+        "percent": 1.5,
+        "items": [
+          {
+            "proposal": "Engineering Services",
+            "type": "Expenses",
+            "accountCode": "541000",
+            "accountName": "Communication Services",
+            "description": "Includes mobile devices, iPads and desk phones.",
+            "itemization": 0,
+            "proposedAmount": 9000,
+            "amount": 9000,
+            "category": "Communications & Technology"
+          },
+          {
+            "proposal": "Engineering Services",
+            "type": "Expenses",
+            "accountCode": "554000",
+            "accountName": "Books, Publications, Subscriptions, or Memberships",
+            "description": "Includes mobile devices, iPads and desk phones.",
+            "itemization": 0,
+            "proposedAmount": 25000,
+            "amount": 25000,
+            "category": "Communications & Technology"
+          }
+        ]
+      },
+      {
+        "category": "Facilities, Utilities & Maintenance",
+        "amount": 30000,
+        "percent": 1.4,
         "items": [
           {
             "proposal": "Engineering Services",
@@ -5389,62 +5488,15 @@ window.wcDepartmentExpenses = [
             "accountName": "Repair & Maintenance",
             "description": "Includes estimated vehicle maintenance and repair (tire replacement & oil changes included; fuel expenses moved to Operating Supplies).",
             "itemization": 0,
-            "proposedAmount": 25000,
-            "amount": 25000,
+            "proposedAmount": 10000,
+            "amount": 10000,
             "category": "Facilities, Utilities & Maintenance"
           }
         ]
       },
       {
-        "category": "Vehicles & Equipment",
-        "amount": 45000,
-        "percent": 1.8,
-        "items": [
-          {
-            "proposal": "Engineering Services",
-            "type": "Expenses",
-            "accountCode": "564000",
-            "accountName": "Machinery & Equipment",
-            "description": "4x4 Crew Cab Truck",
-            "itemization": 45000,
-            "proposedAmount": 0,
-            "amount": 45000,
-            "category": "Vehicles & Equipment"
-          }
-        ]
-      },
-      {
-        "category": "Communications & Technology",
-        "amount": 34000,
-        "percent": 1.3,
-        "items": [
-          {
-            "proposal": "Engineering Services",
-            "type": "Expenses",
-            "accountCode": "541000",
-            "accountName": "Communication Services",
-            "description": "Includes mobile devices, iPads and desk phones.",
-            "itemization": 0,
-            "proposedAmount": 9000,
-            "amount": 9000,
-            "category": "Communications & Technology"
-          },
-          {
-            "proposal": "Engineering Services",
-            "type": "Expenses",
-            "accountCode": "554000",
-            "accountName": "Books, Publications, Subscriptions, or Memberships",
-            "description": "Includes license renewals, organizational memberships, AutoCAD subscription, ICPR/Stormwise Stormwater Modeling software, etc.",
-            "itemization": 0,
-            "proposedAmount": 25000,
-            "amount": 25000,
-            "category": "Communications & Technology"
-          }
-        ]
-      },
-      {
         "category": "Travel & Training",
-        "amount": 17500,
+        "amount": 15000,
         "percent": 0.7,
         "items": [
           {
@@ -5454,8 +5506,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Travel & Per Diem",
             "description": "Includes Conference/Training travel (hotel/transportation) for Engineering and Surveying PDHs and CEUs for licenses and certifications. Actual cost of classes for continuing education/license requirements is under the Training line item.",
             "itemization": 0,
-            "proposedAmount": 7500,
-            "amount": 7500,
+            "proposedAmount": 5000,
+            "amount": 5000,
             "category": "Travel & Training"
           },
           {
@@ -5480,19 +5532,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 1628444,
-        "amount": 1628444,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Engineering Services",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 15214,
-        "amount": 15214,
+        "proposedAmount": 1471211,
+        "amount": 1471211,
         "category": "Personnel & Benefits"
       },
       {
@@ -5502,8 +5543,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 124576,
-        "amount": 124576,
+        "proposedAmount": 112556,
+        "amount": 112556,
         "category": "Personnel & Benefits"
       },
       {
@@ -5513,8 +5554,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Retirement Contributions",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 252715,
-        "amount": 252715,
+        "proposedAmount": 237325,
+        "amount": 237325,
         "category": "Personnel & Benefits"
       },
       {
@@ -5524,8 +5565,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 225872,
-        "amount": 225872,
+        "proposedAmount": 212319,
+        "amount": 212319,
         "category": "Personnel & Benefits"
       },
       {
@@ -5535,20 +5576,9 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 2179,
-        "amount": 2179,
+        "proposedAmount": 1995,
+        "amount": 1995,
         "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Engineering Services",
-        "type": "Expenses",
-        "accountCode": "531000",
-        "accountName": "Professional Services",
-        "description": "Includes professional services for projects that are not covered under other departments.  Based upon the capital improvement projects for the next FY identified in the adopted Five Year Work Plan.",
-        "itemization": 0,
-        "proposedAmount": 100000,
-        "amount": 100000,
-        "category": "Professional Services"
       },
       {
         "proposal": "Engineering Services",
@@ -5557,8 +5587,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Travel & Per Diem",
         "description": "Includes Conference/Training travel (hotel/transportation) for Engineering and Surveying PDHs and CEUs for licenses and certifications. Actual cost of classes for continuing education/license requirements is under the Training line item.",
         "itemization": 0,
-        "proposedAmount": 7500,
-        "amount": 7500,
+        "proposedAmount": 5000,
+        "amount": 5000,
         "category": "Travel & Training"
       },
       {
@@ -5601,8 +5631,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Repair & Maintenance",
         "description": "Includes estimated vehicle maintenance and repair (tire replacement & oil changes included; fuel expenses moved to Operating Supplies).",
         "itemization": 0,
-        "proposedAmount": 25000,
-        "amount": 25000,
+        "proposedAmount": 10000,
+        "amount": 10000,
         "category": "Facilities, Utilities & Maintenance"
       },
       {
@@ -5632,7 +5662,7 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "552002",
         "accountName": "Fuel",
-        "description": "Includes fuel cost",
+        "description": "",
         "itemization": 0,
         "proposedAmount": 20000,
         "amount": 20000,
@@ -5643,7 +5673,7 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "554000",
         "accountName": "Books, Publications, Subscriptions, or Memberships",
-        "description": "Includes license renewals, organizational memberships, AutoCAD subscription, ICPR/Stormwise Stormwater Modeling software, etc.",
+        "description": "Includes mobile devices, iPads and desk phones.",
         "itemization": 0,
         "proposedAmount": 25000,
         "amount": 25000,
@@ -5675,12 +5705,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Environmental Resources",
-    "total": 850000,
+    "total": 698968,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 452909,
-        "percent": 53.3,
+        "amount": 441877,
+        "percent": 63.2,
         "items": [
           {
             "proposal": "Environmental Resources",
@@ -5689,19 +5719,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 316298,
-            "amount": 316298,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Environmental Resources",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "*OMB entered",
-            "itemization": 0,
-            "proposedAmount": 1078,
-            "amount": 1078,
+            "proposedAmount": 307086,
+            "amount": 307086,
             "category": "Personnel & Benefits"
           },
           {
@@ -5711,8 +5730,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 24197,
-            "amount": 24197,
+            "proposedAmount": 23493,
+            "amount": 23493,
             "category": "Personnel & Benefits"
           },
           {
@@ -5733,8 +5752,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 60803,
-            "amount": 60803,
+            "proposedAmount": 60775,
+            "amount": 60775,
             "category": "Personnel & Benefits"
           },
           {
@@ -5744,56 +5763,16 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 348,
-            "amount": 348,
+            "proposedAmount": 338,
+            "amount": 338,
             "category": "Personnel & Benefits"
           }
         ]
       },
       {
-        "category": "Vehicles & Equipment",
-        "amount": 195000,
-        "percent": 22.9,
-        "items": [
-          {
-            "proposal": "Environmental Resources",
-            "type": "Expenses",
-            "accountCode": "564000",
-            "accountName": "Machinery & Equipment",
-            "description": "ATV Trailer",
-            "itemization": 2500,
-            "proposedAmount": 0,
-            "amount": 2500,
-            "category": "Vehicles & Equipment"
-          },
-          {
-            "proposal": "Environmental Resources",
-            "type": "Expenses",
-            "accountCode": "564000",
-            "accountName": "Machinery & Equipment",
-            "description": "ATV Side-by-side",
-            "itemization": 17500,
-            "proposedAmount": 0,
-            "amount": 17500,
-            "category": "Vehicles & Equipment"
-          },
-          {
-            "proposal": "Environmental Resources",
-            "type": "Expenses",
-            "accountCode": "564000",
-            "accountName": "Machinery & Equipment",
-            "description": "Vessel and associated trailer",
-            "itemization": 175000,
-            "proposedAmount": 0,
-            "amount": 175000,
-            "category": "Vehicles & Equipment"
-          }
-        ]
-      },
-      {
         "category": "Professional Services",
-        "amount": 137875,
-        "percent": 16.2,
+        "amount": 112875,
+        "percent": 16.1,
         "items": [
           {
             "proposal": "Environmental Resources",
@@ -5827,24 +5806,53 @@ window.wcDepartmentExpenses = [
             "proposedAmount": 0,
             "amount": 50000,
             "category": "Professional Services"
+          }
+        ]
+      },
+      {
+        "category": "Vehicles & Equipment",
+        "amount": 80000,
+        "percent": 11.4,
+        "items": [
+          {
+            "proposal": "Environmental Resources",
+            "type": "Expenses",
+            "accountCode": "564000",
+            "accountName": "Machinery & Equipment",
+            "description": "ATV Trailer",
+            "itemization": 2500,
+            "proposedAmount": 0,
+            "amount": 2500,
+            "category": "Vehicles & Equipment"
           },
           {
             "proposal": "Environmental Resources",
             "type": "Expenses",
-            "accountCode": "534000",
-            "accountName": "Other Services",
-            "description": "Emerald Coast Regional Planning Council - Small Quantity Generator",
-            "itemization": 25000,
+            "accountCode": "564000",
+            "accountName": "Machinery & Equipment",
+            "description": "ATV Side-by-side",
+            "itemization": 17500,
             "proposedAmount": 0,
-            "amount": 25000,
-            "category": "Professional Services"
+            "amount": 17500,
+            "category": "Vehicles & Equipment"
+          },
+          {
+            "proposal": "Environmental Resources",
+            "type": "Expenses",
+            "accountCode": "564000",
+            "accountName": "Machinery & Equipment",
+            "description": "Vessel and associated trailer",
+            "itemization": 60000,
+            "proposedAmount": 0,
+            "amount": 60000,
+            "category": "Vehicles & Equipment"
           }
         ]
       },
       {
         "category": "Supplies & Fuel",
         "amount": 34216,
-        "percent": 4,
+        "percent": 4.9,
         "items": [
           {
             "proposal": "Environmental Resources",
@@ -5884,7 +5892,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Travel & Training",
         "amount": 18000,
-        "percent": 2.1,
+        "percent": 2.6,
         "items": [
           {
             "proposal": "Environmental Resources",
@@ -5913,7 +5921,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 7500,
-        "percent": 0.9,
+        "percent": 1.1,
         "items": [
           {
             "proposal": "Environmental Resources",
@@ -5942,7 +5950,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Facilities, Utilities & Maintenance",
         "amount": 4000,
-        "percent": 0.5,
+        "percent": 0.6,
         "items": [
           {
             "proposal": "Environmental Resources",
@@ -5984,19 +5992,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 316298,
-        "amount": 316298,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Environmental Resources",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "*OMB entered",
-        "itemization": 0,
-        "proposedAmount": 1078,
-        "amount": 1078,
+        "proposedAmount": 307086,
+        "amount": 307086,
         "category": "Personnel & Benefits"
       },
       {
@@ -6006,8 +6003,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 24197,
-        "amount": 24197,
+        "proposedAmount": 23493,
+        "amount": 23493,
         "category": "Personnel & Benefits"
       },
       {
@@ -6028,8 +6025,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 60803,
-        "amount": 60803,
+        "proposedAmount": 60775,
+        "amount": 60775,
         "category": "Personnel & Benefits"
       },
       {
@@ -6039,8 +6036,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 348,
-        "amount": 348,
+        "proposedAmount": 338,
+        "amount": 338,
         "category": "Personnel & Benefits"
       },
       {
@@ -6074,17 +6071,6 @@ window.wcDepartmentExpenses = [
         "itemization": 50000,
         "proposedAmount": 0,
         "amount": 50000,
-        "category": "Professional Services"
-      },
-      {
-        "proposal": "Environmental Resources",
-        "type": "Expenses",
-        "accountCode": "534000",
-        "accountName": "Other Services",
-        "description": "Emerald Coast Regional Planning Council - Small Quantity Generator",
-        "itemization": 25000,
-        "proposedAmount": 0,
-        "amount": 25000,
         "category": "Professional Services"
       },
       {
@@ -6214,21 +6200,21 @@ window.wcDepartmentExpenses = [
         "accountCode": "564000",
         "accountName": "Machinery & Equipment",
         "description": "Vessel and associated trailer",
-        "itemization": 175000,
+        "itemization": 60000,
         "proposedAmount": 0,
-        "amount": 175000,
+        "amount": 60000,
         "category": "Vehicles & Equipment"
       }
     ]
   },
   {
     "department": "Extension Office",
-    "total": 598000,
+    "total": 584347,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 515605,
-        "percent": 86.2,
+        "amount": 501952,
+        "percent": 85.9,
         "items": [
           {
             "proposal": "Extension Office",
@@ -6237,19 +6223,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 411693,
-            "amount": 411693,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Extension Office",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "*OMB entered",
-            "itemization": 0,
-            "proposedAmount": 681,
-            "amount": 681,
+            "proposedAmount": 399702,
+            "amount": 399702,
             "category": "Personnel & Benefits"
           },
           {
@@ -6259,8 +6234,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 31495,
-            "amount": 31495,
+            "proposedAmount": 30578,
+            "amount": 30578,
             "category": "Personnel & Benefits"
           },
           {
@@ -6281,8 +6256,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 28112,
-            "amount": 28112,
+            "proposedAmount": 28075,
+            "amount": 28075,
             "category": "Personnel & Benefits"
           },
           {
@@ -6292,8 +6267,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 905,
-            "amount": 905,
+            "proposedAmount": 878,
+            "amount": 878,
             "category": "Personnel & Benefits"
           }
         ]
@@ -6301,7 +6276,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Vehicles & Equipment",
         "amount": 40000,
-        "percent": 6.7,
+        "percent": 6.8,
         "items": [
           {
             "proposal": "Extension Office",
@@ -6319,7 +6294,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 16395,
-        "percent": 2.7,
+        "percent": 2.8,
         "items": [
           {
             "proposal": "Extension Office",
@@ -6348,7 +6323,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 11000,
-        "percent": 1.8,
+        "percent": 1.9,
         "items": [
           {
             "proposal": "Extension Office",
@@ -6377,7 +6352,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Travel & Training",
         "amount": 8000,
-        "percent": 1.3,
+        "percent": 1.4,
         "items": [
           {
             "proposal": "Extension Office",
@@ -6448,19 +6423,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 411693,
-        "amount": 411693,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Extension Office",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "*OMB entered",
-        "itemization": 0,
-        "proposedAmount": 681,
-        "amount": 681,
+        "proposedAmount": 399702,
+        "amount": 399702,
         "category": "Personnel & Benefits"
       },
       {
@@ -6470,8 +6434,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 31495,
-        "amount": 31495,
+        "proposedAmount": 30578,
+        "amount": 30578,
         "category": "Personnel & Benefits"
       },
       {
@@ -6492,8 +6456,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 28112,
-        "amount": 28112,
+        "proposedAmount": 28075,
+        "amount": 28075,
         "category": "Personnel & Benefits"
       },
       {
@@ -6503,8 +6467,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 905,
-        "amount": 905,
+        "proposedAmount": 878,
+        "amount": 878,
         "category": "Personnel & Benefits"
       },
       {
@@ -6610,12 +6574,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Geographic Info System",
-    "total": 845000,
+    "total": 824115,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 688075,
-        "percent": 81.4,
+        "amount": 667190,
+        "percent": 81,
         "items": [
           {
             "proposal": "Geographic Info System",
@@ -6624,19 +6588,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 477520,
-            "amount": 477520,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Geographic Info System",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 5854,
-            "amount": 5854,
+            "proposedAmount": 463612,
+            "amount": 463612,
             "category": "Personnel & Benefits"
           },
           {
@@ -6646,8 +6599,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 36531,
-            "amount": 36531,
+            "proposedAmount": 35467,
+            "amount": 35467,
             "category": "Personnel & Benefits"
           },
           {
@@ -6668,8 +6621,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 102599,
-            "amount": 102599,
+            "proposedAmount": 102556,
+            "amount": 102556,
             "category": "Personnel & Benefits"
           },
           {
@@ -6679,8 +6632,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 526,
-            "amount": 526,
+            "proposedAmount": 510,
+            "amount": 510,
             "category": "Personnel & Benefits"
           }
         ]
@@ -6688,7 +6641,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 83825,
-        "percent": 9.9,
+        "percent": 10.2,
         "items": [
           {
             "proposal": "Geographic Info System",
@@ -6783,7 +6736,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 42600,
-        "percent": 5,
+        "percent": 5.2,
         "items": [
           {
             "proposal": "Geographic Info System",
@@ -6878,7 +6831,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Travel & Training",
         "amount": 22000,
-        "percent": 2.6,
+        "percent": 2.7,
         "items": [
           {
             "proposal": "Geographic Info System",
@@ -6975,19 +6928,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 477520,
-        "amount": 477520,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Geographic Info System",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 5854,
-        "amount": 5854,
+        "proposedAmount": 463612,
+        "amount": 463612,
         "category": "Personnel & Benefits"
       },
       {
@@ -6997,8 +6939,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 36531,
-        "amount": 36531,
+        "proposedAmount": 35467,
+        "amount": 35467,
         "category": "Personnel & Benefits"
       },
       {
@@ -7019,8 +6961,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 102599,
-        "amount": 102599,
+        "proposedAmount": 102556,
+        "amount": 102556,
         "category": "Personnel & Benefits"
       },
       {
@@ -7030,8 +6972,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 526,
-        "amount": 526,
+        "proposedAmount": 510,
+        "amount": 510,
         "category": "Personnel & Benefits"
       },
       {
@@ -7291,12 +7233,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Human Resources",
-    "total": 1430000,
+    "total": 1400621,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 1259447,
-        "percent": 88.1,
+        "amount": 1230068,
+        "percent": 87.8,
         "items": [
           {
             "proposal": "Human Resources",
@@ -7305,19 +7247,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 836015,
-            "amount": 836015,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Human Resources",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 3064,
-            "amount": 3064,
+            "proposedAmount": 811665,
+            "amount": 811665,
             "category": "Personnel & Benefits"
           },
           {
@@ -7327,8 +7258,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 63956,
-            "amount": 63956,
+            "proposedAmount": 62093,
+            "amount": 62093,
             "category": "Personnel & Benefits"
           },
           {
@@ -7349,8 +7280,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 214499,
-            "amount": 214499,
+            "proposedAmount": 214424,
+            "amount": 214424,
             "category": "Personnel & Benefits"
           },
           {
@@ -7360,8 +7291,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 920,
-            "amount": 920,
+            "proposedAmount": 893,
+            "amount": 893,
             "category": "Personnel & Benefits"
           }
         ]
@@ -7369,7 +7300,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Travel & Training",
         "amount": 54653,
-        "percent": 3.8,
+        "percent": 3.9,
         "items": [
           {
             "proposal": "Human Resources",
@@ -7398,9 +7329,9 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "555001",
             "accountName": "Employee Tuition Reimbursement",
-            "description": "Employee Tuition Reimbursement",
-            "itemization": 0,
-            "proposedAmount": 30000,
+            "description": "Employee Tuition Reimbursement Program",
+            "itemization": 30000,
+            "proposedAmount": 0,
             "amount": 30000,
             "category": "Travel & Training"
           }
@@ -7637,19 +7568,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 836015,
-        "amount": 836015,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Human Resources",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 3064,
-        "amount": 3064,
+        "proposedAmount": 811665,
+        "amount": 811665,
         "category": "Personnel & Benefits"
       },
       {
@@ -7659,8 +7579,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 63956,
-        "amount": 63956,
+        "proposedAmount": 62093,
+        "amount": 62093,
         "category": "Personnel & Benefits"
       },
       {
@@ -7681,8 +7601,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 214499,
-        "amount": 214499,
+        "proposedAmount": 214424,
+        "amount": 214424,
         "category": "Personnel & Benefits"
       },
       {
@@ -7692,8 +7612,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 920,
-        "amount": 920,
+        "proposedAmount": 893,
+        "amount": 893,
         "category": "Personnel & Benefits"
       },
       {
@@ -7899,9 +7819,9 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "555001",
         "accountName": "Employee Tuition Reimbursement",
-        "description": "Employee Tuition Reimbursement",
-        "itemization": 0,
-        "proposedAmount": 30000,
+        "description": "Employee Tuition Reimbursement Program",
+        "itemization": 30000,
+        "proposedAmount": 0,
         "amount": 30000,
         "category": "Travel & Training"
       },
@@ -7920,12 +7840,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Libraries",
-    "total": 2257000,
+    "total": 2120494,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 1627000,
-        "percent": 72.1,
+        "amount": 1590494,
+        "percent": 75,
         "items": [
           {
             "proposal": "Libraries",
@@ -7934,19 +7854,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 1122091,
-            "amount": 1122091,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Libraries",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 1345,
-            "amount": 1345,
+            "proposedAmount": 1089554,
+            "amount": 1089554,
             "category": "Personnel & Benefits"
           },
           {
@@ -7956,8 +7865,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 85458,
-            "amount": 85458,
+            "proposedAmount": 82969,
+            "amount": 82969,
             "category": "Personnel & Benefits"
           },
           {
@@ -7978,8 +7887,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 279318,
-            "amount": 279318,
+            "proposedAmount": 279218,
+            "amount": 279218,
             "category": "Personnel & Benefits"
           },
           {
@@ -7989,8 +7898,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 1229,
-            "amount": 1229,
+            "proposedAmount": 1194,
+            "amount": 1194,
             "category": "Personnel & Benefits"
           }
         ]
@@ -7998,7 +7907,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 188000,
-        "percent": 8.3,
+        "percent": 8.9,
         "items": [
           {
             "proposal": "Libraries",
@@ -8038,17 +7947,28 @@ window.wcDepartmentExpenses = [
       {
         "category": "Library Materials",
         "amount": 150000,
-        "percent": 6.6,
+        "percent": 7.1,
         "items": [
           {
             "proposal": "Libraries",
             "type": "Expenses",
             "accountCode": "566000",
             "accountName": "Books, Publications, Library Materials",
-            "description": "significant increase in print and e-books circulation and costs; supports Dolly Parton's Imagination Library directly instead of through nonprofit grant process at $20,000.",
-            "itemization": 0,
-            "proposedAmount": 150000,
-            "amount": 150000,
+            "description": "Print and e-books circulation and costs",
+            "itemization": 130000,
+            "proposedAmount": 0,
+            "amount": 130000,
+            "category": "Library Materials"
+          },
+          {
+            "proposal": "Libraries",
+            "type": "Expenses",
+            "accountCode": "566000",
+            "accountName": "Books, Publications, Library Materials",
+            "description": "Support Dolly Parton's Imagination Library directly instead of through nonprofit grant process at $20,000.",
+            "itemization": 20000,
+            "proposedAmount": 0,
+            "amount": 20000,
             "category": "Library Materials"
           }
         ]
@@ -8056,7 +7976,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 113000,
-        "percent": 5,
+        "percent": 5.3,
         "items": [
           {
             "proposal": "Libraries",
@@ -8116,27 +8036,9 @@ window.wcDepartmentExpenses = [
         ]
       },
       {
-        "category": "Buildings & Infrastructure",
-        "amount": 100000,
-        "percent": 4.4,
-        "items": [
-          {
-            "proposal": "Libraries",
-            "type": "Expenses",
-            "accountCode": "562000",
-            "accountName": "Buildings",
-            "description": "Renovation of CrossPoint Church to relocated the Freeport Library,",
-            "itemization": 0,
-            "proposedAmount": 100000,
-            "amount": 100000,
-            "category": "Buildings & Infrastructure"
-          }
-        ]
-      },
-      {
         "category": "Facilities, Utilities & Maintenance",
         "amount": 65500,
-        "percent": 2.9,
+        "percent": 3.1,
         "items": [
           {
             "proposal": "Libraries",
@@ -8229,19 +8131,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 1122091,
-        "amount": 1122091,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Libraries",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 1345,
-        "amount": 1345,
+        "proposedAmount": 1089554,
+        "amount": 1089554,
         "category": "Personnel & Benefits"
       },
       {
@@ -8251,8 +8142,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 85458,
-        "amount": 85458,
+        "proposedAmount": 82969,
+        "amount": 82969,
         "category": "Personnel & Benefits"
       },
       {
@@ -8273,8 +8164,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 279318,
-        "amount": 279318,
+        "proposedAmount": 279218,
+        "amount": 279218,
         "category": "Personnel & Benefits"
       },
       {
@@ -8284,8 +8175,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 1229,
-        "amount": 1229,
+        "proposedAmount": 1194,
+        "amount": 1194,
         "category": "Personnel & Benefits"
       },
       {
@@ -8445,23 +8336,23 @@ window.wcDepartmentExpenses = [
       {
         "proposal": "Libraries",
         "type": "Expenses",
-        "accountCode": "562000",
-        "accountName": "Buildings",
-        "description": "Renovation of CrossPoint Church to relocated the Freeport Library,",
-        "itemization": 0,
-        "proposedAmount": 100000,
-        "amount": 100000,
-        "category": "Buildings & Infrastructure"
+        "accountCode": "566000",
+        "accountName": "Books, Publications, Library Materials",
+        "description": "Print and e-books circulation and costs",
+        "itemization": 130000,
+        "proposedAmount": 0,
+        "amount": 130000,
+        "category": "Library Materials"
       },
       {
         "proposal": "Libraries",
         "type": "Expenses",
         "accountCode": "566000",
         "accountName": "Books, Publications, Library Materials",
-        "description": "significant increase in print and e-books circulation and costs; supports Dolly Parton's Imagination Library directly instead of through nonprofit grant process at $20,000.",
-        "itemization": 0,
-        "proposedAmount": 150000,
-        "amount": 150000,
+        "description": "Support Dolly Parton's Imagination Library directly instead of through nonprofit grant process at $20,000.",
+        "itemization": 20000,
+        "proposedAmount": 0,
+        "amount": 20000,
         "category": "Library Materials"
       }
     ]
@@ -8504,13 +8395,50 @@ window.wcDepartmentExpenses = [
     ]
   },
   {
+    "department": "Non-Profit Program Funding",
+    "total": 500000,
+    "categories": [
+      {
+        "category": "Grants, Aid & Transfers",
+        "amount": 500000,
+        "percent": 100,
+        "items": [
+          {
+            "proposal": "Non-Profit Program Funding",
+            "type": "Expenses",
+            "accountCode": "583000",
+            "accountName": "Other Grants & Aid",
+            "description": "Non-Profit Program Funding",
+            "itemization": 0,
+            "proposedAmount": 500000,
+            "amount": 500000,
+            "category": "Grants, Aid & Transfers"
+          }
+        ]
+      }
+    ],
+    "items": [
+      {
+        "proposal": "Non-Profit Program Funding",
+        "type": "Expenses",
+        "accountCode": "583000",
+        "accountName": "Other Grants & Aid",
+        "description": "Non-Profit Program Funding",
+        "itemization": 0,
+        "proposedAmount": 500000,
+        "amount": 500000,
+        "category": "Grants, Aid & Transfers"
+      }
+    ]
+  },
+  {
     "department": "Office of Management and Budget",
-    "total": 1245000,
+    "total": 1209849,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 969250,
-        "percent": 77.9,
+        "amount": 946299,
+        "percent": 78.2,
         "items": [
           {
             "proposal": "Office of Management and Budget",
@@ -8519,19 +8447,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 677141,
-            "amount": 677141,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Office of Management and Budget",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 1992,
-            "amount": 1992,
+            "proposedAmount": 657419,
+            "amount": 657419,
             "category": "Personnel & Benefits"
           },
           {
@@ -8541,8 +8458,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 50638,
-            "amount": 50638,
+            "proposedAmount": 49482,
+            "amount": 49482,
             "category": "Personnel & Benefits"
           },
           {
@@ -8563,8 +8480,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 100487,
-            "amount": 100487,
+            "proposedAmount": 100427,
+            "amount": 100427,
             "category": "Personnel & Benefits"
           },
           {
@@ -8574,8 +8491,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 745,
-            "amount": 745,
+            "proposedAmount": 724,
+            "amount": 724,
             "category": "Personnel & Benefits"
           }
         ]
@@ -8583,7 +8500,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 230000,
-        "percent": 18.5,
+        "percent": 19,
         "items": [
           {
             "proposal": "Office of Management and Budget",
@@ -8621,38 +8538,9 @@ window.wcDepartmentExpenses = [
         ]
       },
       {
-        "category": "Travel & Training",
-        "amount": 15000,
-        "percent": 1.2,
-        "items": [
-          {
-            "proposal": "Office of Management and Budget",
-            "type": "Expenses",
-            "accountCode": "540000",
-            "accountName": "Travel & Per Diem",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 10000,
-            "amount": 10000,
-            "category": "Travel & Training"
-          },
-          {
-            "proposal": "Office of Management and Budget",
-            "type": "Expenses",
-            "accountCode": "555000",
-            "accountName": "Training",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 5000,
-            "amount": 5000,
-            "category": "Travel & Training"
-          }
-        ]
-      },
-      {
         "category": "Professional Services",
         "amount": 13000,
-        "percent": 1,
+        "percent": 1.1,
         "items": [
           {
             "proposal": "Office of Management and Budget",
@@ -8669,7 +8557,7 @@ window.wcDepartmentExpenses = [
       },
       {
         "category": "Supplies & Fuel",
-        "amount": 11250,
+        "amount": 11050,
         "percent": 0.9,
         "items": [
           {
@@ -8712,15 +8600,15 @@ window.wcDepartmentExpenses = [
             "accountName": "Fuel",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 1000,
-            "amount": 1000,
+            "proposedAmount": 800,
+            "amount": 800,
             "category": "Supplies & Fuel"
           }
         ]
       },
       {
         "category": "Facilities, Utilities & Maintenance",
-        "amount": 6500,
+        "amount": 5500,
         "percent": 0.5,
         "items": [
           {
@@ -8741,9 +8629,38 @@ window.wcDepartmentExpenses = [
             "accountName": "Repair & Maintenance",
             "description": "Vehicle & Building maintenance",
             "itemization": 0,
-            "proposedAmount": 3000,
-            "amount": 3000,
+            "proposedAmount": 2000,
+            "amount": 2000,
             "category": "Facilities, Utilities & Maintenance"
+          }
+        ]
+      },
+      {
+        "category": "Travel & Training",
+        "amount": 4000,
+        "percent": 0.3,
+        "items": [
+          {
+            "proposal": "Office of Management and Budget",
+            "type": "Expenses",
+            "accountCode": "540000",
+            "accountName": "Travel & Per Diem",
+            "description": "",
+            "itemization": 0,
+            "proposedAmount": 2000,
+            "amount": 2000,
+            "category": "Travel & Training"
+          },
+          {
+            "proposal": "Office of Management and Budget",
+            "type": "Expenses",
+            "accountCode": "555000",
+            "accountName": "Training",
+            "description": "",
+            "itemization": 0,
+            "proposedAmount": 2000,
+            "amount": 2000,
+            "category": "Travel & Training"
           }
         ]
       }
@@ -8756,19 +8673,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 677141,
-        "amount": 677141,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Office of Management and Budget",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 1992,
-        "amount": 1992,
+        "proposedAmount": 657419,
+        "amount": 657419,
         "category": "Personnel & Benefits"
       },
       {
@@ -8778,8 +8684,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 50638,
-        "amount": 50638,
+        "proposedAmount": 49482,
+        "amount": 49482,
         "category": "Personnel & Benefits"
       },
       {
@@ -8800,8 +8706,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 100487,
-        "amount": 100487,
+        "proposedAmount": 100427,
+        "amount": 100427,
         "category": "Personnel & Benefits"
       },
       {
@@ -8811,8 +8717,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 745,
-        "amount": 745,
+        "proposedAmount": 724,
+        "amount": 724,
         "category": "Personnel & Benefits"
       },
       {
@@ -8833,8 +8739,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Travel & Per Diem",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 10000,
-        "amount": 10000,
+        "proposedAmount": 2000,
+        "amount": 2000,
         "category": "Travel & Training"
       },
       {
@@ -8877,8 +8783,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Repair & Maintenance",
         "description": "Vehicle & Building maintenance",
         "itemization": 0,
-        "proposedAmount": 3000,
-        "amount": 3000,
+        "proposedAmount": 2000,
+        "amount": 2000,
         "category": "Facilities, Utilities & Maintenance"
       },
       {
@@ -8910,8 +8816,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Fuel",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 1000,
-        "amount": 1000,
+        "proposedAmount": 800,
+        "amount": 800,
         "category": "Supplies & Fuel"
       },
       {
@@ -8943,20 +8849,20 @@ window.wcDepartmentExpenses = [
         "accountName": "Training",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 5000,
-        "amount": 5000,
+        "proposedAmount": 2000,
+        "amount": 2000,
         "category": "Travel & Training"
       }
     ]
   },
   {
     "department": "Office of the County Attorney",
-    "total": 1897000,
+    "total": 1867199,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 1147000,
-        "percent": 60.5,
+        "amount": 1117199,
+        "percent": 59.8,
         "items": [
           {
             "proposal": "Office of the County Attorney",
@@ -8965,19 +8871,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 779327,
-            "amount": 779327,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Office of the County Attorney",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 5259,
-            "amount": 5259,
+            "proposedAmount": 756614,
+            "amount": 756614,
             "category": "Personnel & Benefits"
           },
           {
@@ -8987,8 +8882,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 59654,
-            "amount": 59654,
+            "proposedAmount": 57916,
+            "amount": 57916,
             "category": "Personnel & Benefits"
           },
           {
@@ -9009,8 +8904,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 135084,
-            "amount": 135084,
+            "proposedAmount": 135015,
+            "amount": 135015,
             "category": "Personnel & Benefits"
           },
           {
@@ -9020,8 +8915,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 764,
-            "amount": 764,
+            "proposedAmount": 742,
+            "amount": 742,
             "category": "Personnel & Benefits"
           }
         ]
@@ -9029,7 +8924,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Professional Services",
         "amount": 660000,
-        "percent": 34.8,
+        "percent": 35.3,
         "items": [
           {
             "proposal": "Office of the County Attorney",
@@ -9087,7 +8982,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 23500,
-        "percent": 1.2,
+        "percent": 1.3,
         "items": [
           {
             "proposal": "Office of the County Attorney",
@@ -9116,7 +9011,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 21500,
-        "percent": 1.1,
+        "percent": 1.2,
         "items": [
           {
             "proposal": "Office of the County Attorney",
@@ -9202,19 +9097,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 779327,
-        "amount": 779327,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Office of the County Attorney",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 5259,
-        "amount": 5259,
+        "proposedAmount": 756614,
+        "amount": 756614,
         "category": "Personnel & Benefits"
       },
       {
@@ -9224,8 +9108,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 59654,
-        "amount": 59654,
+        "proposedAmount": 57916,
+        "amount": 57916,
         "category": "Personnel & Benefits"
       },
       {
@@ -9246,8 +9130,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 135084,
-        "amount": 135084,
+        "proposedAmount": 135015,
+        "amount": 135015,
         "category": "Personnel & Benefits"
       },
       {
@@ -9257,8 +9141,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 764,
-        "amount": 764,
+        "proposedAmount": 742,
+        "amount": 742,
         "category": "Personnel & Benefits"
       },
       {
@@ -9397,12 +9281,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Planning",
-    "total": 7266000,
+    "total": 6942505,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 4932975,
-        "percent": 67.9,
+        "amount": 4909480,
+        "percent": 70.7,
         "items": [
           {
             "proposal": "Planning",
@@ -9411,19 +9295,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 3007917,
-            "amount": 3007917,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Planning",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "*OMB entered",
-            "itemization": 0,
-            "proposedAmount": 17892,
-            "amount": 17892,
+            "proposedAmount": 2924070,
+            "amount": 2924070,
             "category": "Personnel & Benefits"
           },
           {
@@ -9444,8 +9317,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 230106,
-            "amount": 230106,
+            "proposedAmount": 223692,
+            "amount": 223692,
             "category": "Personnel & Benefits"
           },
           {
@@ -9455,8 +9328,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Retirement Contributions",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 412708,
-            "amount": 412708,
+            "proposedAmount": 413236,
+            "amount": 413236,
             "category": "Personnel & Benefits"
           },
           {
@@ -9466,8 +9339,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 669080,
-            "amount": 669080,
+            "proposedAmount": 668824,
+            "amount": 668824,
             "category": "Personnel & Benefits"
           },
           {
@@ -9477,8 +9350,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 3272,
-            "amount": 3272,
+            "proposedAmount": 3181,
+            "amount": 3181,
             "category": "Personnel & Benefits"
           },
           {
@@ -9486,10 +9359,10 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "512000",
             "accountName": "Regular Salaries & Wages",
-            "description": "*Does not include the STR Code enforcement officer, this is account in Code Compliance",
+            "description": "",
             "itemization": 0,
-            "proposedAmount": 368218,
-            "amount": 368218,
+            "proposedAmount": 427816,
+            "amount": 427816,
             "category": "Personnel & Benefits"
           },
           {
@@ -9499,8 +9372,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 29502,
-            "amount": 29502,
+            "proposedAmount": 32660,
+            "amount": 32660,
             "category": "Personnel & Benefits"
           },
           {
@@ -9510,8 +9383,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Retirement Contributions",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 52529,
-            "amount": 52529,
+            "proposedAmount": 59898,
+            "amount": 59898,
             "category": "Personnel & Benefits"
           },
           {
@@ -9521,8 +9394,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 100402,
-            "amount": 100402,
+            "proposedAmount": 113706,
+            "amount": 113706,
             "category": "Personnel & Benefits"
           },
           {
@@ -9532,16 +9405,16 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 1349,
-            "amount": 1349,
+            "proposedAmount": 2397,
+            "amount": 2397,
             "category": "Personnel & Benefits"
           }
         ]
       },
       {
         "category": "Professional Services",
-        "amount": 1552000,
-        "percent": 21.4,
+        "amount": 1252000,
+        "percent": 18,
         "items": [
           {
             "proposal": "Planning",
@@ -9574,17 +9447,6 @@ window.wcDepartmentExpenses = [
             "itemization": 110000,
             "proposedAmount": 0,
             "amount": 110000,
-            "category": "Professional Services"
-          },
-          {
-            "proposal": "Planning",
-            "type": "Expenses",
-            "accountCode": "531000",
-            "accountName": "Professional Services",
-            "description": "Parks & Rec Master Plan",
-            "itemization": 300000,
-            "proposedAmount": 0,
-            "amount": 300000,
             "category": "Professional Services"
           },
           {
@@ -9636,7 +9498,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 325825,
-        "percent": 4.5,
+        "percent": 4.7,
         "items": [
           {
             "proposal": "Planning",
@@ -9808,7 +9670,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Vehicles & Equipment",
         "amount": 109000,
-        "percent": 1.5,
+        "percent": 1.6,
         "items": [
           {
             "proposal": "Planning",
@@ -9837,7 +9699,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Facilities, Utilities & Maintenance",
         "amount": 104500,
-        "percent": 1.4,
+        "percent": 1.5,
         "items": [
           {
             "proposal": "Planning",
@@ -10109,19 +9971,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 3007917,
-        "amount": 3007917,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Planning",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "*OMB entered",
-        "itemization": 0,
-        "proposedAmount": 17892,
-        "amount": 17892,
+        "proposedAmount": 2924070,
+        "amount": 2924070,
         "category": "Personnel & Benefits"
       },
       {
@@ -10142,8 +9993,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 230106,
-        "amount": 230106,
+        "proposedAmount": 223692,
+        "amount": 223692,
         "category": "Personnel & Benefits"
       },
       {
@@ -10153,8 +10004,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Retirement Contributions",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 412708,
-        "amount": 412708,
+        "proposedAmount": 413236,
+        "amount": 413236,
         "category": "Personnel & Benefits"
       },
       {
@@ -10164,8 +10015,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 669080,
-        "amount": 669080,
+        "proposedAmount": 668824,
+        "amount": 668824,
         "category": "Personnel & Benefits"
       },
       {
@@ -10175,8 +10026,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 3272,
-        "amount": 3272,
+        "proposedAmount": 3181,
+        "amount": 3181,
         "category": "Personnel & Benefits"
       },
       {
@@ -10210,17 +10061,6 @@ window.wcDepartmentExpenses = [
         "itemization": 110000,
         "proposedAmount": 0,
         "amount": 110000,
-        "category": "Professional Services"
-      },
-      {
-        "proposal": "Planning",
-        "type": "Expenses",
-        "accountCode": "531000",
-        "accountName": "Professional Services",
-        "description": "Parks & Rec Master Plan",
-        "itemization": 300000,
-        "proposedAmount": 0,
-        "amount": 300000,
         "category": "Professional Services"
       },
       {
@@ -10547,10 +10387,10 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "512000",
         "accountName": "Regular Salaries & Wages",
-        "description": "*Does not include the STR Code enforcement officer, this is account in Code Compliance",
+        "description": "",
         "itemization": 0,
-        "proposedAmount": 368218,
-        "amount": 368218,
+        "proposedAmount": 427816,
+        "amount": 427816,
         "category": "Personnel & Benefits"
       },
       {
@@ -10560,8 +10400,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 29502,
-        "amount": 29502,
+        "proposedAmount": 32660,
+        "amount": 32660,
         "category": "Personnel & Benefits"
       },
       {
@@ -10571,8 +10411,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Retirement Contributions",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 52529,
-        "amount": 52529,
+        "proposedAmount": 59898,
+        "amount": 59898,
         "category": "Personnel & Benefits"
       },
       {
@@ -10582,8 +10422,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 100402,
-        "amount": 100402,
+        "proposedAmount": 113706,
+        "amount": 113706,
         "category": "Personnel & Benefits"
       },
       {
@@ -10593,8 +10433,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 1349,
-        "amount": 1349,
+        "proposedAmount": 2397,
+        "amount": 2397,
         "category": "Personnel & Benefits"
       },
       {
@@ -10744,12 +10584,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Probation",
-    "total": 372000,
+    "total": 363585,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 330950,
-        "percent": 89,
+        "amount": 322535,
+        "percent": 88.7,
         "items": [
           {
             "proposal": "Probation",
@@ -10758,19 +10598,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 219447,
-            "amount": 219447,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Probation",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "*OMB entered",
-            "itemization": 0,
-            "proposedAmount": 1423,
-            "amount": 1423,
+            "proposedAmount": 213055,
+            "amount": 213055,
             "category": "Personnel & Benefits"
           },
           {
@@ -10780,8 +10609,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 16788,
-            "amount": 16788,
+            "proposedAmount": 16299,
+            "amount": 16299,
             "category": "Personnel & Benefits"
           },
           {
@@ -10802,8 +10631,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 60259,
-            "amount": 60259,
+            "proposedAmount": 60239,
+            "amount": 60239,
             "category": "Personnel & Benefits"
           },
           {
@@ -10813,8 +10642,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 3141,
-            "amount": 3141,
+            "proposedAmount": 3050,
+            "amount": 3050,
             "category": "Personnel & Benefits"
           }
         ]
@@ -10822,7 +10651,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Professional Services",
         "amount": 19000,
-        "percent": 5.1,
+        "percent": 5.2,
         "items": [
           {
             "proposal": "Probation",
@@ -10851,7 +10680,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 12250,
-        "percent": 3.3,
+        "percent": 3.4,
         "items": [
           {
             "proposal": "Probation",
@@ -10891,7 +10720,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 6500,
-        "percent": 1.7,
+        "percent": 1.8,
         "items": [
           {
             "proposal": "Probation",
@@ -10973,19 +10802,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 219447,
-        "amount": 219447,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Probation",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "*OMB entered",
-        "itemization": 0,
-        "proposedAmount": 1423,
-        "amount": 1423,
+        "proposedAmount": 213055,
+        "amount": 213055,
         "category": "Personnel & Benefits"
       },
       {
@@ -10995,8 +10813,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 16788,
-        "amount": 16788,
+        "proposedAmount": 16299,
+        "amount": 16299,
         "category": "Personnel & Benefits"
       },
       {
@@ -11017,8 +10835,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 60259,
-        "amount": 60259,
+        "proposedAmount": 60239,
+        "amount": 60239,
         "category": "Personnel & Benefits"
       },
       {
@@ -11028,8 +10846,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 3141,
-        "amount": 3141,
+        "proposedAmount": 3050,
+        "amount": 3050,
         "category": "Personnel & Benefits"
       },
       {
@@ -11461,12 +11279,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Purchasing",
-    "total": 1185000,
+    "total": 1161373,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 914200,
-        "percent": 77.1,
+        "amount": 890573,
+        "percent": 76.7,
         "items": [
           {
             "proposal": "Purchasing",
@@ -11475,19 +11293,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 638649,
-            "amount": 638649,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Purchasing",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 3201,
-            "amount": 3201,
+            "proposedAmount": 619798,
+            "amount": 619798,
             "category": "Personnel & Benefits"
           },
           {
@@ -11497,8 +11304,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 49513,
-            "amount": 49513,
+            "proposedAmount": 48071,
+            "amount": 48071,
             "category": "Personnel & Benefits"
           },
           {
@@ -11519,8 +11326,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 132112,
-            "amount": 132112,
+            "proposedAmount": 132054,
+            "amount": 132054,
             "category": "Personnel & Benefits"
           },
           {
@@ -11530,8 +11337,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 2564,
-            "amount": 2564,
+            "proposedAmount": 2489,
+            "amount": 2489,
             "category": "Personnel & Benefits"
           }
         ]
@@ -11539,7 +11346,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Communications & Technology",
         "amount": 94600,
-        "percent": 8,
+        "percent": 8.1,
         "items": [
           {
             "proposal": "Purchasing",
@@ -11579,7 +11386,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Buildings & Infrastructure",
         "amount": 90000,
-        "percent": 7.6,
+        "percent": 7.7,
         "items": [
           {
             "proposal": "Purchasing",
@@ -11597,7 +11404,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 36000,
-        "percent": 3,
+        "percent": 3.1,
         "items": [
           {
             "proposal": "Purchasing",
@@ -11615,7 +11422,7 @@ window.wcDepartmentExpenses = [
             "type": "Expenses",
             "accountCode": "552000",
             "accountName": "Operating Supplies",
-            "description": "Storage systems for county wide supplies",
+            "description": "",
             "itemization": 0,
             "proposedAmount": 29500,
             "amount": 29500,
@@ -11730,19 +11537,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 638649,
-        "amount": 638649,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Purchasing",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "",
-        "itemization": 0,
-        "proposedAmount": 3201,
-        "amount": 3201,
+        "proposedAmount": 619798,
+        "amount": 619798,
         "category": "Personnel & Benefits"
       },
       {
@@ -11752,8 +11548,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 49513,
-        "amount": 49513,
+        "proposedAmount": 48071,
+        "amount": 48071,
         "category": "Personnel & Benefits"
       },
       {
@@ -11774,8 +11570,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 132112,
-        "amount": 132112,
+        "proposedAmount": 132054,
+        "amount": 132054,
         "category": "Personnel & Benefits"
       },
       {
@@ -11785,8 +11581,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 2564,
-        "amount": 2564,
+        "proposedAmount": 2489,
+        "amount": 2489,
         "category": "Personnel & Benefits"
       },
       {
@@ -11871,7 +11667,7 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "552000",
         "accountName": "Operating Supplies",
-        "description": "Storage systems for county wide supplies",
+        "description": "",
         "itemization": 0,
         "proposedAmount": 29500,
         "amount": 29500,
@@ -11936,12 +11732,12 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Recreation",
-    "total": 868000,
+    "total": 851686,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 596837,
-        "percent": 68.8,
+        "amount": 580523,
+        "percent": 68.2,
         "items": [
           {
             "proposal": "Recreation",
@@ -11950,19 +11746,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 354525,
-            "amount": 354525,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Recreation",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "*OMB entered",
-            "itemization": 0,
-            "proposedAmount": 5179,
-            "amount": 5179,
+            "proposedAmount": 344221,
+            "amount": 344221,
             "category": "Personnel & Benefits"
           },
           {
@@ -11994,8 +11779,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 27064,
-            "amount": 27064,
+            "proposedAmount": 26276,
+            "amount": 26276,
             "category": "Personnel & Benefits"
           },
           {
@@ -12016,8 +11801,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 86490,
-            "amount": 86490,
+            "proposedAmount": 86459,
+            "amount": 86459,
             "category": "Personnel & Benefits"
           },
           {
@@ -12027,8 +11812,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 390,
-            "amount": 390,
+            "proposedAmount": 378,
+            "amount": 378,
             "category": "Personnel & Benefits"
           }
         ]
@@ -12036,7 +11821,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 152928,
-        "percent": 17.6,
+        "percent": 18,
         "items": [
           {
             "proposal": "Recreation",
@@ -12076,17 +11861,28 @@ window.wcDepartmentExpenses = [
       {
         "category": "Professional Services",
         "amount": 50000,
-        "percent": 5.8,
+        "percent": 5.9,
         "items": [
           {
             "proposal": "Recreation",
             "type": "Expenses",
             "accountCode": "534000",
             "accountName": "Other Services",
-            "description": "Added $20,000 for event security",
-            "itemization": 0,
-            "proposedAmount": 50000,
-            "amount": 50000,
+            "description": "Event Security",
+            "itemization": 20000,
+            "proposedAmount": 0,
+            "amount": 20000,
+            "category": "Professional Services"
+          },
+          {
+            "proposal": "Recreation",
+            "type": "Expenses",
+            "accountCode": "534000",
+            "accountName": "Other Services",
+            "description": "Officials",
+            "itemization": 30000,
+            "proposedAmount": 0,
+            "amount": 30000,
             "category": "Professional Services"
           }
         ]
@@ -12187,19 +11983,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 354525,
-        "amount": 354525,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Recreation",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "*OMB entered",
-        "itemization": 0,
-        "proposedAmount": 5179,
-        "amount": 5179,
+        "proposedAmount": 344221,
+        "amount": 344221,
         "category": "Personnel & Benefits"
       },
       {
@@ -12231,8 +12016,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 27064,
-        "amount": 27064,
+        "proposedAmount": 26276,
+        "amount": 26276,
         "category": "Personnel & Benefits"
       },
       {
@@ -12253,8 +12038,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 86490,
-        "amount": 86490,
+        "proposedAmount": 86459,
+        "amount": 86459,
         "category": "Personnel & Benefits"
       },
       {
@@ -12264,8 +12049,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 390,
-        "amount": 390,
+        "proposedAmount": 378,
+        "amount": 378,
         "category": "Personnel & Benefits"
       },
       {
@@ -12273,10 +12058,21 @@ window.wcDepartmentExpenses = [
         "type": "Expenses",
         "accountCode": "534000",
         "accountName": "Other Services",
-        "description": "Added $20,000 for event security",
-        "itemization": 0,
-        "proposedAmount": 50000,
-        "amount": 50000,
+        "description": "Event Security",
+        "itemization": 20000,
+        "proposedAmount": 0,
+        "amount": 20000,
+        "category": "Professional Services"
+      },
+      {
+        "proposal": "Recreation",
+        "type": "Expenses",
+        "accountCode": "534000",
+        "accountName": "Other Services",
+        "description": "Officials",
+        "itemization": 30000,
+        "proposedAmount": 0,
+        "amount": 30000,
         "category": "Professional Services"
       },
       {
@@ -12528,11 +12324,11 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Soil Conservation",
-    "total": 150000,
+    "total": 146847,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 148520,
+        "amount": 145367,
         "percent": 99,
         "items": [
           {
@@ -12542,8 +12338,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 100076,
-            "amount": 100076,
+            "proposedAmount": 97179,
+            "amount": 97179,
             "category": "Personnel & Benefits"
           },
           {
@@ -12553,8 +12349,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 7608,
-            "amount": 7608,
+            "proposedAmount": 7387,
+            "amount": 7387,
             "category": "Personnel & Benefits"
           },
           {
@@ -12575,8 +12371,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 26425,
-            "amount": 26425,
+            "proposedAmount": 26416,
+            "amount": 26416,
             "category": "Personnel & Benefits"
           },
           {
@@ -12586,8 +12382,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 864,
-            "amount": 864,
+            "proposedAmount": 838,
+            "amount": 838,
             "category": "Personnel & Benefits"
           }
         ]
@@ -12637,8 +12433,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 100076,
-        "amount": 100076,
+        "proposedAmount": 97179,
+        "amount": 97179,
         "category": "Personnel & Benefits"
       },
       {
@@ -12648,8 +12444,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 7608,
-        "amount": 7608,
+        "proposedAmount": 7387,
+        "amount": 7387,
         "category": "Personnel & Benefits"
       },
       {
@@ -12670,8 +12466,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 26425,
-        "amount": 26425,
+        "proposedAmount": 26416,
+        "amount": 26416,
         "category": "Personnel & Benefits"
       },
       {
@@ -12681,8 +12477,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 864,
-        "amount": 864,
+        "proposedAmount": 838,
+        "amount": 838,
         "category": "Personnel & Benefits"
       },
       {
@@ -13363,12 +13159,41 @@ window.wcDepartmentExpenses = [
   },
   {
     "department": "Tax Collector",
-    "total": 8449400,
+    "total": 8249400,
     "categories": [
       {
+        "category": "Personnel & Benefits",
+        "amount": 7262320,
+        "percent": 88,
+        "items": [
+          {
+            "proposal": "Tax Collector",
+            "type": "Expenses",
+            "accountCode": "512000",
+            "accountName": "Regular Salaries & Wages",
+            "description": "",
+            "itemization": 0,
+            "proposedAmount": 7258320,
+            "amount": 7258320,
+            "category": "Personnel & Benefits"
+          },
+          {
+            "proposal": "Tax Collector",
+            "type": "Expenses",
+            "accountCode": "524000",
+            "accountName": "Workers' Compensation",
+            "description": "",
+            "itemization": 0,
+            "proposedAmount": 4000,
+            "amount": 4000,
+            "category": "Personnel & Benefits"
+          }
+        ]
+      },
+      {
         "category": "Contingency & Other",
-        "amount": 8260400,
-        "percent": 97.8,
+        "amount": 802080,
+        "percent": 9.7,
         "items": [
           {
             "proposal": "Tax Collector",
@@ -13377,8 +13202,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Other Current Charges",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 8260400,
-            "amount": 8260400,
+            "proposedAmount": 802080,
+            "amount": 802080,
             "category": "Contingency & Other"
           }
         ]
@@ -13418,27 +13243,20 @@ window.wcDepartmentExpenses = [
             "category": "Communications & Technology"
           }
         ]
-      },
-      {
-        "category": "Personnel & Benefits",
-        "amount": 4000,
-        "percent": 0,
-        "items": [
-          {
-            "proposal": "Tax Collector",
-            "type": "Expenses",
-            "accountCode": "524000",
-            "accountName": "Workers' Compensation",
-            "description": "",
-            "itemization": 0,
-            "proposedAmount": 4000,
-            "amount": 4000,
-            "category": "Personnel & Benefits"
-          }
-        ]
       }
     ],
     "items": [
+      {
+        "proposal": "Tax Collector",
+        "type": "Expenses",
+        "accountCode": "512000",
+        "accountName": "Regular Salaries & Wages",
+        "description": "",
+        "itemization": 0,
+        "proposedAmount": 7258320,
+        "amount": 7258320,
+        "category": "Personnel & Benefits"
+      },
       {
         "proposal": "Tax Collector",
         "type": "Expenses",
@@ -13479,20 +13297,20 @@ window.wcDepartmentExpenses = [
         "accountName": "Other Current Charges",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 8260400,
-        "amount": 8260400,
+        "proposedAmount": 802080,
+        "amount": 802080,
         "category": "Contingency & Other"
       }
     ]
   },
   {
     "department": "Veteran Services",
-    "total": 318000,
+    "total": 310155,
     "categories": [
       {
         "category": "Personnel & Benefits",
-        "amount": 300074,
-        "percent": 94.4,
+        "amount": 292229,
+        "percent": 94.2,
         "items": [
           {
             "proposal": "Veteran Services",
@@ -13501,19 +13319,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Regular Salaries & Wages",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 206356,
-            "amount": 206356,
-            "category": "Personnel & Benefits"
-          },
-          {
-            "proposal": "Veteran Services",
-            "type": "Expenses",
-            "accountCode": "512007",
-            "accountName": "Sick Leave Incentive Pay",
-            "description": "*OMB entered",
-            "itemization": 0,
-            "proposedAmount": 1350,
-            "amount": 1350,
+            "proposedAmount": 200346,
+            "amount": 200346,
             "category": "Personnel & Benefits"
           },
           {
@@ -13534,8 +13341,8 @@ window.wcDepartmentExpenses = [
             "accountName": "FICA Taxes & Medicare",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 15787,
-            "amount": 15787,
+            "proposedAmount": 15327,
+            "amount": 15327,
             "category": "Personnel & Benefits"
           },
           {
@@ -13556,8 +13363,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Life & Health Insurance",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 47765,
-            "amount": 47765,
+            "proposedAmount": 47746,
+            "amount": 47746,
             "category": "Personnel & Benefits"
           },
           {
@@ -13567,8 +13374,8 @@ window.wcDepartmentExpenses = [
             "accountName": "Workers' Compensation",
             "description": "",
             "itemization": 0,
-            "proposedAmount": 227,
-            "amount": 227,
+            "proposedAmount": 221,
+            "amount": 221,
             "category": "Personnel & Benefits"
           }
         ]
@@ -13634,7 +13441,7 @@ window.wcDepartmentExpenses = [
       {
         "category": "Supplies & Fuel",
         "amount": 3926,
-        "percent": 1.2,
+        "percent": 1.3,
         "items": [
           {
             "proposal": "Veteran Services",
@@ -13698,19 +13505,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Regular Salaries & Wages",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 206356,
-        "amount": 206356,
-        "category": "Personnel & Benefits"
-      },
-      {
-        "proposal": "Veteran Services",
-        "type": "Expenses",
-        "accountCode": "512007",
-        "accountName": "Sick Leave Incentive Pay",
-        "description": "*OMB entered",
-        "itemization": 0,
-        "proposedAmount": 1350,
-        "amount": 1350,
+        "proposedAmount": 200346,
+        "amount": 200346,
         "category": "Personnel & Benefits"
       },
       {
@@ -13731,8 +13527,8 @@ window.wcDepartmentExpenses = [
         "accountName": "FICA Taxes & Medicare",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 15787,
-        "amount": 15787,
+        "proposedAmount": 15327,
+        "amount": 15327,
         "category": "Personnel & Benefits"
       },
       {
@@ -13753,8 +13549,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Life & Health Insurance",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 47765,
-        "amount": 47765,
+        "proposedAmount": 47746,
+        "amount": 47746,
         "category": "Personnel & Benefits"
       },
       {
@@ -13764,8 +13560,8 @@ window.wcDepartmentExpenses = [
         "accountName": "Workers' Compensation",
         "description": "",
         "itemization": 0,
-        "proposedAmount": 227,
-        "amount": 227,
+        "proposedAmount": 221,
+        "amount": 221,
         "category": "Personnel & Benefits"
       },
       {
