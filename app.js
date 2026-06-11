@@ -1164,7 +1164,7 @@ function renderPersonnel() {
 
     $("#personnelControls").innerHTML = `
       <tr>
-        <td><strong>County General Fund FTE Total</strong></td>
+        <td><strong>Property Tax Funded FTE Total</strong></td>
         <td>${number(publicFteTotal)}</td>
         <td>
           <input
@@ -1669,6 +1669,17 @@ function expenseItemsForDepartment(department) {
 
 function expenseItemCode(item) {
   return String(item.accountCode || "").trim();
+}
+
+function lockedOperatingExpenseItem(item) {
+  const departmentId = normalizeBootstrapDepartmentId(item?.departmentId || "");
+  const accountCode = expenseItemCode(item);
+  const accountName = String(item?.accountName || item?.name || "").toLowerCase();
+
+  return (
+    (departmentId === "building-construction-and-maintenance" && accountName.includes("utility services")) ||
+    (departmentId === "board-of-county-commissioners" && accountCode === "545000")
+  );
 }
 
 function isPersonnelExpenseItem(item) {
