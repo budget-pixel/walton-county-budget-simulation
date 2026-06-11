@@ -2674,7 +2674,7 @@ function renderResultingShortfallForecast(totals) {
   const rows = [
     { year: "FY2027", amount: fy2027MillageShortfall },
     ...shortfallComponents()
-      .filter((year) => ["FY2028", "FY2029", "FY2030", "FY2031", "FY2032"].includes(year.year))
+      .filter((year) => ["FY2028", "FY2029"].includes(year.year))
       .map((year) => {
         const forecastShortfall = year.directRevenueReduction + year.expenseInflationPressure;
         return {
